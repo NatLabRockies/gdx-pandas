@@ -267,6 +267,74 @@ class GdxFile(MutableSequence, NeedsGamsDir):
                 symbol.load()
         return
 
+    def read_single_symbol(self,filename,target_symbol_name):
+        """
+        Optimized read method that only loads metadata for a specific symbol.
+
+        Parameters
+        ----------
+        filename : pathlib.Path or str
+            Path to the GDX file to read
+        target_symbol_name : str
+            Name of the specific symbol to read
+
+        Returns
+        -------
+        GdxSymbol
+            The requested symbol (not yet loaded with data)
+
+        Raises
+        ------
+        Error
+            If not self.empty or if symbol not found
+        """
+        if not self.empty:
+            raise Error("GdxFile.read_single_symbol can only be used if the GdxFile is .empty")
+
+        # open the file
+        rc = gdxcc.gdxOpenRead(self.H, str(filename))
+        if not rc[0]:
+            raise GdxError(self.H, f"Could not open {filename!r}")
+        self._filename = filename
+
+        # read in meta-data for the file
+        ret, self._version, self._producer = gdxcc.gdxFileVersion(self.H)
+        if ret != 1:
+            raise GdxError(self.H, "Could not get file version")
+        ret, symbol_count, element_count = gdxcc.gdxSystemInfo(self.H)
+        logger.debug(f"Opening '{filename}' with {symbol_count} symbols and "
+                    f"{element_count} elements, searching for '{target_symbol_name}' with optimized read.")
+
+        # read universal set
+        ret, name, dims, data_type = gdxcc.gdxSymbolInfo(self.H, 0)
+        if ret != 1:
+            raise GdxError(self.H, "Could not get symbol info for the universal set")
+        self.universal_set = GdxSymbol(name, data_type, dims=dims, file=self, index=0)
+
+        # search for target symbol without creating objects for others
+        target_symbol = None
+        for i in range(symbol_count):
+            index = i + 1
+            ret, name, dims, data_type = gdxcc.gdxSymbolInfo(self.H, index)
+            if ret != 1:
+                raise GdxError(self.H, f"Could not get symbol info for symbol {index}")
+
+            if name == target_symbol_name:
+                # found our target - create the symbol object with full metadata
+                try:
+                    target_symbol = GdxSymbol(name, data_type, dims=dims, file=self, index=index)
+                    self.append(target_symbol)
+                    logger.debug(f"Found and loaded metadata for symbol '{target_symbol_name}' at index {index}")
+                    break
+                except Exception as e:
+                    logger.error(f"Unable to initialize target GdxSymbol {name!r}, because {e}.")
+                    raise
+
+        if target_symbol is None:
+            raise Error(f"No symbol named '{target_symbol_name}' in '{filename}'")
+
+        return target_symbol
+
     def write(self,filename):
         """
         Writes this :py:class:`GdxFile` to filename
@@ -991,9 +1059,9 @@ class GdxSymbol(object):
         s += ", loaded" if self.loaded else ", not loaded"
         return s
 
-    def load(self, load_set_text=False):
+    def load(self,load_set_text=False,disable_gc=True):
         """
-        Loads this :py:class:`GdxSymbol` from its :py:attr:`file`, thereby popluating
+        Loads this :py:class:`GdxSymbol` from its :py:attr:`file`, thereby populating
         :py:attr:`dataframe`.
 
         Parameters
@@ -1001,6 +1069,9 @@ class GdxSymbol(object):
         load_set_text : bool
             If True (default is False) and this symbol is a :class:`GamsDataType.Set <GamsDataType>`,
             loads the GDX Text field into the :py:attr:`dataframe` rather than a `c_bool`.
+        disable_gc: bool
+            If True (default is True), disables Python's garbage collector when reading data to 
+            speed up the process.
         """
         if self.loaded:
             logger.info("Nothing to do. Symbol already loaded.")
@@ -1010,29 +1081,51 @@ class GdxSymbol(object):
         if not self.index:
             raise Error("Cannot load {} because there is no symbol index".format(repr(self)))
 
-        if self.data_type == GamsDataType.Parameter and HAVE_GDX2PY:
-            self.dataframe = gdx2py.par2list(self.file.filename,self.name) 
-            self._loaded = True
-            return
+        # GDX2PY does not have property .par2list and the lines below should be rewritten. Commenting out for now.
+        #if self.data_type == GamsDataType.Parameter and HAVE_GDX2PY:
+        #    self.dataframe = gdx2py.par2list(self.file.filename,self.name) 
+        #    self._loaded = True
+        #    return
 
-        _ret, records = gdxcc.gdxDataReadStrStart(self.file.H,self.index)
+        # preprocessing
+        _, records = gdxcc.gdxDataReadStrStart(self.file.H,self.index)
+
+        # Local bindings to speed up the loops
+        fH = self.file.H
+        gdxDataReadStr = gdxcc.gdxDataReadStr
+        gdxGetElemText = gdxcc.gdxGetElemText
+        value_indices = [col_ind for _, col_ind in self.value_cols]
 
         def reader():
-            handle = self.file.H
-            for i in range(records):
-                yield gdxcc.gdxDataReadStr(handle)
+            for _ in range(records):
+                yield gdxDataReadStr(fH)
 
-        vc = self.value_cols  # do this for speed in the next line
-        if load_set_text and (self.data_type == GamsDataType.Set):
-            data = [elements + [gdxcc.gdxGetElemText(self.file.H,int(values[col_ind]))[1] 
-                                for _col_name, col_ind in vc] 
-                    for _ret, elements, values, _afdim in reader()]
-            self._fixup_set_vals = False
-        else:
-            data = [elements + [values[col_ind] for col_name, col_ind in vc] for ret, elements, values, afdim in reader()]
-        self.dataframe = data
+        # Disable GC
+        import gc
+        gc_was_enabled = False
+        if disable_gc:
+            gc_was_enabled = gc.isenabled()
+            gc.disable()
+
+        try:
+            # Read data row by row
+            if load_set_text and (self.data_type == GamsDataType.Set):
+                self.dataframe = [elements + [gdxGetElemText(fH, int(values[i]))[1] 
+                                              for i in value_indices]
+                                  for _, elements, values, _ in reader()]
+                self._fixup_set_vals = False
+            else:
+                self.dataframe = [elements + [values[i] for i in value_indices] 
+                  for _, elements, values, _ in reader()]
+
+        finally:
+            # restore GC if changed
+            if disable_gc and gc_was_enabled and not gc.isenabled():
+                gc.enable()
+
         if not self.data_type in (GamsDataType.Set, GamsDataType.Alias):
             self.dataframe = special.convert_gdx_to_np_svs(self.dataframe, self.num_dims)
+
         self._loaded = True
         return
 
@@ -1078,6 +1171,7 @@ class GdxSymbol(object):
                                           self.data_type.value,
                                           userinfo):
             raise GdxError(self.file.H,"Could not start writing data for symbol {}".format(repr(self.name)))
+
         # set domain information
         if self.num_dims > 0:
             if self.index:
@@ -1085,24 +1179,42 @@ class GdxSymbol(object):
                     raise GdxError(self.file.H,"Could not set domain information for {}. Domains are {}".format(repr(self.name),repr(self.dims)))
             else:
                 logger.info("Not writing domain information because symbol index is unknown.")
+
+        if self.data_type not in (GamsDataType.Set, GamsDataType.Alias):
+            # Only reset index if actually needed for the conversion
+            if self.dataframe.index.duplicated().any() or not self.dataframe.index.is_monotonic_increasing:
+                self.dataframe = self.dataframe.reset_index(drop=True)
+            to_write = convert_np_to_gdx_svs(self.dataframe, self.num_dims)
+        else:
+            to_write = self.dataframe.copy()
+
+        # Local bindings to speed up the loops
         values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
-        # make sure index is clean -- needed for merging in convert_np_to_gdx_svs
-        self.dataframe = self.dataframe.reset_index(drop=True)
-        # convert special numeric values if appropriate
-        to_write = self.dataframe.copy() if (self.data_type in (GamsDataType.Set, GamsDataType.Alias)) else special.convert_np_to_gdx_svs(self.dataframe, self.num_dims)
-        # write each row
-        for row in to_write.itertuples(index=False, name=None):
-            dims = [str(x) for x in row[:self.num_dims]]
-            vals = row[self.num_dims:]
-            for _col_name, col_ind in self.value_cols:
-                values[col_ind] = float(0.0)
-                try:
-                    if isinstance(vals[col_ind],Number):
-                        values[col_ind] = float(vals[col_ind])
-                except: 
-                    raise Error("Unable to set element {} from {}.".format(col_ind,vals))
-            gdxcc.gdxDataWriteStr(self.file.H,dims,values)
+        gdxDataWriteStr = gdxcc.gdxDataWriteStr
+        fh = self.file.H
+        value_indices = [col_ind for _, col_ind in self.value_cols]
+        snd = self.num_dims
+
+        # Convert dimensions to string
+        try:
+            to_write.iloc[:, :snd] = to_write.iloc[:, :snd].astype(str)
+        except Exception as e:
+           raise Error(f"Unable to convert values in to_write df to string: {e}")
+        
+        # write each row         
+        for row in to_write.itertuples(index=False, name=None):             
+            dims = list(row[:snd])
+            for i in value_indices:                              
+               try:
+                   v = row[snd + i]
+                   values[i] = float(v) if isinstance(v, Number) else 0.0
+               except:
+                   raise Error("Unable to set element {} from {}.".format(i,vals))
+            gdxDataWriteStr(fh,dims,values)
+        
+        # close
         gdxcc.gdxDataWriteDone(self.file.H)
+
         return
 
 

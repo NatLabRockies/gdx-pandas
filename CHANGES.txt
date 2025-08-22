@@ -1,3 +1,7 @@
+v1.5.0, 08/12/25 -- Improved read and write speed
+                    add gdx.GdxFile.read_single_symbol(self, filename, target_symbol_name)
+                    add disable_gc kwarg to gdx.GdxSymbol.load, 
+                    add disable_gc kwarg to read_gdx.to_dataframes and read_gdx.to_dataframe
 v1.4.0, 07/21/23 -- add get_data_types function that maps symbol name to gdx.GamsDataType; 
                     add load_set_text kwarg to gdx.GdxSymbol.load, to_dataframe, and to_dataframes
 v1.3.0, 05/09/23 -- performance improvements (faster read and write)
