@@ -6,7 +6,7 @@ DataFrames or a csv version thereof. Starting with the Version 1.0.0 rewrite,
 there is now a second style of use which involves interfacing with GDX files and 
 symbols via the `gdxpds.gdx.GdxFile` and `gdxpds.gdx.GdxSymbol` classes.
 
-Please visit https://nrel.github.io/gdx-pandas for the latest documentation.
+Please visit https://NatLabRockies.github.io/gdx-pandas for the latest documentation.
 
 
 DEPENDENCIES

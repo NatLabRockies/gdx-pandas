@@ -9,7 +9,7 @@ pandas.
 .. |PyPI| image:: https://img.shields.io/pypi/v/gdxpds.svg
    :target: https://pypi.python.org/pypi/gdxpds/
 .. |Documentation| image:: https://img.shields.io/badge/docs-ready-blue.svg
-   :target: https://nrel.github.io/gdx-pandas
+   :target: https://NatLabRockies.github.io/gdx-pandas
 
 .. toctree::
    :maxdepth: 2

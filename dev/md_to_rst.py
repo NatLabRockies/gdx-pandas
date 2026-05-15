@@ -9,7 +9,7 @@ with the same filename, just with a different extension (.rst instead of .md).
 Then, if there is a corresponding .postfix file, the text in that file 
 (assumed to be in .rst format) is appended to the resulting .rst.
 
-:copyright: (c) 2021, Alliance for Sustainable Energy, LLC
+:copyright: (c) 2026, Alliance for Energy Innovation, LLC
 :license: BSD-3
 """
 

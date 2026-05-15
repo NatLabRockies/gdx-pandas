@@ -1,10 +1,10 @@
 # gdx-pandas
 [![PyPI](https://img.shields.io/pypi/v/gdxpds.svg)](https://pypi.python.org/pypi/gdxpds/)
-[![Documentation](https://img.shields.io/badge/docs-ready-blue.svg)](https://nrel.github.io/gdx-pandas)
+[![Documentation](https://img.shields.io/badge/docs-ready-blue.svg)](https://NatLabRockies.github.io/gdx-pandas)
 
 gdx-pandas is a python package to translate between gdx (GAMS data) and pandas. 
 
-[Install](#install) | [Documentation](https://nrel.github.io/gdx-pandas) | [Uninstall](#uninstall)
+[Install](#install) | [Documentation](https://NatLabRockies.github.io/gdx-pandas) | [Uninstall](#uninstall)
 
 ## Install
 
@@ -42,18 +42,18 @@ pip install gdxpds
 or
 
 ```bash
-pip install git+https://github.com/NREL/gdx-pandas.git@v1.4.0
+pip install git+https://github.com/NatLabRockies/gdx-pandas.git@v1.4.0
 ```
 
 or
 
 ```bash
-pip install git+https://github.com/NREL/gdx-pandas.git@main
+pip install git+https://github.com/NatLabRockies/gdx-pandas.git@main
 ```
 
 
 Versions are listed at [pypi](https://pypi.python.org/pypi/gdxpds/) and 
-https://github.com/NREL/gdx-pandas/releases.
+https://github.com/NatLabRockies/gdx-pandas/releases.
 
 After installation, you can test the package using pytest:
 
