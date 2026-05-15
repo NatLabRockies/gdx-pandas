@@ -1,7 +1,10 @@
 import copy
 import logging
 
-import gdxcc
+try:
+    from gams.core import gdx as gdxcc
+except ImportError:
+    import gdxcc
 import numpy as np
 
 logger = logging.getLogger(__name__)

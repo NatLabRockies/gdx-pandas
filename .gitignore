@@ -11,3 +11,4 @@ build
 gdxpds/test/pytest.log
 
 .vscode
+.venv*

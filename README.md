@@ -11,32 +11,27 @@ gdx-pandas is a python package to translate between gdx (GAMS data) and pandas.
 ### Preliminaries
 
 - Python 3.11 or higher (exact compatibility might depend on which GAMS version you are using)
-- pandas (In general you will want the SciPy stack. Anaconda comes with it, or see [my notes for Windows](https://elainethale.wordpress.com/programming-notes/python-environment-set-up/).)
 - Install [GAMS](https://www.gams.com/download/)
 - Put the GAMS directory in your `PATH` and/or assign it to the `GAMS_DIR` environment variable
-- GAMS Python bindings
-    - See GAMS/**/apifiles/readme.txt on Windows and Mac, or 
-      /opt/gams/**/apifiles/readme.txt on Linux
-    - Run the following for the correct version of the Python bindings (e.g., from the GAMS/**/apifiles/Python/api_39 folder):
-        
-        ```bash
-        python setup.py install
-        ```
+- GAMS Python bindings — choose one:
 
-        or 
+    **Recommended.** Install the `gamsapi` that matches your installed GAMS version:
 
-        ```bash
-        python setup.py build --build-base={temporary-path-where-you-have-write-access} install
-        ```
+    ```bash
+    # xx.y.z corresponds to your GAMS version
+    pip install gamsapi[transfer]==xx.y.z
+    ```
 
-        with the latter being for the case when you can install packages into 
-        Python but don't have GAMS directory write access.
-    - If `import gdxcc` fails (which will also cause `import gdxpds` to fail) because there "is no `_gdxcc` module", one workaround is to copy all the `_*.pyd` (or `_*.so`) files from GAMS/**/apifiles/Python/api_XX/ and paste them into your Python environment next to, e.g., the `gdxcc-8-py3.9.egg` file, which on Anaconda is your environment's lib/site-packages directory.
+    **Legacy.** Use the standalone `gdxcc` package from PyPI by installing `gdxpds` with the `legacy` extra (see below). `gdxcc` is older and is not version-matched to your GAMS install, but the SWIG-bound C ABI is stable enough that it generally works.
 
 ### Get the Latest Package
 
 ```bash
+# Recommended (use with the gamsapi install above):
 pip install gdxpds
+
+# Legacy (also installs gdxcc; use if you skipped gamsapi):
+pip install gdxpds[legacy]
 ```
 
 Versions are listed at [pypi](https://pypi.python.org/pypi/gdxpds/) and 

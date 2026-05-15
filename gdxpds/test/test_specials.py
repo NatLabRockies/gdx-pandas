@@ -8,7 +8,10 @@ from gdxpds.test import base_dir, run_dir
 from gdxpds.test.test_session import manage_rundir
 from gdxpds.test.test_conversions import roundtrip_one_gdx
 
-import gdxcc
+try:
+    from gams.core import gdx as gdxcc
+except ImportError:
+    import gdxcc
 import numpy as np
 import pandas as pd
 import pytest

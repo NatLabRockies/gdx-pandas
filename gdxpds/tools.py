@@ -47,6 +47,40 @@ class GamsDirFinder(object):
         if self.__gams_dir is None:
             self.__gams_dir = self.__find_gams()
             
+    def __find_gams_root_in(self, parent):
+        """Search direct subdirectories of `parent` for a GAMS installation,
+        identified by the presence of gams.exe. If multiple are found, prefer
+        the one whose directory name parses as the largest version."""
+        if not os.path.isdir(parent):
+            return None
+        roots = []
+        try:
+            for name in os.listdir(parent):
+                d = os.path.join(parent, name)
+                if os.path.isdir(d) and os.path.exists(os.path.join(d, 'gams.exe')):
+                    roots.append(d)
+        except OSError:
+            return None
+        if not roots:
+            return None
+        if len(roots) == 1:
+            return roots[0]
+        def _parse(d):
+            name = os.path.basename(d)
+            try:
+                return (float(name),)
+            except ValueError:
+                pass
+            try:
+                return tuple(int(p) for p in name.split('.'))
+            except ValueError:
+                return None
+        parsed = [(_parse(d), d) for d in roots]
+        valid = [(v, d) for v, d in parsed if v is not None]
+        if valid:
+            return max(valid)[1]
+        return roots[0]
+
     def __clean_gams_dir(self,value):
         """
         Cleans up the path string.
@@ -93,30 +127,13 @@ class GamsDirFinder(object):
             ret = self.__clean_gams_dir(ret)
 
         if ret is None and os.name == 'nt':
-            # search in default installation location
-            cur_dir = r'C:\GAMS'
-            if os.path.exists(cur_dir):
-                # level 1 - prefer win64 to win32
-                for _p, dirs, _files in os.walk(cur_dir):
-                    if 'win64' in dirs:
-                        cur_dir = os.path.join(cur_dir, 'win64')
-                    elif len(dirs) > 0:
-                        cur_dir = os.path.join(cur_dir, dirs[0])
-                    else:
-                        return ret
-                    break
-            if os.path.exists(cur_dir):
-                # level 2 - prefer biggest number (most recent version)
-                for _p, dirs, _files in os.walk(cur_dir):
-                    if len(dirs) > 1:
-                        try:
-                            versions = [float(x) for x in dirs]
-                            ret = os.path.join(cur_dir, "{}".format(max(versions)))
-                        except:
-                            ret = os.path.join(cur_dir, dirs[0])
-                    elif len(dirs) > 0:
-                        ret = os.path.join(cur_dir, dirs[0])
-                    break
+            # search in default installation location. Modern GAMS (v42+)
+            # installs to C:\GAMS\<version>\; legacy installs went to
+            # C:\GAMS\win64\<version>\. A GAMS root is identified by the
+            # presence of gams.exe.
+            ret = self.__find_gams_root_in(r'C:\GAMS')
+            if ret is None:
+                ret = self.__find_gams_root_in(os.path.join(r'C:\GAMS', 'win64'))
             ret = self.__clean_gams_dir(ret)
 
         if ret is None and os.name != 'nt':

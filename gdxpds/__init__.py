@@ -1,4 +1,4 @@
-__version__ = "1.4.0"
+__version__ = "1.5.0"
 
 import logging
 import sys
@@ -23,7 +23,10 @@ def load_gdxcc(gams_dir=None):
         logger.warning("Especially on Linux, gdxpds should be imported before " + \
                        "pandas to avoid a library conflict. Also make sure your " + \
                        "GAMS directory is listed in LD_LIBRARY_PATH.")
-    import gdxcc
+    try:
+        from gams.core import gdx as gdxcc
+    except ImportError:
+        import gdxcc
     from gdxpds.tools import GamsDirFinder
     finder = GamsDirFinder(gams_dir=gams_dir)
     H = gdxcc.new_gdxHandle_tp()

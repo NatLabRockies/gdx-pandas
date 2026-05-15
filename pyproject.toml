@@ -12,7 +12,6 @@ authors = [
 license = "BSD-3-Clause"
 requires-python = ">=3.11"
 dependencies = [
-    "gdxcc",
     "pandas>=2.2",
     "numpy>=2.0",
 ]
@@ -21,6 +20,9 @@ dynamic = ["version"]
 [project.optional-dependencies]
 test = [
     "pytest",
+]
+legacy = [
+    "gdxcc",
 ]
 admin = [
     "pytest",

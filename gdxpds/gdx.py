@@ -35,7 +35,10 @@ except ImportError: pass
 from gdxpds import Error
 from gdxpds.tools import NeedsGamsDir
 
-import gdxcc
+try:
+    from gams.core import gdx as gdxcc
+except ImportError:
+    import gdxcc
 import numpy as np
 import pandas as pd
 
