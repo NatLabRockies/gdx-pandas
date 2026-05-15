@@ -10,6 +10,61 @@ Also, you will need to install
 
 - [pandoc](https://pandoc.org/installing.html)
 
+## Maintain multiple .venvs for testing
+
+Because `gdxpds` depends on the GAMS shared libraries, validating a change typically means exercising the package against more than one GAMS install. The recommended pattern is one Python virtual environment per GAMS install you care about, each pinning its own `GAMS_DIR` so activating the venv automatically points at the intended GAMS.
+
+For example, on Windows with PowerShell:
+
+```powershell
+py -3.11 -m venv .venv-old   # pinned to an older GAMS
+py -3.13 -m venv .venv-new   # pinned to your newest GAMS
+```
+
+To make a venv self-pin its `GAMS_DIR`, edit its `Scripts\Activate.ps1` (two paste-in additions, following the same `_OLD_VIRTUAL_*` sentinel convention the script already uses for `PYTHONHOME` and `PATH`):
+
+1. **Inside the `deactivate` function**, right after the existing `PATH` restore block, add:
+
+    ```powershell
+    # The prior GAMS_DIR:
+    if (Test-Path -Path Env:_OLD_VIRTUAL_GAMS_DIR) {
+        Copy-Item -Path Env:_OLD_VIRTUAL_GAMS_DIR -Destination Env:GAMS_DIR
+        Remove-Item -Path Env:_OLD_VIRTUAL_GAMS_DIR
+    }
+    elseif (Test-Path -Path Env:GAMS_DIR) {
+        Remove-Item -Path Env:GAMS_DIR
+    }
+    ```
+
+2. **At the very bottom of the script**, append (substituting the right path for this venv):
+
+    ```powershell
+    # Pin GAMS_DIR for this venv
+    if (Test-Path -Path Env:GAMS_DIR) {
+        Copy-Item -Path Env:GAMS_DIR -Destination Env:_OLD_VIRTUAL_GAMS_DIR
+    }
+    $Env:GAMS_DIR = "C:\GAMS\48"
+    ```
+
+Verify with `echo $env:GAMS_DIR` right after `Activate.ps1` runs, and confirm it goes away after `deactivate`.
+
+**Caveat:** `Activate.ps1` is regenerated whenever the venv is recreated (`python -m venv .venv-old` overwrites it), so these edits are lost on recreation. Re-apply them, or keep a copy of the customized script next to the project for easy restoration.
+
+For a typical compatibility check, install the GAMS-version-matched `gamsapi` and gdxpds in each venv:
+
+```powershell
+.\.venv-old\Scripts\Activate.ps1
+pip install gamsapi[transfer]==<old GAMS version>
+pip install -e .[test]
+pytest gdxpds\test
+
+deactivate
+.\.venv-new\Scripts\Activate.ps1
+pip install gamsapi[transfer]==<new GAMS version>
+pip install -e .[test]
+pytest gdxpds\test
+```
+
 ## Create a new release
 
 1. Update version number, CHANGES.txt, setup.py, LICENSE and header as needed
