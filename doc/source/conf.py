@@ -22,8 +22,8 @@ import sphinx_rtd_theme
 import gdxpds
 
 project = 'gdx-pandas'
-copyright = '2023, Alliance for Sustainable Energy'
-author = 'Elaine T. Hale'
+copyright = '2026, The Alliance for Energy Innovation, LLC'
+author = 'Elaine Hale'
 
 # The short X.Y version
 version = gdxpds.__version__
