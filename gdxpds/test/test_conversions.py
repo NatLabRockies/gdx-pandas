@@ -1,5 +1,6 @@
 import os
 import subprocess as subp
+import sys
 
 import gdxpds.gdx
 from gdxpds.test import base_dir, run_dir
@@ -23,7 +24,7 @@ def roundtrip_one_gdx(filename,dirname):
     out_dir = os.path.join(run_dir, dirname, os.path.splitext(filename)[0])
     if not os.path.exists(os.path.dirname(out_dir)):
         os.mkdir(os.path.dirname(out_dir))
-    cmds = ['python', os.path.join(gdxpds.test.bin_prefix,'gdx_to_csv.py'),
+    cmds = [sys.executable, os.path.join(gdxpds.test.bin_prefix,'gdx_to_csv.py'),
             '-i', gdx_file,
             '-o', out_dir]
     subp.call(cmds)            
@@ -38,7 +39,7 @@ def roundtrip_one_gdx(filename,dirname):
         break
     f.close()
     roundtripped_gdx = os.path.join(out_dir, 'output.gdx')
-    cmds = ['python', os.path.join(gdxpds.test.bin_prefix,'csv_to_gdx.py'),
+    cmds = [sys.executable, os.path.join(gdxpds.test.bin_prefix,'csv_to_gdx.py'),
             '-i', txt_file,
             '-o', roundtripped_gdx]
     subp.call(cmds)
@@ -89,13 +90,13 @@ def test_csv_roundtrip(manage_rundir):
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
     gdx_file = os.path.join(out_dir, 'intermediate.gdx')
-    cmds = ['python', os.path.join(gdxpds.test.bin_prefix,'csv_to_gdx.py'),
+    cmds = [sys.executable, os.path.join(gdxpds.test.bin_prefix,'csv_to_gdx.py'),
             '-i', csvs[0], csvs[1],
             '-o', gdx_file]
     subp.call(cmds)
     
     # call command-line interface to transform gdx to csv
-    cmds = ['python', os.path.join(gdxpds.test.bin_prefix,'gdx_to_csv.py'),
+    cmds = [sys.executable, os.path.join(gdxpds.test.bin_prefix,'gdx_to_csv.py'),
             '-i', gdx_file,
             '-o', out_dir]
     subp.call(cmds)
