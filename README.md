@@ -10,7 +10,7 @@ gdx-pandas is a python package to translate between gdx (GAMS data) and pandas.
 
 ### Preliminaries
 
-- Python 3.7 or higher (exact compatibility might depend on which GAMS version you are using)
+- Python 3.11 or higher (exact compatibility might depend on which GAMS version you are using)
 - pandas (In general you will want the SciPy stack. Anaconda comes with it, or see [my notes for Windows](https://elainethale.wordpress.com/programming-notes/python-environment-set-up/).)
 - Install [GAMS](https://www.gams.com/download/)
 - Put the GAMS directory in your `PATH` and/or assign it to the `GAMS_DIR` environment variable
@@ -38,19 +38,6 @@ gdx-pandas is a python package to translate between gdx (GAMS data) and pandas.
 ```bash
 pip install gdxpds
 ```
-
-or
-
-```bash
-pip install git+https://github.com/NatLabRockies/gdx-pandas.git@v1.4.0
-```
-
-or
-
-```bash
-pip install git+https://github.com/NatLabRockies/gdx-pandas.git@main
-```
-
 
 Versions are listed at [pypi](https://pypi.python.org/pypi/gdxpds/) and 
 https://github.com/NatLabRockies/gdx-pandas/releases.

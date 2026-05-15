@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gdxpds"
+description = "gdx-pandas is a python package to translate between gdx (GAMS data) and pandas"
+readme = "README.md"
+authors = [
+    {name = "Elaine Hale", email = "elaine.hale@nlr.gov"},
+]
+license = "BSD-3-Clause"
+requires-python = ">=3.11"
+dependencies = [
+    "gdxcc",
+    "pandas>=2.2",
+    "numpy>=2.0",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+admin = [
+    "pytest",
+    "ghp-import",
+    "numpydoc",
+    "pandoc",
+    "sphinx",
+    "sphinx_rtd_theme",
+    "twine",
+    "setuptools",
+    "wheel",
+]
+
+[project.urls]
+Homepage = "https://github.com/NatLabRockies/gdx-pandas"
+
+[tool.setuptools]
+script-files = ["bin/csv_to_gdx.py", "bin/gdx_to_csv.py"]
+
+[tool.setuptools.dynamic]
+version = {attr = "gdxpds.__version__"}
+
+[tool.setuptools.packages.find]
+
+[tool.setuptools.package-data]
+"gdxpds.test" = ["*.csv", "*.gdx"]
+
+[tool.pytest.ini_options]
+log_file = "gdxpds/test/pytest.log"
+log_file_level = "INFO"

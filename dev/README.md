@@ -3,7 +3,7 @@
 To get all of the development dependencies for Python:
 
 ```
-pip install -r gdx-pandas/dev/requirements.txt
+pip install -e .[admin]
 ```
 
 Also, you will need to install

@@ -1,4 +1,4 @@
-from ._version import __version__
+__version__ = "1.4.0"
 
 import logging
 import sys
@@ -7,8 +7,6 @@ logger = logging.getLogger(__name__)
 
 from gdxpds.tools import Error
 from gdxpds.special import load_specials
-
-from ._version import __version__
 
 
 def load_gdxcc(gams_dir=None):
