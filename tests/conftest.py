@@ -2,14 +2,6 @@ import os
 import shutil
 import subprocess
 
-# Investigation hook for the historical pandas-before-gdxpds Linux segfault.
-# When set, force pandas into sys.modules BEFORE the first gdxpds import so
-# the whole test session exercises the bad import order. Drives the matrix
-# in dev/run_test_matrix.sh and will be deleted once the underlying concern
-# is confirmed obsolete.
-if os.environ.get("GDXPDS_TEST_PREIMPORT_PANDAS"):
-    import pandas  # noqa: F401
-
 import gdxpds.gdx
 import pytest
 
@@ -54,8 +46,7 @@ def roundtrip_one_gdx(base_dir, run_dir):
 
     CLI scripts are invoked by entry-point name. pip places `csv_to_gdx` and
     `gdx_to_csv` on PATH after `pip install -e .`. Using subprocess (rather
-    than direct in-process calls) preserves the load-bearing Linux constraint
-    that `import gdxpds` runs before `import pandas`.
+    than direct in-process calls) keeps each round-trip in a fresh process.
     """
     def _roundtrip(filename, dirname):
         gdx_file = os.path.join(base_dir, filename)

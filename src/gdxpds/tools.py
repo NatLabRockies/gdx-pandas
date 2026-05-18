@@ -2,6 +2,7 @@ import logging
 import os
 import subprocess as subp
 import re
+import sys
 
 logger = logging.getLogger(__name__)
 
@@ -254,5 +255,146 @@ class NeedsGamsDir(object):
         
     @gams_dir.setter
     def gams_dir(self, value):
-        self.__gams_dir = GamsDirFinder(value).gams_dir    
+        self.__gams_dir = GamsDirFinder(value).gams_dir
+
+
+# Process-global state for the bound GAMS library. Populated by the first
+# successful load_gdxcc() call; consumed by info() and the mismatch warning.
+_bindings_source = None
+_loaded_gams_dir = None
+
+
+def load_gdxcc(gams_dir=None):
+    """Bind the GAMS library and initialize special-value conversion tables.
+
+    Idempotent: safe to call repeatedly. The first successful call binds the
+    GDX shared library at the resolved ``gams_dir`` and populates the
+    module-level dicts in :mod:`gdxpds.special`. Subsequent calls early-return
+    after validating the resolved directory; if the resolved ``gams_dir``
+    differs from the already-bound directory, a warning is emitted (one GAMS
+    library bound per process).
+
+    Parameters
+    ----------
+    gams_dir : None or str
+        If not None, directory containing the GAMS executable. If None, the
+        directory is resolved by :class:`GamsDirFinder` (env vars, PATH,
+        default-install walk).
+
+    Raises
+    ------
+    GamsLoadError
+        If the resolved directory does not contain GAMS, or if ``gdxCreateD``
+        fails on the first bind.
+    """
+    global _bindings_source, _loaded_gams_dir
+    finder = GamsDirFinder(gams_dir=gams_dir)
+    _require_gams_installation(finder)
+    if _loaded_gams_dir is not None:
+        if finder.gams_dir != _loaded_gams_dir:
+            logger.warning(
+                f"gams_dir={finder.gams_dir!r} differs from the already-bound "
+                f"directory {_loaded_gams_dir!r}; the passed gams_dir is "
+                f"ignored (one GAMS library bound per process)."
+            )
+        return
+    try:
+        from gams.core import gdx as gdxcc
+        _bindings_source = "gams.core.gdx"
+    except ImportError:
+        import gdxcc
+        _bindings_source = "gdxcc"
+    H = gdxcc.new_gdxHandle_tp()
+    rc = gdxcc.gdxCreateD(H, finder.gams_dir, gdxcc.GMS_SSSIZE)
+    _check_gdx_create_rc(H, rc, gdxcc, finder.gams_dir, finder.source)
+    gdxcc.gdxFree(H)
+    # Deferred to break the tools <-> special import cycle.
+    from gdxpds.special import load_specials
+    load_specials(finder)
+    _loaded_gams_dir = finder.gams_dir
+
+
+def info(gams_dir=None):
+    """Return a human-readable environment report as a string.
+
+    Includes the gdxpds version, Python info, which GDX bindings are available
+    and which (if any) is currently bound, the resolved GAMS directory plus the
+    discovery branch that produced it, and any error from the active load
+    attempt.
+
+    Calls :func:`load_gdxcc` internally inside a try/except so install issues
+    surface in the report even before any GDX operation has run. The first
+    such call binds the library if it isn't already bound; subsequent calls
+    hit the idempotent fast-path.
+
+    Parameters
+    ----------
+    gams_dir : None or str
+        If ``None`` (default), the GAMS directory is resolved via a fresh
+        ``GamsDirFinder()`` probe -- the same discovery any subsequent gdxpds
+        operation would do. If a string, probes that directory instead.
+
+    This function never raises. Probe failures show up as ``"(unknown)"`` or
+    ``"not importable"`` in the corresponding field. The return value is a
+    string suitable for printing or pasting into a bug report.
+    """
+    import importlib
+    import importlib.metadata
+    import importlib.util
+    # Deferred to break the tools <-> __init__ import cycle.
+    from gdxpds import __version__
+
+    lines = ["gdxpds info", "-----------"]
+
+    lines.append(f"gdxpds:        {__version__}")
+
+    py_version = ".".join(str(v) for v in sys.version_info[:3])
+    lines.append(f"Python:        {py_version} ({sys.platform})")
+
+    lines.append("Bindings:")
+    for module_path, dist_name in [("gams.core.gdx", "gamsapi"), ("gdxcc", "gdxcc")]:
+        try:
+            importlib.import_module(module_path)
+            try:
+                version = importlib.metadata.version(dist_name)
+            except importlib.metadata.PackageNotFoundError:
+                version = "(version unknown)"
+            lines.append(f"  {module_path}: {dist_name} {version}")
+        except Exception:
+            lines.append(f"  {module_path}: not importable")
+
+    load_failure = None
+    try:
+        load_gdxcc(gams_dir=gams_dir)
+    except Exception as e:
+        load_failure = e
+
+    selected = _bindings_source or "(not yet selected)"
+    lines.append(f"  selected:    {selected}")
+    bound = _loaded_gams_dir or "(not yet bound)"
+    lines.append(f"  bound dir:   {bound}")
+
+    try:
+        finder = GamsDirFinder(gams_dir=gams_dir)
+        lines.append(f"GAMS_DIR:      {finder.gams_dir}")
+        lines.append(f"  source:      {finder.source}")
+    except RuntimeError:
+        lines.append("GAMS_DIR:      (not found)")
+    except Exception as e:
+        lines.append(f"GAMS_DIR:      (probe failed: {type(e).__name__}: {e})")
+
+    try:
+        gdx2py_spec = importlib.util.find_spec("gdx2py")
+    except Exception:
+        gdx2py_spec = None
+    gdx2py_status = "importable" if gdx2py_spec else "not importable"
+    lines.append(f"gdx2py:        {gdx2py_status}  (optional fast path)")
+
+    if load_failure is not None:
+        lines.append("")
+        lines.append(
+            f"load_gdxcc FAILED: {type(load_failure).__name__}: {load_failure}"
+        )
+
+    return "\n".join(lines)
 

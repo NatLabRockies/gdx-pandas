@@ -1,8 +1,6 @@
 from collections import OrderedDict
 import logging
 
-# gdxpds needs to be imported before pandas to try to avoid library conflict on 
-# Linux that causes a segmentation fault.
 from gdxpds.tools import Error
 from gdxpds.gdx import GdxFile, GamsDataType
 

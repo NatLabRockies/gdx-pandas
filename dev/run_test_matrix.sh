@@ -7,16 +7,14 @@
 # For each existing .venv-* below, this script:
 #   1) sources its bin/activate (which should `module load gams/<ver>` and
 #      pin GAMS_DIR per the patches in dev/README.md);
-#   2) runs `pytest tests` (normal order);
-#   3) runs `GDXPDS_TEST_PREIMPORT_PANDAS=1 pytest tests` (historical bad
-#      order: pandas imported before gdxpds; see tests/conftest.py);
-#   4) runs `gdxpds test`;
-#   5) deactivates.
+#   2) runs `pytest tests`;
+#   3) runs `gdxpds test`;
+#   4) deactivates.
 #
 # Per-venv logs go to dev/test_matrix_logs/<venv>.log; a top-level
 # summary is printed to stdout and saved to dev/test_matrix_logs/summary.txt.
 #
-# For .venv-no-gams every command is expected to FAIL cleanly (non-zero
+# For .venv-no-gams both commands are expected to FAIL cleanly (non-zero
 # exit, no segfault, useful error message). The script flips its verdict
 # accordingly.
 
@@ -61,16 +59,10 @@ run_one_venv () {
         echo
     } | tee -a "$log"
 
-    echo "--- pytest (normal order) ---" | tee -a "$log"
+    echo "--- pytest ---" | tee -a "$log"
     pytest tests >>"$log" 2>&1
     local pytest_rc=$?
     echo "pytest exit: $pytest_rc" | tee -a "$log"
-    echo | tee -a "$log"
-
-    echo "--- pytest with GDXPDS_TEST_PREIMPORT_PANDAS=1 ---" | tee -a "$log"
-    GDXPDS_TEST_PREIMPORT_PANDAS=1 pytest tests >>"$log" 2>&1
-    local pytest_preimport_rc=$?
-    echo "pytest (preimport) exit: $pytest_preimport_rc" | tee -a "$log"
     echo | tee -a "$log"
 
     echo "--- gdxpds test ---" | tee -a "$log"
@@ -81,16 +73,16 @@ run_one_venv () {
 
     local verdict
     if [ "$venv" = ".venv-no-gams" ]; then
-        if [ "$pytest_rc" -ne 0 ] && [ "$pytest_preimport_rc" -ne 0 ] && [ "$gdxpds_rc" -ne 0 ]; then
-            verdict="OK (all 3 failed as expected for no-GAMS)"
+        if [ "$pytest_rc" -ne 0 ] && [ "$gdxpds_rc" -ne 0 ]; then
+            verdict="OK (both failed as expected for no-GAMS)"
         else
-            verdict="UNEXPECTED (no-GAMS venv had a passing command; pytest=$pytest_rc, preimport=$pytest_preimport_rc, gdxpds=$gdxpds_rc)"
+            verdict="UNEXPECTED (no-GAMS venv had a passing command; pytest=$pytest_rc, gdxpds=$gdxpds_rc)"
         fi
     else
-        if [ "$pytest_rc" -eq 0 ] && [ "$pytest_preimport_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ]; then
+        if [ "$pytest_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ]; then
             verdict="PASS"
         else
-            verdict="FAIL (pytest=$pytest_rc, preimport=$pytest_preimport_rc, gdxpds=$gdxpds_rc)"
+            verdict="FAIL (pytest=$pytest_rc, gdxpds=$gdxpds_rc)"
         fi
     fi
     echo "verdict: $verdict" | tee -a "$log"

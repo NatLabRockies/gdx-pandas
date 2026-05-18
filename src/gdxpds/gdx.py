@@ -30,10 +30,7 @@ try:
     HAVE_GDX2PY = True
 except ImportError: pass
 
-# gdxpds needs to be imported before pandas to try to avoid library conflict on 
-# Linux that causes a segmentation fault.
-from gdxpds import Error
-from gdxpds.tools import NeedsGamsDir
+from gdxpds.tools import Error, NeedsGamsDir, load_gdxcc
 
 try:
     from gams.core import gdx as gdxcc
@@ -431,10 +428,13 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         return        
 
     def _create_gdx_object(self):
+        # Idempotent: first call binds the library + populates SPECIAL_VALUES;
+        # subsequent calls validate self.gams_dir and warn on mismatch.
+        load_gdxcc(gams_dir=self.gams_dir)
         H = gdxcc.new_gdxHandle_tp()
-        rc = gdxcc.gdxCreateD(H,self.gams_dir,gdxcc.GMS_SSSIZE)
+        rc = gdxcc.gdxCreateD(H, self.gams_dir, gdxcc.GMS_SSSIZE)
         if not rc:
-            raise GdxError(H,rc[1])
+            raise GdxError(H, rc[1])
         return H
 
 
