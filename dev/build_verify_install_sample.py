@@ -1,7 +1,7 @@
 """Generate src/gdxpds/_verify_install/sample.gdx.
 
 The resulting sample.gdx is committed to the repo; this script only needs to
-be re-run if the schema of the smoke test changes.
+be re-run if the schema of the install verification test changes.
 
 Usage (from repo root, with the venv active and $env:GAMS_DIR set):
 
