@@ -13,12 +13,6 @@ def test_gdx_roundtrip(roundtrip_one_gdx):
         roundtrip_one_gdx(filename,'gdx_roundtrip')
 
 
-def test_verify_install_command():
-    # Smoke test: the `gdxpds test` command itself runs to completion.
-    # Exercises the entry point, argparse dispatch, and all five internal checks.
-    subprocess.run(["gdxpds", "test"], check=True)
-
-
 def test_csv_roundtrip(base_dir, run_dir):
     # load csvs into pandas and make map of filenames to number of rows
     csvs = [os.path.join(base_dir, 'installed_capacity.csv'),

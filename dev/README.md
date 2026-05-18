@@ -46,7 +46,7 @@ To make a venv self-pin its `GAMS_DIR`, edit its `Scripts\Activate.ps1` (two pas
     $Env:GAMS_DIR = "C:\GAMS\48"
     ```
 
-Verify with `echo $env:GAMS_DIR` right after `Activate.ps1` runs, and confirm it goes away after `deactivate`.
+Verify with `gdxpds info` right after `Activate.ps1` runs — the report will show `GAMS_DIR: <pinned path>` and `source: GAMS_DIR env var`. Confirm with `echo $env:GAMS_DIR` that the variable goes away after `deactivate`.
 
 **Caveat:** `Activate.ps1` is regenerated whenever the venv is recreated (`python -m venv .venv-old` overwrites it), so these edits are lost on recreation. Re-apply them, or keep a copy of the customized script next to the project for easy restoration.
 
