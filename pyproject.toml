@@ -41,6 +41,7 @@ admin = [
 Homepage = "https://github.com/NatLabRockies/gdx-pandas"
 
 [project.scripts]
+gdxpds = "gdxpds.cli.main:main"
 csv_to_gdx = "gdxpds.cli.csv_to_gdx:main"
 gdx_to_csv = "gdxpds.cli.gdx_to_csv:main"
 
@@ -55,6 +56,9 @@ version = {attr = "gdxpds.__version__"}
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"gdxpds._verify_install" = ["*.gdx"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

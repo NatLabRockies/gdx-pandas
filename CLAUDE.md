@@ -57,7 +57,17 @@ Keep test output files after a run (useful when debugging round-trip failures):
 pytest tests --no-clean-up
 ```
 
-The custom `--no-clean-up` flag and the shared test fixtures (`base_dir`, `run_dir`, `bin_prefix`, `manage_rundir`, `roundtrip_one_gdx`) are defined in [tests/conftest.py](tests/conftest.py).
+The custom `--no-clean-up` flag and the shared test fixtures (`base_dir`, `run_dir`, `manage_rundir`, `roundtrip_one_gdx`) are defined in [tests/conftest.py](tests/conftest.py).
+
+Verify a fresh install end-to-end (intended for end users; ships with the base package, no `[test]` extra needed):
+
+```powershell
+gdxpds test
+```
+
+Source lives in [src/gdxpds/cli/main.py](src/gdxpds/cli/main.py); the embedded
+sample GDX is at `src/gdxpds/_verify_install/sample.gdx`, regenerable via
+[dev/build_verify_install_sample.py](dev/build_verify_install_sample.py).
 
 Build the docs (Sphinx):
 

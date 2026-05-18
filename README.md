@@ -37,6 +37,30 @@ pip install gdxpds[legacy]
 Versions are listed at [pypi](https://pypi.python.org/pypi/gdxpds/) and 
 https://github.com/NatLabRockies/gdx-pandas/releases.
 
+## Verify installation
+
+After installing `gdxpds` and a matching `gamsapi`, verify your environment
+end-to-end with:
+
+```bash
+gdxpds test
+```
+
+Expected output:
+
+```
+Verifying gdxpds installation...
+  [OK]   GAMS install found at <your GAMS directory>
+  [OK]   GDX bindings loaded: gams.core.gdx (gamsapi)
+  [OK]   Read embedded sample.gdx (...)
+  [OK]   Round-trip write->read preserves all symbols
+  [OK]   Special values (+Inf, -Inf, NaN) survive round-trip
+
+PASSED: gdxpds installation verified.
+```
+
+## Development tests
+
 To run the development test suite, clone the repo and run:
 
 ```bash
