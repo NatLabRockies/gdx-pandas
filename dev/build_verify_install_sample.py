@@ -14,7 +14,6 @@ Schema (chosen to exercise the distinct code paths gdxpds handles):
 """
 import os
 
-# gdxpds before pandas, for the documented Linux shared-library ordering.
 import gdxpds
 import gdxpds.gdx
 

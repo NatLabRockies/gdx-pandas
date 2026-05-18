@@ -1,8 +1,6 @@
 import logging
 from numbers import Number
 
-# gdxpds needs to be imported before pandas to try to avoid library conflict on 
-# Linux that causes a segmentation fault.
 from gdxpds.tools import Error
 from gdxpds.gdx import GdxFile, GdxSymbol, GAMS_VALUE_COLS_MAP, GamsDataType
 

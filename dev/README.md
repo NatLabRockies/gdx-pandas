@@ -12,7 +12,7 @@ That meta-extra pulls in `[test]` (pytest) and `[docs]` (sphinx, sphinx_rtd_them
 
 Because `gdxpds` depends on the GAMS shared libraries, validating a change typically means exercising the package against more than one GAMS install. The recommended pattern is one Python virtual environment per GAMS install you care about, each pinning its own `GAMS_DIR` so activating the venv automatically points at the intended GAMS.
 
-For example, on Windows with PowerShell:
+### On Windows (PowerShell)
 
 ```powershell
 py -3.11 -m venv .venv-old   # pinned to an older GAMS
@@ -62,6 +62,93 @@ pip install gamsapi[transfer]==<new GAMS version>
 pip install -e .[test]
 pytest tests
 ```
+
+### On Linux with `environment-modules`
+
+On HPC-style hosts where multiple GAMS versions are exposed via `module load gams/<ver>`, the same multi-venv pattern works in bash. The `bin/activate` script gets the equivalent of the Windows patch: `module load` on activate, `module unload` + restore the prior `GAMS_DIR` on deactivate.
+
+A representative matrix (three GAMS-present venvs plus one no-GAMS venv for negative testing):
+
+| venv | module | what to `pip install` after activate |
+|---|---|---|
+| `.venv-gams-34` | `gams/34.3.0` | `pip install -e '.[test,legacy]'` (pulls `gdxcc` for the legacy SWIG bindings; pre-`gamsapi` era) |
+| `.venv-gams-49` | `gams/49.6.0` | `pip install -e '.[test]'` then `pip install 'gamsapi[transfer]==49.6.0'` |
+| `.venv-gams-51` | `gams/51.3.0` | `pip install -e '.[test]'` then `pip install 'gamsapi[transfer]==51.3.0'` |
+| `.venv-no-gams` | — (do not load) | `pip install -e .` — exercises `gdxpds test` failure paths |
+
+Create them all up front:
+
+```bash
+python -m venv .venv-gams-34
+python -m venv .venv-gams-49
+python -m venv .venv-gams-51
+python -m venv .venv-no-gams
+```
+
+**Activate-script patch (bash).** For each of the three `*-gams-*` venvs, edit its `bin/activate` in two places (mirroring the Windows pattern):
+
+1. **Inside the existing `deactivate ()` function**, right after the `PATH` restore block, add:
+
+    ```bash
+    # Restore previous GAMS_DIR / unload module
+    if [ -n "${_OLD_VIRTUAL_GAMS_MODULE_LOADED:-}" ] ; then
+        module unload gams 2>/dev/null || true
+        unset _OLD_VIRTUAL_GAMS_MODULE_LOADED
+    fi
+    if [ -n "${_OLD_VIRTUAL_GAMS_DIR:-}" ] ; then
+        export GAMS_DIR="$_OLD_VIRTUAL_GAMS_DIR"
+    else
+        unset GAMS_DIR
+    fi
+    unset _OLD_VIRTUAL_GAMS_DIR
+    ```
+
+2. **Right before the trailing `hash -r` block** (the bash/zsh-specific block guarded by `if [ -n "${BASH:-}" -o -n "${ZSH_VERSION:-}" ]`, near the bottom of the file), insert — substituting the right version per venv:
+
+    ```bash
+    # Pin GAMS for this venv
+    _OLD_VIRTUAL_GAMS_DIR="${GAMS_DIR:-}"
+    _OLD_VIRTUAL_GAMS_MODULE_LOADED=""
+    if command -v module >/dev/null 2>&1 ; then
+        module load gams/51.3.0   # <-- adjust per venv
+        _OLD_VIRTUAL_GAMS_MODULE_LOADED=1
+    fi
+    if command -v gams >/dev/null 2>&1 ; then
+        export GAMS_DIR="$(dirname "$(command -v gams)")"
+    fi
+    ```
+
+    Placement matters: the block must run *after* PATH is set so `module load` and `command -v gams` see the venv's PATH, and *before* `hash -r` so bash's command-cache refresh picks up the freshly module-loaded `gams`.
+
+For `.venv-no-gams`, use the same deactivate block but replace the pin-GAMS block above with one that *clears* GAMS instead of loading it (defensive, in case the parent shell already has GAMS in the environment):
+
+```bash
+# Force no-GAMS environment for this venv
+_OLD_VIRTUAL_GAMS_DIR="${GAMS_DIR:-}"
+_OLD_VIRTUAL_GAMS_MODULE_LOADED=""
+if command -v module >/dev/null 2>&1 ; then
+    module unload gams 2>/dev/null || true
+fi
+unset GAMS_DIR
+```
+
+Verify with `echo "$GAMS_DIR"; command -v gams` right after `source bin/activate`, and confirm both go away (or change back) after `deactivate`.
+
+**Caveat (same as Windows):** `bin/activate` is regenerated whenever the venv is recreated (`python -m venv .venv-gams-XX` overwrites it), so these edits are lost on recreation. Re-apply them, or keep a copy of the customized scripts next to the project for easy restoration.
+
+**Note on `module`.** `module` is a shell function set up by `/etc/profile.d/modules.sh` and is normally available only in interactive shells. The patch above guards `module` calls with `command -v module` so the venv still works on a developer laptop without environment-modules; in that case you'd set `GAMS_DIR` yourself or rely on `which gams`.
+
+#### Run the test matrix
+
+A helper script drives all four venvs in sequence and writes per-venv logs plus a top-level summary:
+
+```bash
+bash dev/run_test_matrix.sh
+```
+
+It runs, in each existing venv: `pytest tests`, `GDXPDS_TEST_PREIMPORT_PANDAS=1 pytest tests` (exercises the historical pandas-before-gdxpds bad-order path; see [tests/conftest.py](../tests/conftest.py)), and `gdxpds test`. For `.venv-no-gams` it expects all three commands to fail with clean exit codes (no segfaults, useful error messages).
+
+Invoke it from an interactive bash shell so the `module` function is in scope.
 
 ## Create a new release
 

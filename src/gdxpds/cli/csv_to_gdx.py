@@ -2,8 +2,6 @@ import argparse
 import os
 import warnings
 
-# gdxpds needs to be imported before pandas to try to avoid library conflict on
-# Linux that causes a segmentation fault.
 import gdxpds
 
 import pandas as pd

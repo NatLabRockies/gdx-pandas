@@ -46,8 +46,7 @@ def roundtrip_one_gdx(base_dir, run_dir):
 
     CLI scripts are invoked by entry-point name. pip places `csv_to_gdx` and
     `gdx_to_csv` on PATH after `pip install -e .`. Using subprocess (rather
-    than direct in-process calls) preserves the load-bearing Linux constraint
-    that `import gdxpds` runs before `import pandas`.
+    than direct in-process calls) keeps each round-trip in a fresh process.
     """
     def _roundtrip(filename, dirname):
         gdx_file = os.path.join(base_dir, filename)

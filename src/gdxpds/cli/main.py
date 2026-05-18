@@ -10,7 +10,6 @@ import sys
 import tempfile
 from importlib.resources import as_file, files
 
-# gdxpds before pandas/numpy, for the documented Linux shared-library ordering.
 import gdxpds
 import gdxpds.gdx
 import gdxpds.tools
