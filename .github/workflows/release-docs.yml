@@ -31,9 +31,12 @@ jobs:
           cache-dependency-path: pyproject.toml
 
       - name: Install docs deps
+        # [legacy] pulls in the gdxcc PyPI binding, which is importable
+        # without a real GAMS install and provides the integer constants
+        # that gdxpds.gdx and gdxpds.special reference at module load.
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[docs]
+          pip install -e .[docs,legacy]
 
       - name: Build Sphinx (warnings-as-errors)
         working-directory: doc
