@@ -56,18 +56,18 @@ For a typical compatibility check, install the GAMS-version-matched `gamsapi` an
 .\.venv-old\Scripts\Activate.ps1
 pip install gamsapi[transfer]==<old GAMS version>
 pip install -e .[test]
-pytest gdxpds\test
+pytest tests
 
 deactivate
 .\.venv-new\Scripts\Activate.ps1
 pip install gamsapi[transfer]==<new GAMS version>
 pip install -e .[test]
-pytest gdxpds\test
+pytest tests
 ```
 
 ## Create a new release
 
-1. Update version number (`gdxpds/__init__.py`), CHANGES.txt, `pyproject.toml`, LICENSE and header as needed
+1. Update version number (`src/gdxpds/__init__.py`), CHANGES.txt, `pyproject.toml`, LICENSE and header as needed
 2. Run tests locally and fix any issues
 3. Install from github and make sure tests pass 
 4. Uninstall the draft package

@@ -8,7 +8,8 @@ build
 .idea
 
 .pytest_cache
-gdxpds/test/pytest.log
+tests/pytest.log
+tests/output/
 
 .vscode
 .venv*

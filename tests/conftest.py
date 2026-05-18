@@ -1,0 +1,111 @@
+import os
+import shutil
+import subprocess as subp
+import sys
+
+import gdxpds.gdx
+import pytest
+
+
+def pytest_addoption(parser):
+    parser.addoption(
+        "--no-clean-up", action="store_true", default=False,
+        help="Pass this option to leave test outputs in place"
+    )
+
+
+@pytest.fixture(scope="session")
+def clean_up(request):
+    return not request.config.getoption("--no-clean-up")
+
+
+@pytest.fixture(scope="session")
+def base_dir():
+    return os.path.dirname(__file__)
+
+
+@pytest.fixture(scope="session")
+def run_dir(base_dir):
+    return os.path.join(base_dir, "output")
+
+
+@pytest.fixture(scope="session")
+def bin_prefix():
+    # Resolves bin/ or Scripts/ depending on install mode.
+    # Will be removed in Commit 2 once CLI scripts become entry points.
+    here = os.path.dirname(__file__)
+    candidates = [
+        os.path.join(here, "..", "bin"),                 # dev (repo root)
+        os.path.join(here, *([".."] * 5), "bin"),        # anaconda
+        os.path.join(here, *([".."] * 4), "Scripts"),    # Windows install
+        os.path.join("/", "usr", "local", "bin"),        # Linux install
+    ]
+    for c in candidates:
+        if os.path.isdir(c) and os.path.isfile(os.path.join(c, "gdx_to_csv.py")):
+            return os.path.abspath(c)
+    return ""
+
+
+@pytest.fixture(scope="session", autouse=True)
+def manage_rundir(request, clean_up, run_dir):
+    if os.path.exists(run_dir):
+        shutil.rmtree(run_dir)
+    os.mkdir(run_dir)
+
+    def finalize_rundir():
+        if os.path.exists(run_dir) and clean_up:
+            shutil.rmtree(run_dir)
+    request.addfinalizer(finalize_rundir)
+
+
+@pytest.fixture
+def roundtrip_one_gdx(base_dir, run_dir, bin_prefix):
+    """Factory: returns a callable(filename, dirname) -> roundtripped_gdx_path."""
+    def _roundtrip(filename, dirname):
+        gdx_file = os.path.join(base_dir, filename)
+        with gdxpds.gdx.GdxFile() as gdx:
+            gdx.read(gdx_file)
+            num_records = {}
+            total_records = 0
+            for symbol in gdx:
+                num_records[symbol.name] = symbol.num_records
+                total_records += num_records[symbol.name]
+            assert total_records > 0
+
+        out_dir = os.path.join(run_dir, dirname, os.path.splitext(filename)[0])
+        if not os.path.exists(os.path.dirname(out_dir)):
+            os.mkdir(os.path.dirname(out_dir))
+        cmds = [sys.executable, os.path.join(bin_prefix, 'gdx_to_csv.py'),
+                '-i', gdx_file,
+                '-o', out_dir]
+        subp.call(cmds)
+
+        txt_file = os.path.join(out_dir, 'csvs.txt')
+        with open(txt_file, 'w') as f:
+            for p, _dirs, files in os.walk(out_dir):
+                for file in files:
+                    if os.path.splitext(file)[1] == '.csv':
+                        f.write("{}\n".format(os.path.join(p, file)))
+                break
+        roundtripped_gdx = os.path.join(out_dir, 'output.gdx')
+        cmds = [sys.executable, os.path.join(bin_prefix, 'csv_to_gdx.py'),
+                '-i', txt_file,
+                '-o', roundtripped_gdx]
+        subp.call(cmds)
+
+        with gdxpds.gdx.GdxFile(lazy_load=True) as gdx:
+            gdx.read(roundtripped_gdx)
+            for symbol_name, records in num_records.items():
+                if records > 0:
+                    assert symbol_name in gdx, "Expected {} in {}.".format(symbol_name, roundtripped_gdx)
+                    assert gdx[symbol_name].num_records == records, "Expected {} in {} to have {} records, but has {}.".format(symbol_name, roundtripped_gdx, records, gdx[symbol_name].num_records)
+        with gdxpds.gdx.GdxFile(lazy_load=False) as gdx:
+            gdx.read(roundtripped_gdx)
+            for symbol_name, records in num_records.items():
+                if records > 0:
+                    assert symbol_name in gdx, "Expected {} in {}.".format(symbol_name, roundtripped_gdx)
+                    assert gdx[symbol_name].num_records == records, "Expected {} in {} to have {} records, but has {}.".format(symbol_name, roundtripped_gdx, records, gdx[symbol_name].num_records)
+
+        return roundtripped_gdx
+
+    return _roundtrip

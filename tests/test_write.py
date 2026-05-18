@@ -9,13 +9,11 @@ import pytest
 
 import gdxpds.gdx
 from gdxpds.tools import Error
-from gdxpds.test import base_dir, run_dir
-from gdxpds.test.test_session import manage_rundir
 
 logger = logging.getLogger(__name__)
 
 
-def test_from_scratch_sets(manage_rundir):
+def test_from_scratch_sets(run_dir):
     outdir = os.path.join(run_dir,'from_scratch_sets')
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -42,7 +40,7 @@ def test_from_scratch_sets(manage_rundir):
             assert isinstance(sym.dataframe[sym.dataframe.columns[-1]].values[0],c_bool)
 
 
-def test_unnamed_dimensions(manage_rundir):
+def test_unnamed_dimensions(run_dir):
     from pathlib import Path
     outdir = Path(run_dir) / 'unnamed_dimensions'
     if not outdir.exists():
@@ -103,7 +101,7 @@ def test_unnamed_dimensions(manage_rundir):
         assert gdx['star_eqn'].equation_type == gdxpds.gdx.GamsEquationType.GreaterThan
 
 
-def test_setting_dataframes(manage_rundir):
+def test_setting_dataframes(run_dir):
     outdir = os.path.join(run_dir,'setting_dataframes')
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -340,7 +338,7 @@ def test_setting_dataframes(manage_rundir):
         assert gdx['sym_17'].num_records == 0
 
 
-def test_parameter_with_nulls(manage_rundir):
+def test_parameter_with_nulls(run_dir):
     outdir = os.path.join(run_dir,'parameter_with_nulls')
     if not os.path.exists(outdir):
         os.mkdir(outdir)

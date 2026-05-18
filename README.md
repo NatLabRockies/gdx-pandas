@@ -37,14 +37,14 @@ pip install gdxpds[legacy]
 Versions are listed at [pypi](https://pypi.python.org/pypi/gdxpds/) and 
 https://github.com/NatLabRockies/gdx-pandas/releases.
 
-After installation, you can test the package using pytest:
+To run the development test suite, clone the repo and run:
 
 ```bash
-pytest --pyargs gdxpds
+pytest tests
 ```
 
-If the tests fail due to permission IOErrors, apply `chmod g+x` and `chmod a+x` 
-to the `gdx-pandas/gdxpds/test` folder.
+If the tests fail due to permission IOErrors, apply `chmod g+x` and `chmod a+x`
+to the `tests` folder.
 
 ## Uninstall
 

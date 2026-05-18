@@ -4,9 +4,6 @@ import subprocess as subp
 
 import gdxpds.gdx
 import gdxpds.special
-from gdxpds.test import base_dir, run_dir
-from gdxpds.test.test_session import manage_rundir
-from gdxpds.test.test_conversions import roundtrip_one_gdx
 
 try:
     from gams.core import gdx as gdxcc
@@ -26,7 +23,7 @@ def value_column_index(sym,gams_value_type):
     return len(sym.dims) + i
 
 
-def test_roundtrip_just_special_values(manage_rundir):
+def test_roundtrip_just_special_values(run_dir, roundtrip_one_gdx):
     outdir = os.path.join(run_dir,'special_values')
     if not os.path.exists(outdir):
         os.mkdir(outdir)
@@ -87,7 +84,7 @@ def test_roundtrip_just_special_values(manage_rundir):
         check_special_values(h)
     
 
-def test_roundtrip_special_values(manage_rundir):
+def test_roundtrip_special_values(base_dir, roundtrip_one_gdx):
     filename = 'OptimalCSPConfig_Out.gdx'
     original_gdx = os.path.join(base_dir,filename)
     roundtripped_gdx = roundtrip_one_gdx(filename,'roundtrip_special_values')

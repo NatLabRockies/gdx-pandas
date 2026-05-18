@@ -5,11 +5,10 @@ import pytest
 
 import gdxpds.gdx
 from gdxpds import to_dataframes, list_symbols, get_data_types
-from gdxpds.test import base_dir
 
 logger = logging.getLogger(__name__)
 
-def test_read():
+def test_read(base_dir):
     filename = 'all_generator_properties_input.gdx'
     gdx_file = os.path.join(base_dir,filename)
     with gdxpds.gdx.GdxFile() as f:
@@ -22,7 +21,7 @@ def test_read_none():
         to_dataframes(None)
     assert "Could not open None" in str(excinfo.value)
 
-def test_read_path():
+def test_read_path(base_dir):
     filename = 'all_generator_properties_input.gdx'
     from pathlib import Path
     gdx_file = Path(base_dir) / filename
@@ -44,7 +43,7 @@ def test_read_path():
     for val in dtypes.values():
         val == gdxpds.gdx.GamsDataType.Parameter
 
-def test_unload():
+def test_unload(base_dir):
     filename = 'all_generator_properties_input.gdx'
     gdx_file = os.path.join(base_dir,filename)
     with gdxpds.gdx.GdxFile() as f:

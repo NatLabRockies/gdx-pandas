@@ -47,10 +47,9 @@ script-files = ["bin/csv_to_gdx.py", "bin/gdx_to_csv.py"]
 version = {attr = "gdxpds.__version__"}
 
 [tool.setuptools.packages.find]
-
-[tool.setuptools.package-data]
-"gdxpds.test" = ["*.csv", "*.gdx"]
+where = ["src"]
 
 [tool.pytest.ini_options]
-log_file = "gdxpds/test/pytest.log"
+testpaths = ["tests"]
+log_file = "tests/pytest.log"
 log_file_level = "INFO"
