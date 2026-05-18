@@ -3,12 +3,10 @@
 To get all of the development dependencies for Python:
 
 ```
-pip install -e .[admin]
+pip install -e .[dev]
 ```
 
-Also, you will need to install
-
-- [pandoc](https://pandoc.org/installing.html)
+That meta-extra pulls in `[test]` (pytest) and `[docs]` (sphinx, sphinx_rtd_theme, myst-parser). Use `.[test]` or `.[docs]` if you only want one. Build/release tooling (`build`, `twine`, etc.) is no longer a local concern — see [Releases](#create-a-new-release) below.
 
 ## Maintain multiple .venvs for testing
 
@@ -67,86 +65,63 @@ pytest tests
 
 ## Create a new release
 
-1. Update version number (`src/gdxpds/__init__.py`), CHANGES.txt, `pyproject.toml`, LICENSE and header as needed
-2. Run tests locally and fix any issues
-3. Install from github and make sure tests pass 
-4. Uninstall the draft package
-5. Publish documentation
-6. Create release on github
-7. Release tagged version on pypi
-    
-## Publish documentation
+Two GitHub Actions workflows make a release fully automatic from the Releases UI: [release-pypi.yml](../.github/workflows/release-pypi.yml) publishes to PyPI via Trusted Publishing (OIDC, no API token stored anywhere), and [release-docs.yml](../.github/workflows/release-docs.yml) builds docs against the release tag and deploys them under `https://NatLabRockies.github.io/gdx-pandas/vX.Y.Z/`. Both gate on `release.prerelease == false`, so pre-release tags (e.g. `v2.0.0rc1`) are no-ops for automation — if you ever need a pre-release on PyPI, run `python -m build` and `twine upload` by hand.
 
-The documentation is built with [Sphinx](http://sphinx-doc.org/index.html). There are several steps to creating and publishing the documentation:
+The end-to-end flow:
 
-1. Convert .md input files to .rst
-2. Refresh API documentation
-3. Build the HTML docs
-4. Push to GitHub
+1. Update version number in `src/gdxpds/__init__.py`, `CHANGES.txt`, `pyproject.toml` (if hardcoded anywhere), and `LICENSE` header as needed. Commit and merge to `main`.
+2. Run `pytest tests` locally against each GAMS-pinned venv (see [Maintain multiple .venvs for testing](#maintain-multiple-venvs-for-testing)).
+3. On GitHub: Releases → **Draft a new release** → tag `vX.Y.Z` (matching `gdxpds.__version__` — `release-pypi.yml` enforces this) → write release notes → **Publish release**.
+4. Within ~5 minutes both workflows complete:
+    - `pip install gdxpds==X.Y.Z` works from PyPI.
+    - `https://NatLabRockies.github.io/gdx-pandas/vX.Y.Z/` is live.
+    - The version dropdown on `/latest/` now offers `vX.Y.Z`.
 
-### Markdown to reStructuredText
+## Documentation
 
-Markdown files are registered in `doc/source/md_files.txt`. Paths in that file should be relative to the docs folder and should exclude the file extension. For every file listed there, the `dev/md_to_rst.py` utility will expect to find a markdown (`.md`) file, and will look for an optional `.postfix` file, which is expected to contain `.rst` code to be appended to the `.rst` file created by converting the input `.md` file. Thus, running `dev/md_to_rst.py` on the `doc/source/md_files.txt` file will create revised `.rst` files, one for each entry listed in the registry. In summary:
+Docs are built with [Sphinx](http://sphinx-doc.org/index.html) and authored in MyST-flavored markdown — see [doc/source/index.md](../doc/source/index.md), [doc/source/overview.md](../doc/source/overview.md), and [doc/source/api.md](../doc/source/api.md). The API page is generated automatically by `sphinx.ext.autosummary` (details below). Three GitHub Actions workflows manage them:
 
-```
-cd doc/source
-python ../../dev/md_to_rst.py md_files.txt
-```
+- [docs-pr.yml](../.github/workflows/docs-pr.yml) — builds Sphinx on every PR (with `-W` warnings-as-errors) and uploads the HTML as an artifact for review.
+- [docs.yml](../.github/workflows/docs.yml) — on every push to `main`, rebuilds and deploys `/latest/`.
+- [release-docs.yml](../.github/workflows/release-docs.yml) — on every published Release, builds against the tag and deploys `/vX.Y.Z/`.
 
-### Refresh API Documentation
-
-- Make sure gdx-pandas is in your PYTHONPATH
-- Delete the contents of `source/api`.
-- Run `sphinx-apidoc -o source/api ..` from the `doc` folder.
-- Compare `source/api/modules.rst` to `source/api.rst`. Delete `setup.rst` and references to it.
-- Copy-paste the text in `gdxpds.postfix` at the bottom of `gdxpds.rst`
-- 'git push' changes to the documentation source code as needed.
-- Make the documentation per below
-
-### Building HTML Docs
-
-Run `make html` for Mac and Linux; `make.bat html` for Windows.
-
-### Pushing to GitHub Pages
-
-#### Mac/Linux
+The deployed layout on the `gh-pages` branch:
 
 ```
-make github
+gh-pages/
+    index.html                 # redirects to /latest/
+    versions.json              # [latest, v2.0.0, v1.5.0, ...]
+    latest/                    # built from main
+    v1.5.0/                    # built from v1.5.0 tag
+    v2.0.0/                    # built from v2.0.0 tag
+    ...
 ```
 
-#### Windows
+The version dropdown (sidebar, sphinx_rtd_theme) is populated from `versions.json` at page load by [doc/source/_static/versions.js](../doc/source/_static/versions.js).
+
+### Build docs locally
 
 ```
-make.bat html
+pip install -e .[docs]
+cd doc
+make.bat html      # Windows
+# or: make html    # Mac/Linux
 ```
 
-Then run the github-related commands by hand:
+Output: `doc/build/html/index.html`. The version dropdown hides itself silently when there's no `versions.json` (local builds).
 
-```
-git branch -D gh-pages
-git push origin --delete gh-pages
-ghp-import -n -b gh-pages -m "Update documentation" ./build/html
-git checkout gh-pages
-git push origin gh-pages
-git checkout main # or whatever branch you were on
-```
+### API reference is fully automatic
 
-## Release on pypi
+The API page is driven by `sphinx.ext.autosummary` with `:recursive:` (see [doc/source/api.md](../doc/source/api.md)). Sphinx walks `gdxpds.*` at build time and writes per-symbol stubs into `doc/source/_autosummary/` (gitignored). Adding or removing a module under [src/gdxpds/](../src/gdxpds/) is picked up on the next build — no manual `sphinx-apidoc` step. The output style is controlled by the templates in [doc/source/_templates/autosummary/](../doc/source/_templates/autosummary/).
 
-1. [using testpyi](https://packaging.python.org/guides/using-testpypi/) has good instructions for setting up your user account on TestPyPI and PyPI, and configuring twine to know how to access both repositories.
-2. Test the package
+### Manage versioned docs from the UI
 
-    ```
-    python -m build
-    twine upload --repository testpypi dist/*
-    # look at https://test.pypi.org/project/gdxpds/
-    pip install --index-url https://test.pypi.org/simple/ gdxpds
-    # check it out ... fix things ...
-    ```
+Backfill an old tag's docs:
 
-3. Upload to pypi
+- Actions → **Build and deploy docs** → "Run workflow" → set `version` to e.g. `v1.4.0`. The workflow checks out that tag and deploys to `/v1.4.0/`. The tag must have the MyST-based docs layout (i.e., it was released after this migration).
 
-    ```
-    twine upload --repository pypi dist/*
-    ```
+Delete a version's docs (e.g., dropping support for an old line you no longer want listed in the version dropdown):
+
+- Actions → **Build and deploy docs** → "Run workflow" → set `delete_version` to e.g. `v1.4.0`. The workflow removes `gh-pages/v1.4.0/` and regenerates `versions.json` so the dropdown no longer offers it.
+
+Both inputs are mutually exclusive in a single run.
