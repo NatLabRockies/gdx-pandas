@@ -2,6 +2,14 @@ import os
 import shutil
 import subprocess
 
+# Investigation hook for the historical pandas-before-gdxpds Linux segfault.
+# When set, force pandas into sys.modules BEFORE the first gdxpds import so
+# the whole test session exercises the bad import order. Drives the matrix
+# in dev/run_test_matrix.sh and will be deleted once the underlying concern
+# is confirmed obsolete.
+if os.environ.get("GDXPDS_TEST_PREIMPORT_PANDAS"):
+    import pandas  # noqa: F401
+
 import gdxpds.gdx
 import pytest
 

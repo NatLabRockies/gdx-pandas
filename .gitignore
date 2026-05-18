@@ -13,3 +13,5 @@ tests/output/
 
 .vscode
 .venv*
+
+dev/test_matrix_logs
