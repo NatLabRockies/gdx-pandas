@@ -26,6 +26,7 @@ legacy = [
 ]
 admin = [
     "pytest",
+    "build",
     "ghp-import",
     "numpydoc",
     "pandoc",

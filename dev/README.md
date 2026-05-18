@@ -67,7 +67,7 @@ pytest gdxpds\test
 
 ## Create a new release
 
-1. Update version number, CHANGES.txt, setup.py, LICENSE and header as needed
+1. Update version number (`gdxpds/__init__.py`), CHANGES.txt, `pyproject.toml`, LICENSE and header as needed
 2. Run tests locally and fix any issues
 3. Install from github and make sure tests pass 
 4. Uninstall the draft package
@@ -138,7 +138,7 @@ git checkout main # or whatever branch you were on
 2. Test the package
 
     ```
-    python setup.py sdist
+    python -m build
     twine upload --repository testpypi dist/*
     # look at https://test.pypi.org/project/gdxpds/
     pip install --index-url https://test.pypi.org/simple/ gdxpds
