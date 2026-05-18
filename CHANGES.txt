@@ -1,4 +1,14 @@
-v1.4.0, 07/21/23 -- add get_data_types function that maps symbol name to gdx.GamsDataType; 
+v1.5.0           -- migrate to pyproject.toml; require Python >= 3.11,
+                    pandas >= 2.2, numpy >= 2.0
+                    support modern gamsapi bindings (gams.core.gdx); the older
+                    standalone gdxcc package moves to a [legacy] extra
+                    GamsDirFinder handles the modern C:\GAMS\<version>\ layout
+                    adopt src layout (src/gdxpds/); tests live in top-level
+                    tests/ and no longer ship in the wheel
+                    new csv_to_gdx and gdx_to_csv console commands; the old
+                    csv_to_gdx.py and gdx_to_csv.py names continue to work but
+                    are deprecated and will be removed in a future release
+v1.4.0, 07/21/23 -- add get_data_types function that maps symbol name to gdx.GamsDataType;
                     add load_set_text kwarg to gdx.GdxSymbol.load, to_dataframe, and to_dataframes
 v1.3.0, 05/09/23 -- performance improvements (faster read and write)
                     GAMS directory finder improvements

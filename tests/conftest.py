@@ -1,7 +1,6 @@
 import os
 import shutil
-import subprocess as subp
-import sys
+import subprocess
 
 import gdxpds.gdx
 import pytest
@@ -29,23 +28,6 @@ def run_dir(base_dir):
     return os.path.join(base_dir, "output")
 
 
-@pytest.fixture(scope="session")
-def bin_prefix():
-    # Resolves bin/ or Scripts/ depending on install mode.
-    # Will be removed in Commit 2 once CLI scripts become entry points.
-    here = os.path.dirname(__file__)
-    candidates = [
-        os.path.join(here, "..", "bin"),                 # dev (repo root)
-        os.path.join(here, *([".."] * 5), "bin"),        # anaconda
-        os.path.join(here, *([".."] * 4), "Scripts"),    # Windows install
-        os.path.join("/", "usr", "local", "bin"),        # Linux install
-    ]
-    for c in candidates:
-        if os.path.isdir(c) and os.path.isfile(os.path.join(c, "gdx_to_csv.py")):
-            return os.path.abspath(c)
-    return ""
-
-
 @pytest.fixture(scope="session", autouse=True)
 def manage_rundir(request, clean_up, run_dir):
     if os.path.exists(run_dir):
@@ -59,8 +41,14 @@ def manage_rundir(request, clean_up, run_dir):
 
 
 @pytest.fixture
-def roundtrip_one_gdx(base_dir, run_dir, bin_prefix):
-    """Factory: returns a callable(filename, dirname) -> roundtripped_gdx_path."""
+def roundtrip_one_gdx(base_dir, run_dir):
+    """Factory: returns a callable(filename, dirname) -> roundtripped_gdx_path.
+
+    CLI scripts are invoked by entry-point name. pip places `csv_to_gdx` and
+    `gdx_to_csv` on PATH after `pip install -e .`. Using subprocess (rather
+    than direct in-process calls) preserves the load-bearing Linux constraint
+    that `import gdxpds` runs before `import pandas`.
+    """
     def _roundtrip(filename, dirname):
         gdx_file = os.path.join(base_dir, filename)
         with gdxpds.gdx.GdxFile() as gdx:
@@ -75,10 +63,7 @@ def roundtrip_one_gdx(base_dir, run_dir, bin_prefix):
         out_dir = os.path.join(run_dir, dirname, os.path.splitext(filename)[0])
         if not os.path.exists(os.path.dirname(out_dir)):
             os.mkdir(os.path.dirname(out_dir))
-        cmds = [sys.executable, os.path.join(bin_prefix, 'gdx_to_csv.py'),
-                '-i', gdx_file,
-                '-o', out_dir]
-        subp.call(cmds)
+        subprocess.run(["gdx_to_csv", "-i", gdx_file, "-o", out_dir], check=True)
 
         txt_file = os.path.join(out_dir, 'csvs.txt')
         with open(txt_file, 'w') as f:
@@ -88,10 +73,7 @@ def roundtrip_one_gdx(base_dir, run_dir, bin_prefix):
                         f.write("{}\n".format(os.path.join(p, file)))
                 break
         roundtripped_gdx = os.path.join(out_dir, 'output.gdx')
-        cmds = [sys.executable, os.path.join(bin_prefix, 'csv_to_gdx.py'),
-                '-i', txt_file,
-                '-o', roundtripped_gdx]
-        subp.call(cmds)
+        subprocess.run(["csv_to_gdx", "-i", txt_file, "-o", roundtripped_gdx], check=True)
 
         with gdxpds.gdx.GdxFile(lazy_load=True) as gdx:
             gdx.read(roundtripped_gdx)

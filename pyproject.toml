@@ -40,7 +40,14 @@ admin = [
 [project.urls]
 Homepage = "https://github.com/NatLabRockies/gdx-pandas"
 
+[project.scripts]
+csv_to_gdx = "gdxpds.cli.csv_to_gdx:main"
+gdx_to_csv = "gdxpds.cli.gdx_to_csv:main"
+
 [tool.setuptools]
+# Deprecated `.py`-suffixed commands preserved for one release.
+# Remove this block, the bin/ directory, and main_py_alias() in the next
+# (interface-breaking) release. See CLAUDE.md "Conventions and gotchas".
 script-files = ["bin/csv_to_gdx.py", "bin/gdx_to_csv.py"]
 
 [tool.setuptools.dynamic]
