@@ -212,10 +212,12 @@ def load_specials(gams_dir_finder):
     global GDX_TO_NP_SVS
     global NP_TO_GDX_SVS
 
+    from gdxpds.tools import _require_gams_installation, _check_gdx_create_rc
+    _require_gams_installation(gams_dir_finder)
+
     H = gdxcc.new_gdxHandle_tp()
     rc = gdxcc.gdxCreateD(H, gams_dir_finder.gams_dir, gdxcc.GMS_SSSIZE)
-    if not rc:
-        raise Exception(rc[1])
+    _check_gdx_create_rc(H, rc, gdxcc, gams_dir_finder.gams_dir, gams_dir_finder.source)
     # get special values
     special_values = gdxcc.doubleArray(gdxcc.GMS_SVIDX_MAX)
     gdxcc.gdxGetSpecialValues(H, special_values)

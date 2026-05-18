@@ -23,7 +23,18 @@ def main(argv=None):
         prog="gdxpds",
         description="gdx-pandas command-line utilities.",
     )
+    parser.add_argument(
+        "--version", action="version", version=f"gdxpds {gdxpds.__version__}",
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    info_parser = subparsers.add_parser(
+        "info",
+        help="Print gdxpds environment info (Python, bindings, GAMS_DIR, load status).",
+    )
+    info_parser.add_argument(
+        "-g", "--gams_dir", default=None,
+        help="Probe this GAMS directory instead of the loaded / discovered one.")
 
     test_parser = subparsers.add_parser(
         "test",
@@ -32,13 +43,21 @@ def main(argv=None):
     test_parser.add_argument(
         "-v", "--verbose", action="store_true",
         help="Print exception tracebacks on failure.")
+    test_parser.add_argument(
+        "-g", "--gams_dir", default=None,
+        help="Use this GAMS directory for the verification run.")
 
     args = parser.parse_args(argv)
+    if args.command == "info":
+        print(gdxpds.info(gams_dir=args.gams_dir))
+        return 0
     if args.command == "test":
         return _run_verify_install(args)
 
 
 def _run_verify_install(args) -> int:
+    print(gdxpds.info(gams_dir=args.gams_dir))
+    print()
     print("Verifying gdxpds installation...")
     failures = []
 
@@ -64,13 +83,14 @@ def _run_verify_install(args) -> int:
 
 def _check_gams_install(args, failures):
     try:
-        gams_dir = gdxpds.tools.GamsDirFinder().gams_dir
-        _ok(f"GAMS install found at {gams_dir}")
-        return gams_dir
+        finder = gdxpds.tools.GamsDirFinder(gams_dir=args.gams_dir)
+        gdxpds.tools._require_gams_installation(finder)
+        _ok(f"GAMS install found at {finder.gams_dir}")
+        return finder.gams_dir
     except Exception as exc:
         _fail("Could not locate a GAMS installation", exc, args)
         _hint("Set $env:GAMS_DIR (PowerShell) or $GAMS_DIR (POSIX) to your "
-              "GAMS install directory, or put `gams` on PATH.")
+              "GAMS install directory, put `gams` on PATH, or pass -g/--gams_dir.")
         failures.append("gams_install")
         return None
 
@@ -95,7 +115,7 @@ def _check_bindings(args, failures):
 
 def _check_read(sample_path, args, failures):
     try:
-        with gdxpds.gdx.GdxFile(lazy_load=False) as gdx:
+        with gdxpds.gdx.GdxFile(gams_dir=args.gams_dir, lazy_load=False) as gdx:
             gdx.read(sample_path)
             names = {s.name for s in gdx}
             assert names == {"t", "p", "v"}, f"unexpected symbols: {names}"
@@ -110,11 +130,11 @@ def _check_read(sample_path, args, failures):
 
 def _check_roundtrip(sample_path, out_path, args, failures):
     try:
-        with gdxpds.gdx.GdxFile(lazy_load=False) as gdx:
+        with gdxpds.gdx.GdxFile(gams_dir=args.gams_dir, lazy_load=False) as gdx:
             gdx.read(sample_path)
             with gdx.clone() as gdx2:
                 gdx2.write(out_path)
-        with gdxpds.gdx.GdxFile(lazy_load=False) as gdx:
+        with gdxpds.gdx.GdxFile(gams_dir=args.gams_dir, lazy_load=False) as gdx:
             gdx.read(out_path)
             assert {s.name for s in gdx} == {"t", "p", "v"}
         _ok("Round-trip write->read preserves all symbols")
@@ -127,7 +147,7 @@ def _check_roundtrip(sample_path, out_path, args, failures):
 
 def _check_specials(out_path, args, failures):
     try:
-        with gdxpds.gdx.GdxFile(lazy_load=False) as gdx:
+        with gdxpds.gdx.GdxFile(gams_dir=args.gams_dir, lazy_load=False) as gdx:
             gdx.read(out_path)
             values = gdx["p"].dataframe["Value"].tolist()
 

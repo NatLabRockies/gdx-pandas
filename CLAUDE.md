@@ -59,6 +59,16 @@ pytest tests --no-clean-up
 
 The custom `--no-clean-up` flag and the shared test fixtures (`base_dir`, `run_dir`, `manage_rundir`, `roundtrip_one_gdx`) are defined in [tests/conftest.py](tests/conftest.py).
 
+The installed `gdxpds` CLI exposes three subcommands:
+
+```powershell
+gdxpds --version    # terse version line
+gdxpds info         # environment report (Python, bindings, GAMS_DIR + source, load status)
+gdxpds test         # end-to-end install verification against the local GAMS
+```
+
+`gdxpds info` is also the Python function [gdxpds.info()](src/gdxpds/__init__.py) — it returns the report as a `str` and is contracted to never raise.
+
 Verify a fresh install end-to-end (intended for end users; ships with the base package, no `[test]` extra needed):
 
 ```powershell
@@ -87,6 +97,33 @@ Things that aren't obvious from one file:
 - **Special values.** GAMS encodes NA/EPS/+Inf/-Inf/UNDEF as fixed magic floats (e.g. 1E300, 2E300, 3E300). [src/gdxpds/special.py](src/gdxpds/special.py) converts these to/from numpy equivalents (`np.nan`, `np.inf`) on read/write. Parameters and Sets bypass this conversion — keep that in mind when debugging value mismatches.
 - **Set text vs. set membership.** By default, Set values are booleans (membership). Pass `load_set_text=True` to surface the GAMS element text via `gdxGetElemText()`. The `_fixup_set_vals` flag controls boolean coercion on write.
 - **Optional fast path.** If `gdx2py` is importable (Windows-only), it is used to read Parameters faster than streaming through the SWIG bindings. The slow path through `gdxDataReadStr()` is the default.
+- **`gams_dir=` kwargs are path/config, not library-swap.** `load_gdxcc()` runs once at `import gdxpds` time and binds the GAMS shared library into the process. After that first successful load, subsequent `gdxCreateD(H, <dir>, ...)` calls treat the directory argument as a no-op — they return success and hand back a working handle that operates on the *already-loaded* library, regardless of what `<dir>` says (empirically verified: post-import, `gdxCreateD(H, "C:\\Windows", ...)` returns rc=1 and the handle reads GDX files just fine). That means the `gams_dir=` parameter on `GdxFile`, `to_dataframes`, `to_gdx`, `gdxpds.info()`, the `-g`/`--gams_dir` CLI flag, etc. — all useful for *path validation* and *configuration intent*, but they cannot swap GAMS at runtime *in current gdxpds*. The only mechanism that actually selects which GAMS gets loaded is the env-var-driven bootstrap (`GAMS_DIR` / `GAMSDIR`, per-venv-pinned via `Activate.ps1` — see [dev/README.md](dev/README.md)). Multi-GAMS testing is one-venv-per-GAMS, not one-process-per-GAMS. (The C bindings *do* expose primitives that would make in-process swap feasible — see "Runtime GAMS swap" below.)
+
+## Runtime GAMS swap (feasible; not implemented)
+
+The "one-process-per-GAMS" constraint above is a property of `gdxpds`, not of the underlying C bindings. `gams.core.gdx` exposes two primitives that together would allow swapping GAMS at runtime:
+
+- `gdxLibraryLoaded() -> int` — returns 1 if the GDX shared library is currently bound to the process, 0 otherwise.
+- `gdxLibraryUnload() -> int` — unloads the bound library; returns 1 on success.
+
+Verified behavior on Windows with `gamsapi 48.7.0`:
+
+1. Before any `import gdxpds`: `gdxLibraryLoaded() == 0`.
+2. After `import gdxpds`: `gdxLibraryLoaded() == 1`.
+3. After `gdxLibraryUnload()`: returns 1, and `gdxLibraryLoaded() == 0`.
+4. A subsequent `gdxCreateD(H, "/different/GAMS", ...)` re-loads from the new directory: rc=1, `gdxLibraryLoaded() == 1`.
+
+So an in-process GAMS swap is technically reachable. The recipe would be: close all open handles → `gdxLibraryUnload()` → fresh `gdxCreateD(H, new_dir, ...)`.
+
+**Caveats that would need verification before relying on this:**
+
+1. **Stale handles.** Any `GdxFile` / raw `H` handles created against the previous library reference unloaded memory after unload. Operations on them likely segfault. A real implementation needs to find and close them all, or refuse to unload while any are open.
+2. **Cold-start crash risk re-emerges.** The first `gdxCreateD` after unload faces the same "non-GAMS dir → access violation on Windows" failure mode as a cold-start. `_require_gams_installation` in [src/gdxpds/tools.py](src/gdxpds/tools.py) would need to run before any reload, not just at import.
+3. **`gdxpds.special` state.** [src/gdxpds/special.py](src/gdxpds/special.py) populates `SPECIAL_VALUES`, `GDX_TO_NP_SVS`, `NP_TO_GDX_SVS` module-level dicts from the loaded library. These are GDX-format constants and likely identical across GAMS versions, but a reload-aware API should re-call `load_specials()` for hygiene.
+4. **`load_gdxcc()` is not reload-aware.** It just calls `gdxCreateD` again, which (as documented above) treats the dir arg as a no-op once the library is loaded. A reload entry point would need to call `gdxLibraryUnload()` first.
+5. **Linux semantics.** All verification above is Windows-only. `dlclose()` on Linux is famously unreliable for "really fully unload" — the kernel may keep the library mapped if any references remain. Cross-platform behavior should be checked during the Linux multi-version testing pass.
+
+A shape for a future `gdxpds.reload_gdxcc(gams_dir)` would: assert no live handles → run pre-checks (`_require_gams_installation`) → call `gdxLibraryUnload()` → fresh `gdxCreateD(H, gams_dir, ...)` → re-call `load_specials()`. The Linux pass is the right time to design this — that's where it'd be most useful (multi-version testing) and where the platform edge cases would surface.
 
 ## Conventions and gotchas
 

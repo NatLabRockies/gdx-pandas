@@ -46,6 +46,11 @@ end-to-end with:
 gdxpds test
 ```
 
+For a quick environment check without running the full round-trip, use
+`gdxpds info` — it prints Python, bindings, the resolved `GAMS_DIR` (and
+which discovery branch produced it), and any import-time load error. Useful
+for bug reports. `gdxpds --version` prints just the version.
+
 Expected output:
 
 ```
