@@ -392,9 +392,13 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         # write the universal set
         self.universal_set.write()
 
+        # Build the {name: position} map once so each symbol's strict-domain
+        # eligibility check is O(1) per parent rather than O(N).
+        name_positions = {name: i for i, name in enumerate(self._symbols.keys())}
+
         for i, symbol in enumerate(self,start=1):
             try:
-                symbol.write(index=i)
+                symbol.write(index=i, name_positions=name_positions)
             except:
                 logger.error("Unable to write {} to {}".format(symbol,filename))
                 raise
@@ -1099,23 +1103,28 @@ class GdxSymbol(object):
         self._domain = resolved
         return True
 
-    def _strict_domain_writeable(self):
+    def _strict_domain_writeable(self, name_positions=None):
         """
-        Internal: True iff this symbol's ``_domain`` can be written using strict 
-        :c:func:`gdxSymbolSetDomain` at this point in the file's write sequence. Requires every 
-        non-``None`` entry to name a parent that (a) exists in ``self.file._symbols`` and 
-        (b) precedes this symbol in insertion order (so the parent has already been 
-        ``gdxDataWriteDone``-ed and is in the GDX symbol table). Returns False for 
+        Internal: True iff this symbol's ``_domain`` can be written using strict
+        :c:func:`gdxSymbolSetDomain` at this point in the file's write sequence. Requires every
+        non-``None`` entry to name a parent that (a) exists in ``self.file._symbols`` and
+        (b) precedes this symbol in insertion order (so the parent has already been
+        ``gdxDataWriteDone``-ed and is in the GDX symbol table). Returns False for
         self-referential 1-dim sets.
+
+        ``name_positions`` is an optional ``{name: insertion_position}`` map for
+        ``self.file._symbols``. :py:meth:`GdxFile.write` builds it once and passes it
+        through so eligibility checks stay O(1) per parent rather than O(N) across a
+        whole-file write. When omitted (standalone calls) it is built on demand.
         """
         if self._domain is None:
             return False
         if self.file is None:
             return False
-        symbol_names = list(self.file._symbols.keys())
-        try:
-            my_pos = symbol_names.index(self.name)
-        except ValueError:
+        if name_positions is None:
+            name_positions = {name: i for i, name in enumerate(self.file._symbols.keys())}
+        my_pos = name_positions.get(self.name)
+        if my_pos is None:
             return False
         for d in self._domain:
             if d is None:
@@ -1124,12 +1133,9 @@ class GdxSymbol(object):
                 # Self-referential set: parent isn't yet in the GDX symbol
                 # table when its own write starts.
                 return False
-            parent_name = d.name
-            if parent_name not in self.file._symbols:
-                return False
-            try:
-                parent_pos = symbol_names.index(parent_name)
-            except ValueError:
+            parent_pos = name_positions.get(d.name)
+            if parent_pos is None:
+                # Parent not in this file.
                 return False
             if parent_pos >= my_pos:
                 # Parent hasn't been written yet in this pass.
@@ -1349,7 +1355,7 @@ class GdxSymbol(object):
         self.dataframe = None
         self._loaded = False
 
-    def write(self,index=None): 
+    def write(self,index=None,name_positions=None):
         """
         Writes this :py:class:`GdxSymbol` to its :py:attr:`file`
         """
@@ -1390,7 +1396,7 @@ class GdxSymbol(object):
         # gdxSymbolSetDomainX. Decision is per-symbol because GDX itself only
         # supports per-symbol strict/relaxed.
         if self.num_dims > 0:
-            domain = self._domain if self._strict_domain_writeable() else None
+            domain = self._domain if self._strict_domain_writeable(name_positions) else None
             if domain is not None:
                 names = [d.name if d is not None else '*' for d in domain]
                 if not gdxcc.gdxSymbolSetDomain(self.file.H, names):
