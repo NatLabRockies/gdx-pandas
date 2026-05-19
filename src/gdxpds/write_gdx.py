@@ -30,6 +30,15 @@ class Translator(object):
         if self.__gdx is not None:
             self.__gdx.__del__()
 
+    def release(self):
+        """
+        Relinquish ownership of the built :class:`GdxFile`. After this call
+        the Translator's cleanup (:meth:`__del__` / :meth:`__exit__`) will
+        not free the GdxFile's GDX handle, so a GdxFile handed to a caller
+        stays valid. The Translator should not be reused afterward.
+        """
+        self.__gdx = None
+
     @property
     def dataframes(self):
         return self.__dataframes
@@ -216,5 +225,8 @@ def to_gdx(dataframes,path=None,gams_dir=None,domains=None):
     gdx = translator.gdx
     if path is not None:
         gdx.write(path)
+    # Hand the GdxFile to the caller: the transient translator must not free
+    # its GDX handle when it is garbage-collected at function exit.
+    translator.release()
     return gdx
 
