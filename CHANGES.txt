@@ -1,4 +1,4 @@
-v1.5.0           -- migrate to pyproject.toml; require Python >= 3.11, pandas >= 2.2, numpy >= 2.0
+v1.5.0, XX/XX/XX -- migrate to pyproject.toml; require Python >= 3.11, pandas >= 2.2, numpy >= 2.0
                     support modern gamsapi bindings (gams.core.gdx); the older standalone gdxcc
                     package moves to a [legacy] extra
                     GamsDirFinder handles the modern C:\GAMS\<version>\ layout
