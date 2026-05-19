@@ -403,9 +403,11 @@ def test_get_subset_relationships(run_dir):
 
     rels = gdxpds.get_subset_relationships(out)
     assert set(rels.keys()) == {"t", "sub_t"}
-    # 't' was built with dims=['t'] (not ['*']) — relaxed string-only domain
-    # for the parent, with its own name as the dim label.
+    # 't' was built with dims=['t'] — its recorded domain is the literal name
+    # 't' (self-referential), reported verbatim rather than collapsed to None,
+    # so the value round-trips back through to_gdx(domains=...).
     assert rels["t"] == ["t"]
+    # 'sub_t' is a genuine subset of 't'.
     assert rels["sub_t"] == ["t"]
 
 
@@ -432,3 +434,32 @@ def test_clone_preserves_refs(run_dir):
         assert gdx["sub_t"].domain_type == GamsDomainType.REGULAR
         assert gdx["sub_t"].domain is not None
         assert gdx["sub_t"].domain[0] is gdx["t"]
+
+
+# ---------------------------------------------------------------------------
+# 21. get_subset_relationships output round-trips through to_gdx(domains=...)
+# ---------------------------------------------------------------------------
+def test_get_subset_relationships_round_trips_through_to_gdx(run_dir):
+    out1 = os.path.join(run_dir, "rels_rt_1.gdx")
+    out2 = os.path.join(run_dir, "rels_rt_2.gdx")
+    dataframes = {
+        "a":     pd.DataFrame([["a1", True], ["a2", True], ["a3", True]],
+                              columns=["a", "Value"]),
+        "sub_a": pd.DataFrame([["a1", True], ["a3", True]],
+                              columns=["a", "Value"]),
+        "free":  pd.DataFrame([["x1", True]], columns=["*", "Value"]),
+    }
+    # Build with a genuine subset (sub_a -> a) and a wildcard set (free).
+    gdxpds.to_gdx(dataframes, out1, domains={"sub_a": ["a"], "free": [None]})
+
+    rels = gdxpds.get_subset_relationships(out1)
+    # Covers all three reported forms: genuine parent, self-referential root
+    # (reported verbatim), and wildcard (None).
+    assert rels["a"] == ["a"]
+    assert rels["sub_a"] == ["a"]
+    assert rels["free"] == [None]
+
+    # Feed the read relationships straight back in; the shape must be accepted
+    # and the resulting file must report identical relationships.
+    gdxpds.to_gdx(dataframes, out2, domains=rels)
+    assert gdxpds.get_subset_relationships(out2) == rels

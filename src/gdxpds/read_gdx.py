@@ -143,19 +143,17 @@ def get_data_types(gdx_file,gams_dir=None):
 
 def get_subset_relationships(gdx_file, gams_dir=None):
     """
-    Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name. 
-    
-    Outputs a dict that maps each symbol name to a list of Set names over which the symbol is 
-    defined. If that information is not encoded in the gdx file at all, or is not provided for 
-    specific dimensions of the domain, ``None`` is used as a placeholder for all missing or self-
-    referential dimensions. The appearance of None values does not necessarily mean that the 
-    Symbol was not defined over specific sets, just that the information is not available in the 
-    GDX file. In all cases, the length of the list for a given symbol will match the number of 
-    dimensions in that symbol's domain, and any names that do appear will be in the correct 
-    position.
-    
-    Pure-relaxed (string-only) domains are reported by name; root Sets and any dimension recorded 
-    as ``'*'`` come through as ``None``.
+    Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name.
+
+    Outputs a dict that maps each symbol name to a list with one entry per dimension, giving the
+    parent Set name recorded for that dimension. A dimension whose domain is the wildcard
+    (``'*'``) -- or for which the GDX file records no domain information at all -- comes through
+    as ``None``. Every other dimension is reported by its recorded name verbatim, including the
+    self-referential case where a (typically root) Set's dimension names the Set itself.
+
+    The length of each list matches the symbol's number of dimensions, and names appear in
+    dimension order. The output shape matches the ``domains=`` argument of :func:`to_gdx`, so a
+    value read here can be fed straight back in (``None`` round-trips as the wildcard).
 
     Parameters
     ----------
