@@ -136,17 +136,14 @@ class GamsDirFinder(object):
         def _parse(d):
             name = os.path.basename(d)
             try:
-                return (float(name),)
-            except ValueError:
-                pass
-            try:
                 return tuple(int(p) for p in name.split('.'))
             except ValueError:
                 return None
-        parsed = [(_parse(d), d) for d in roots]
-        valid = [(v, d) for v, d in parsed if v is not None]
+        valid = [(p, d) for p, d in ((_parse(d), d) for d in roots) if p is not None]
         if valid:
-            return max(valid)[1]
+            pad = max(len(p) for p, _ in valid)
+            padded = [(p + (0,) * (pad - len(p)), d) for p, d in valid]
+            return max(padded)[1]
         return roots[0]
 
     def __clean_gams_dir(self,value):
