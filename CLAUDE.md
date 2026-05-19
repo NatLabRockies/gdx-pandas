@@ -79,14 +79,15 @@ Source lives in [src/gdxpds/cli/main.py](src/gdxpds/cli/main.py); the embedded
 sample GDX is at `src/gdxpds/_verify_install/sample.gdx`, regenerable via
 [dev/build_verify_install_sample.py](dev/build_verify_install_sample.py).
 
-Build the docs (Sphinx):
+Build the docs (Sphinx, MyST-flavored markdown sources):
 
 ```powershell
+pip install -e .[docs]   # or .[dev] for tests + docs
 cd doc
 .\make.bat html
 ```
 
-Full release / docs publish workflow is in [dev/README.md](dev/README.md).
+Output is in `doc/build/html/`. Hand-authored docs are `.md` (parsed by MyST). The API page is generated automatically by `sphinx.ext.autosummary` with `:recursive:` — see [doc/source/api.md](doc/source/api.md) and the templates in [doc/source/_templates/autosummary/](doc/source/_templates/autosummary/). Full release / docs publish workflow — GitHub Actions on Release-published events — is in [dev/README.md](dev/README.md).
 
 ## Architecture notes
 
@@ -103,7 +104,7 @@ Things that aren't obvious from one file:
 ## Conventions and gotchas
 
 - No linter, formatter, or type-checker is configured. Don't introduce one unprompted.
-- No CI workflow in this repo — tests are run locally before release.
+- CI is docs-only — [.github/workflows/](.github/workflows/) builds and deploys Sphinx (PR check + main → /latest/ + per-tag /vX.Y.Z/) and publishes the package to PyPI on Release. Tests still run **locally** before release, per [dev/README.md](dev/README.md); there is no test CI.
 - Test fixtures include real `.gdx` and `.csv` files in [tests/](tests/). These live outside the package and are **not** shipped in the wheel — `pytest tests` runs against a clone of the repo. Don't delete them.
 - The two CLI scripts live in [src/gdxpds/cli/](src/gdxpds/cli/) and are installed via `[project.scripts]` in [pyproject.toml](pyproject.toml) as `csv_to_gdx` and `gdx_to_csv`. Tests subprocess these names directly (e.g. `subprocess.run(["csv_to_gdx", ...], check=True)`), which exercises the installed entry points and keeps each round-trip in its own process.
 - The old `.py`-suffixed commands (`csv_to_gdx.py`, `gdx_to_csv.py`) are preserved for one release via thin wrapper scripts in [bin/](bin/), installed by the deprecated setuptools `script-files` mechanism. They emit a `DeprecationWarning` when invoked. **Cleanup in the next (interface-breaking) release:** delete [bin/](bin/), drop the `[tool.setuptools] script-files = [...]` block from [pyproject.toml](pyproject.toml), and remove the `main_py_alias()` functions from `src/gdxpds/cli/csv_to_gdx.py` and `src/gdxpds/cli/gdx_to_csv.py`.

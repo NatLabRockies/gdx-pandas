@@ -24,17 +24,13 @@ test = [
 legacy = [
     "gdxcc",
 ]
-admin = [
-    "pytest",
-    "build",
-    "ghp-import",
-    "numpydoc",
-    "pandoc",
+docs = [
     "sphinx",
     "sphinx_rtd_theme",
-    "twine",
-    "setuptools",
-    "wheel",
+    "myst-parser",
+]
+dev = [
+    "gdxpds[test,docs]",
 ]
 
 [project.urls]

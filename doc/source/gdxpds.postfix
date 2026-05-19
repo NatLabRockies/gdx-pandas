@@ -1,8 +1,0 @@
-
-.. autofunction:: gdxpds.to_dataframes
-
-.. autofunction:: gdxpds.to_dataframe
-
-.. autofunction:: gdxpds.list_symbols
-
-.. autofunction:: gdxpds.to_gdx

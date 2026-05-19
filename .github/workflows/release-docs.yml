@@ -1,0 +1,103 @@
+name: Build and deploy versioned docs on Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gh-pages-deploy
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    if: github.event.release.prerelease == false
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ github.event.release.tag_name }}
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ env.VERSION }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+
+      - name: Install docs deps
+        # [legacy] pulls in the gdxcc PyPI binding, which is importable
+        # without a real GAMS install and provides the integer constants
+        # that gdxpds.gdx and gdxpds.special reference at module load.
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[docs,legacy]
+
+      - name: Build Sphinx (warnings-as-errors)
+        working-directory: doc
+        run: sphinx-build -W --keep-going -b html source build/html
+
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Apply versioned build to gh-pages tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd gh-pages
+
+          # First-time migration cleanup (idempotent after the first push).
+          # Keep: git metadata, jekyll-disable marker, root redirect, versions list,
+          # per-version subdirs, and CNAME (in case a custom domain is ever configured).
+          shopt -s extglob nullglob dotglob
+          for entry in *; do
+            case "$entry" in
+              .git|.nojekyll|CNAME|index.html|versions.json|latest|v[0-9]*) ;;
+              *) git rm -rf --quiet "$entry" 2>/dev/null || rm -rf "$entry" ;;
+            esac
+          done
+          shopt -u extglob nullglob dotglob
+
+          rm -rf "$VERSION"
+          mkdir -p "$VERSION"
+          cp -r ../doc/build/html/. "$VERSION/"
+          git add "$VERSION"
+
+          python3 - <<'PY'
+          import json, os, re
+          subdirs = [d for d in os.listdir('.')
+                     if os.path.isdir(d) and (d == 'latest' or re.match(r'^v[0-9]', d))]
+          tags = sorted((d for d in subdirs if d != 'latest'), reverse=True)
+          out = (['latest'] if 'latest' in subdirs else []) + tags
+          with open('versions.json', 'w') as f:
+              json.dump(out, f)
+          PY
+
+          cat > index.html <<'HTML'
+          <!DOCTYPE html>
+          <meta http-equiv="refresh" content="0; url=./latest/">
+          HTML
+          touch .nojekyll
+          git add versions.json index.html .nojekyll
+
+      - name: Commit and push
+        working-directory: gh-pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git diff --cached --quiet; then
+            echo "No changes; skipping push."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git commit -m "docs: build $VERSION (release ${{ github.event.release.tag_name }})"
+          git push origin gh-pages

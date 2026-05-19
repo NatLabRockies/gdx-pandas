@@ -2,3 +2,11 @@
 {% block extrahead %}
     <link href="{{ pathto("_static/style.css", True) }}" rel="stylesheet" type="text/css">
 {% endblock %}
+{% block sidebartitle %}
+    {{ super() }}
+    <div id="gdxpds-version-selector" hidden></div>
+{% endblock %}
+{% block footer %}
+    {{ super() }}
+    <script src="{{ pathto('_static/versions.js', True) }}"></script>
+{% endblock %}

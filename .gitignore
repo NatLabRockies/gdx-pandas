@@ -15,3 +15,6 @@ tests/output/
 .venv*
 
 dev/test_matrix_logs
+
+# Sphinx autosummary writes per-symbol stubs here on every build.
+doc/source/_autosummary/

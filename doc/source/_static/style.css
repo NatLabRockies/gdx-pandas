@@ -1,6 +1,21 @@
 .wy-nav-content {
   max-width: none;
 }
+
+/* Version dropdown injected by _static/versions.js. Hidden until JS finds versions.json. */
+#gdxpds-version-selector {
+  padding: 0.5em 1.5em;
+  background: #2980b9;
+  color: #fcfcfc;
+  font-size: 0.85em;
+}
+#gdxpds-version-selector select {
+  margin-left: 0.5em;
+  background: #fcfcfc;
+  color: #404040;
+  border: none;
+  padding: 0.15em 0.3em;
+}
 .wy-table-responsive table td {
   white-space: normal !important;
 }
