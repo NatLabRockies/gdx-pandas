@@ -96,21 +96,17 @@ def _check_gams_install(args, failures):
 
 
 def _check_bindings(args, failures):
-    try:
-        try:
-            from gams.core import gdx as _gdxcc  # noqa: F401
-            source = "gams.core.gdx (gamsapi)"
-        except ImportError:
-            import gdxcc  # noqa: F401
-            source = "gdxcc (legacy)"
-        _ok(f"GDX bindings loaded: {source}")
-        return True
-    except Exception as exc:
-        _fail("Could not import GDX bindings", exc, args)
+    source = gdxpds.tools._bindings_source
+    if source is None:
+        _fail("GDX bindings not loaded",
+              RuntimeError("see info() output above for details"),
+              args)
         _hint("Install `gamsapi` matched to your GAMS version: "
               "pip install gamsapi[transfer]==<your GAMS version>")
         failures.append("bindings")
         return False
+    _ok(f"GDX bindings loaded: {source}")
+    return True
 
 
 def _check_read(sample_path, args, failures):
