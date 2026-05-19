@@ -1,3 +1,4 @@
+import logging
 import os
 import subprocess
 import sys
@@ -63,8 +64,31 @@ def test_gams_dir_finder_records_source_in_env():
 # -------------------------------------------------------------------- load_gdxcc
 
 def test_load_gdxcc_raises_for_non_gams_dir():
-    with pytest.raises(gdxpds.GamsLoadError, match=r"not a GAMS installation"):
-        gdxpds.load_gdxcc(gams_dir=NOT_GAMS_DIR)
+    # load_gdxcc validates the dir only on the first (binding) call; once a
+    # library is bound it warns-and-returns. Reset the bookkeeping so this is
+    # order-independent. The call raises before re-binding, so restore is safe.
+    saved = gdxpds.tools._loaded_gams_dir
+    gdxpds.tools._loaded_gams_dir = None
+    try:
+        with pytest.raises(gdxpds.GamsLoadError, match=r"not a GAMS installation"):
+            gdxpds.load_gdxcc(gams_dir=NOT_GAMS_DIR)
+    finally:
+        gdxpds.tools._loaded_gams_dir = saved
+
+
+def test_load_gdxcc_warns_and_returns_when_already_bound(caplog):
+    # Once a library is bound, a later call with a different (even invalid)
+    # gams_dir must warn-and-return, not raise. Sentinel bound dir keeps this
+    # independent of whether a real bind happened earlier in the session.
+    saved = gdxpds.tools._loaded_gams_dir
+    gdxpds.tools._loaded_gams_dir = "/already/bound/elsewhere"
+    try:
+        with caplog.at_level(logging.WARNING, logger="gdxpds.tools"):
+            result = gdxpds.load_gdxcc(gams_dir=NOT_GAMS_DIR)
+        assert result is None
+        assert "ignored (one GAMS library bound per process)" in caplog.text
+    finally:
+        gdxpds.tools._loaded_gams_dir = saved
 
 
 # ---------------------------------------------------------------- CLI surface

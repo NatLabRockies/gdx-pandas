@@ -268,9 +268,11 @@ def load_gdxcc(gams_dir=None):
     Idempotent: safe to call repeatedly. The first successful call binds the
     GDX shared library at the resolved ``gams_dir`` and populates the
     module-level dicts in :mod:`gdxpds.special`. Subsequent calls early-return
-    after validating the resolved directory; if the resolved ``gams_dir``
-    differs from the already-bound directory, a warning is emitted (one GAMS
-    library bound per process).
+    without re-binding; if the resolved ``gams_dir`` differs from the
+    already-bound directory, a warning is emitted (one GAMS library bound per
+    process). Directory validation runs only on the first, binding call, so a
+    later call with an invalid ``gams_dir`` warns and returns rather than
+    raising (the passed directory is ignored once a library is bound).
 
     Parameters
     ----------
@@ -287,7 +289,6 @@ def load_gdxcc(gams_dir=None):
     """
     global _bindings_source, _loaded_gams_dir
     finder = GamsDirFinder(gams_dir=gams_dir)
-    _require_gams_installation(finder)
     if _loaded_gams_dir is not None:
         if finder.gams_dir != _loaded_gams_dir:
             logger.warning(
@@ -296,6 +297,7 @@ def load_gdxcc(gams_dir=None):
                 f"ignored (one GAMS library bound per process)."
             )
         return
+    _require_gams_installation(finder)
     try:
         from gams.core import gdx as gdxcc
         _bindings_source = "gams.core.gdx"
