@@ -15,15 +15,12 @@
 # import os
 # import sys
 # sys.path.insert(0, os.path.abspath('.'))
-import sphinx_rtd_theme
-
-
 # -- Project information -----------------------------------------------------
 import gdxpds
 
 project = 'gdx-pandas'
-copyright = '2023, Alliance for Sustainable Energy'
-author = 'Elaine T. Hale'
+copyright = '2026, The Alliance for Energy Innovation, LLC'
+author = 'Elaine Hale'
 
 # The short X.Y version
 version = gdxpds.__version__
@@ -42,21 +39,34 @@ release = gdxpds.__version__
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
     'sphinx.ext.doctest',
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx.ext.githubpages',
-    'sphinx.ext.napoleon' # had numpydoc, but got lots of extraneous warnings
+    'sphinx.ext.napoleon', # had numpydoc, but got lots of extraneous warnings
+    'myst_parser',
 ]
+
+# autosummary :recursive: walks gdxpds.* at build time and writes per-symbol
+# stubs into _autosummary/ (gitignored). No manual sphinx-apidoc step needed.
+autosummary_generate = True
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
-# The suffix(es) of source filenames.
-# You can specify multiple suffix as a list of string:
-#
-# source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
+
+myst_enable_extensions = [
+    'colon_fence',
+    'deflist',
+]
+
+# Auto-generate anchor IDs for h1-h3 so [text](#section) links work in .md sources.
+myst_heading_anchors = 3
 
 # The master toctree document.
 master_doc = 'index'
@@ -83,7 +93,6 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 #
 html_theme = 'sphinx_rtd_theme'
-html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the

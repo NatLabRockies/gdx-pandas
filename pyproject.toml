@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gdxpds"
+description = "gdx-pandas is a python package to translate between gdx (GAMS data) and pandas"
+readme = "README.md"
+authors = [
+    {name = "Elaine Hale", email = "elaine.hale@nlr.gov"},
+]
+license = "BSD-3-Clause"
+requires-python = ">=3.11"
+dependencies = [
+    "pandas>=2.2",
+    "numpy>=2.0",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+legacy = [
+    "gdxcc",
+]
+docs = [
+    "sphinx",
+    "sphinx_rtd_theme",
+    "myst-parser",
+]
+dev = [
+    "gdxpds[test,docs]",
+]
+
+[project.urls]
+Homepage = "https://github.com/NatLabRockies/gdx-pandas"
+
+[project.scripts]
+gdxpds = "gdxpds.cli.main:main"
+csv_to_gdx = "gdxpds.cli.csv_to_gdx:main"
+gdx_to_csv = "gdxpds.cli.gdx_to_csv:main"
+
+[tool.setuptools]
+# Deprecated `.py`-suffixed commands preserved for one release.
+# Remove this block, the bin/ directory, and main_py_alias() in the next
+# (interface-breaking) release. See CLAUDE.md "Conventions and gotchas".
+script-files = ["bin/csv_to_gdx.py", "bin/gdx_to_csv.py"]
+
+[tool.setuptools.dynamic]
+version = {attr = "gdxpds.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"gdxpds._verify_install" = ["*.gdx"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+log_file = "tests/pytest.log"
+log_file_level = "INFO"

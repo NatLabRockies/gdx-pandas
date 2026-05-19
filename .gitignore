@@ -8,6 +8,13 @@ build
 .idea
 
 .pytest_cache
-gdxpds/test/pytest.log
+tests/pytest.log
+tests/output/
 
 .vscode
+.venv*
+
+dev/test_matrix_logs
+
+# Sphinx autosummary writes per-symbol stubs here on every build.
+doc/source/_autosummary/

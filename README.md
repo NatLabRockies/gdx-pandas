@@ -1,68 +1,79 @@
 # gdx-pandas
 [![PyPI](https://img.shields.io/pypi/v/gdxpds.svg)](https://pypi.python.org/pypi/gdxpds/)
-[![Documentation](https://img.shields.io/badge/docs-ready-blue.svg)](https://nrel.github.io/gdx-pandas)
+[![Documentation](https://img.shields.io/badge/docs-ready-blue.svg)](https://NatLabRockies.github.io/gdx-pandas)
 
 gdx-pandas is a python package to translate between gdx (GAMS data) and pandas. 
 
-[Install](#install) | [Documentation](https://nrel.github.io/gdx-pandas) | [Uninstall](#uninstall)
+[Install](#install) | [Documentation](https://NatLabRockies.github.io/gdx-pandas) | [Uninstall](#uninstall)
 
 ## Install
 
 ### Preliminaries
 
-- Python 3.7 or higher (exact compatibility might depend on which GAMS version you are using)
-- pandas (In general you will want the SciPy stack. Anaconda comes with it, or see [my notes for Windows](https://elainethale.wordpress.com/programming-notes/python-environment-set-up/).)
+- Python 3.11 or higher (exact compatibility might depend on which GAMS version you are using)
 - Install [GAMS](https://www.gams.com/download/)
 - Put the GAMS directory in your `PATH` and/or assign it to the `GAMS_DIR` environment variable
-- GAMS Python bindings
-    - See GAMS/**/apifiles/readme.txt on Windows and Mac, or 
-      /opt/gams/**/apifiles/readme.txt on Linux
-    - Run the following for the correct version of the Python bindings (e.g., from the GAMS/**/apifiles/Python/api_39 folder):
-        
-        ```bash
-        python setup.py install
-        ```
+- GAMS Python bindings — choose one:
 
-        or 
+    **Recommended.** Install the `gamsapi` that matches your installed GAMS version:
 
-        ```bash
-        python setup.py build --build-base={temporary-path-where-you-have-write-access} install
-        ```
+    ```bash
+    # xx.y.z corresponds to your GAMS version
+    pip install gamsapi[transfer]==xx.y.z
+    ```
 
-        with the latter being for the case when you can install packages into 
-        Python but don't have GAMS directory write access.
-    - If `import gdxcc` fails (which will also cause `import gdxpds` to fail) because there "is no `_gdxcc` module", one workaround is to copy all the `_*.pyd` (or `_*.so`) files from GAMS/**/apifiles/Python/api_XX/ and paste them into your Python environment next to, e.g., the `gdxcc-8-py3.9.egg` file, which on Anaconda is your environment's lib/site-packages directory.
+    **Legacy.** Use the standalone `gdxcc` package from PyPI by installing `gdxpds` with the `legacy` extra (see below). `gdxcc` is older and is not version-matched to your GAMS install, but the SWIG-bound C ABI is stable enough that it generally works.
 
 ### Get the Latest Package
 
 ```bash
+# Recommended (use with the gamsapi install above):
 pip install gdxpds
+
+# Legacy (also installs gdxcc; use if you skipped gamsapi):
+pip install gdxpds[legacy]
 ```
-
-or
-
-```bash
-pip install git+https://github.com/NREL/gdx-pandas.git@v1.4.0
-```
-
-or
-
-```bash
-pip install git+https://github.com/NREL/gdx-pandas.git@main
-```
-
 
 Versions are listed at [pypi](https://pypi.python.org/pypi/gdxpds/) and 
-https://github.com/NREL/gdx-pandas/releases.
+https://github.com/NatLabRockies/gdx-pandas/releases.
 
-After installation, you can test the package using pytest:
+## Verify installation
+
+After installing `gdxpds` and a matching `gamsapi`, verify your environment
+end-to-end with:
 
 ```bash
-pytest --pyargs gdxpds
+gdxpds test
 ```
 
-If the tests fail due to permission IOErrors, apply `chmod g+x` and `chmod a+x` 
-to the `gdx-pandas/gdxpds/test` folder.
+For a quick environment check without running the full round-trip, use
+`gdxpds info` — it prints Python, bindings, the resolved `GAMS_DIR` (and
+which discovery branch produced it), and any import-time load error. Useful
+for bug reports. `gdxpds --version` prints just the version.
+
+Expected output:
+
+```
+Verifying gdxpds installation...
+  [OK]   GAMS install found at <your GAMS directory>
+  [OK]   GDX bindings loaded: gams.core.gdx (gamsapi)
+  [OK]   Read embedded sample.gdx (...)
+  [OK]   Round-trip write->read preserves all symbols
+  [OK]   Special values (+Inf, -Inf, NaN) survive round-trip
+
+PASSED: gdxpds installation verified.
+```
+
+## Development tests
+
+To run the development test suite, clone the repo and run:
+
+```bash
+pytest tests
+```
+
+If the tests fail due to permission IOErrors, apply `chmod g+x` and `chmod a+x`
+to the `tests` folder.
 
 ## Uninstall
 
