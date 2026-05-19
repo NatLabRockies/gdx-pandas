@@ -216,7 +216,7 @@ class GamsDirFinder(object):
         if ret is None and os.name != 'nt':
             # posix systems
             try:
-                ret = os.path.dirname(subp.check_output(['which', 'gams'])).decode()
+                ret = os.path.dirname(subp.check_output(['which', 'gams']).decode().split("\n")[0])
             except:
                 ret = None
             ret = self.__clean_gams_dir(ret)
