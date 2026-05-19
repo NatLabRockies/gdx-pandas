@@ -146,7 +146,7 @@ A helper script drives all four venvs in sequence and writes per-venv logs plus 
 bash dev/run_test_matrix.sh
 ```
 
-It runs, in each existing venv: `pytest tests`, `GDXPDS_TEST_PREIMPORT_PANDAS=1 pytest tests` (exercises the historical pandas-before-gdxpds bad-order path; see [tests/conftest.py](../tests/conftest.py)), and `gdxpds test`. For `.venv-no-gams` it expects all three commands to fail with clean exit codes (no segfaults, useful error messages).
+It runs, in each existing venv: `pytest tests` and `gdxpds test`. For `.venv-no-gams` it expects both commands to fail with clean exit codes (no segfaults, useful error messages).
 
 Invoke it from an interactive bash shell so the `module` function is in scope.
 
