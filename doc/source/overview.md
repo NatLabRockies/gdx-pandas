@@ -52,9 +52,12 @@ dataframes = {
 }
 gdxpds.to_gdx(dataframes, 'data.gdx', domains={'sub_a': ['a']})
 
-# Round-trip the relationship info:
+# Read the relationship info back. Domain names are reported verbatim; only
+# the wildcard '*' (or a dimension with no recorded domain) comes through as
+# None. Here 'a' is a root Set whose single dimension is labeled with its own
+# name, so it round-trips as 'a' rather than None.
 print(gdxpds.get_subset_relationships('data.gdx'))
-# {'a': [None], 'sub_a': ['a']}
+# {'a': ['a'], 'sub_a': ['a']}
 ```
 
 The `domains=` keys are child symbol names; each value is the list of parent Set names (or `None` for the wildcard `'*'`), one entry per dimension. `to_gdx` topologically sorts the input so each parent is written before its children. The Direct Conversion API is **string-based** — parents are named by string. For an object-reference-based API (live links to parent `GdxSymbol`s, useful when mutating or composing files in Python), see [Subset (Domain) Relationships](#subset-domain-relationships) under Backend Classes.
