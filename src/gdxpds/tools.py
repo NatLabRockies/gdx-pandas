@@ -58,7 +58,8 @@ def _check_gdx_create_rc(H, rc, gdxcc, gams_dir, source):
             msg = gdxcc.gdxErrorStr(None, gdxcc.gdxGetLastError(H))[1]
         except Exception:
             pass
-    gdxcc.gdxFree(H)
+    # Deliberately no gdxFree(H): on a failed gdxCreateD the library was never
+    # loaded, so XFree is unbound and gdxFree(H) would segfault.
     raise GamsLoadError(
         f"gdxCreateD failed (rc={code}) for GAMS directory {gams_dir!r} "
         f"[source: {source}]. gdxcc reported: {msg!r}"
