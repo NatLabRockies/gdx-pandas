@@ -38,8 +38,9 @@ def test_info_never_raises():
 
 
 def test_info_override_reflected_in_report():
+    expected = gdxpds.tools.GamsDirFinder(gams_dir=NOT_GAMS_DIR).gams_dir
     report = gdxpds.info(gams_dir=NOT_GAMS_DIR)
-    assert NOT_GAMS_DIR.replace("\\", "/") in report
+    assert expected in report
     assert "source:      explicit override" in report
 
 
