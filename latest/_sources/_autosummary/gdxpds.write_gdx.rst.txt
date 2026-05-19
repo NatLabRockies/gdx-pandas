@@ -1,0 +1,10 @@
+gdxpds.write\_gdx
+=================
+
+.. automodule:: gdxpds.write_gdx
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+

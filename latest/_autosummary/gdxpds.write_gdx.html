@@ -1,0 +1,246 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gdxpds.write_gdx &mdash; gdx-pandas 1.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=e0a75244"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="gdxpds.tools" href="gdxpds.tools.html" />
+    <link href="../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            gdx-pandas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    <div id="gdxpds-version-selector" hidden></div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#direct-conversion">Direct Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#backend-classes">Backend Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="gdxpds.html">gdxpds</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.GamsDirFinder.gams_dir_cache"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir_cache</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.GamsDirFinder.source"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.cli.html">gdxpds.cli</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.cli.gdx_to_csv.html">gdxpds.cli.gdx_to_csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.cli.main.html">gdxpds.cli.main</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.gdx.html">gdxpds.gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS"><code class="docutils literal notranslate"><span class="pre">GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GdxSymbol"><code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.append_set"><code class="docutils literal notranslate"><span class="pre">append_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.append_parameter"><code class="docutils literal notranslate"><span class="pre">append_parameter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.read_gdx.html">gdxpds.read_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.read_gdx.html#gdxpds.read_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.special.html">gdxpds.special</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.NUMPY_SPECIAL_VALUES"><code class="docutils literal notranslate"><span class="pre">NUMPY_SPECIAL_VALUES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.convert_gdx_to_np_svs"><code class="docutils literal notranslate"><span class="pre">convert_gdx_to_np_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.is_np_eps"><code class="docutils literal notranslate"><span class="pre">is_np_eps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.is_np_sv"><code class="docutils literal notranslate"><span class="pre">is_np_sv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.convert_np_to_gdx_svs"><code class="docutils literal notranslate"><span class="pre">convert_np_to_gdx_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.pd_isnan"><code class="docutils literal notranslate"><span class="pre">pd_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.pd_val_equal"><code class="docutils literal notranslate"><span class="pre">pd_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.gdx_isnan"><code class="docutils literal notranslate"><span class="pre">gdx_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.gdx_val_equal"><code class="docutils literal notranslate"><span class="pre">gdx_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.special.html#gdxpds.special.load_specials"><code class="docutils literal notranslate"><span class="pre">load_specials()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.tools.html">gdxpds.tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.tools.html#gdxpds.tools.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.tools.html#gdxpds.tools.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.tools.html#gdxpds.tools.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.tools.html#gdxpds.tools.NeedsGamsDir"><code class="docutils literal notranslate"><span class="pre">NeedsGamsDir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.tools.html#gdxpds.tools.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.tools.html#gdxpds.tools.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">gdxpds.write_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#gdxpds.write_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gdxpds.write_gdx.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">gdx-pandas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../api.html">API Reference</a></li>
+          <li class="breadcrumb-item"><a href="gdxpds.html">gdxpds</a></li>
+      <li class="breadcrumb-item active">gdxpds.write_gdx</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/_autosummary/gdxpds.write_gdx.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-gdxpds.write_gdx">
+<span id="gdxpds-write-gdx"></span><h1>gdxpds.write_gdx<a class="headerlink" href="#module-gdxpds.write_gdx" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="gdxpds.write_gdx.Translator">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gdxpds.write_gdx.</span></span><span class="sig-name descname"><span class="pre">Translator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/write_gdx.html#Translator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.write_gdx.Translator" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py property">
+<dt class="sig sig-object py" id="gdxpds.write_gdx.Translator.dataframes">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">dataframes</span></span><a class="headerlink" href="#gdxpds.write_gdx.Translator.dataframes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gdxpds.write_gdx.Translator.gams_dir">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gams_dir</span></span><a class="headerlink" href="#gdxpds.write_gdx.Translator.gams_dir" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="gdxpds.write_gdx.Translator.gdx">
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gdx</span></span><a class="headerlink" href="#gdxpds.write_gdx.Translator.gdx" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gdxpds.write_gdx.Translator.save_gdx">
+<span class="sig-name descname"><span class="pre">save_gdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/write_gdx.html#Translator.save_gdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.write_gdx.Translator.save_gdx" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="gdxpds.write_gdx.to_gdx">
+<span class="sig-prename descclassname"><span class="pre">gdxpds.write_gdx.</span></span><span class="sig-name descname"><span class="pre">to_gdx</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataframes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/write_gdx.html#to_gdx"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.write_gdx.to_gdx" title="Link to this definition"></a></dt>
+<dd><p>Creates a <a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a> from dataframes and optionally writes it to path</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataframes</strong> (<em>dict</em><em> of </em><em>str to pd.DataFrame</em>) – symbol name to pd.DataFrame dict to be compiled into a single gdx file. Each DataFrame
+is assumed to represent a single set or parameter. The last column must be the parameter’s
+value, or the set’s listing of True/False, and must be labeled as (case insensitive)
+‘value’.</p></li>
+<li><p><strong>path</strong> (<em>None</em><em> or </em><em>pathlib.Path</em><em> or </em><em>str</em>) – If provided, the gdx file will be written to this path</p></li>
+<li><p><strong>gams_dir</strong> (<em>None</em><em> or </em><em>pathlib.Path</em><em> or </em><em>str</em>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="gdxpds.tools.html" class="btn btn-neutral float-left" title="gdxpds.tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, The Alliance for Energy Innovation, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <script src="../_static/versions.js"></script>
+
+
+</body>
+</html>

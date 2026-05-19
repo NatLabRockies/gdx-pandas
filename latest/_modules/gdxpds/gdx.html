@@ -1,0 +1,1468 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gdxpds.gdx &mdash; gdx-pandas 1.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=e0a75244"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            gdx-pandas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    <div id="gdxpds-version-selector" hidden></div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../_autosummary/gdxpds.html">gdxpds</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir_cache"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir_cache</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.source"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.gdx_to_csv.html">gdxpds.cli.gdx_to_csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.main.html">gdxpds.cli.main</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS"><code class="docutils literal notranslate"><span class="pre">GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol"><code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_set"><code class="docutils literal notranslate"><span class="pre">append_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_parameter"><code class="docutils literal notranslate"><span class="pre">append_parameter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html">gdxpds.read_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.special.html">gdxpds.special</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.NUMPY_SPECIAL_VALUES"><code class="docutils literal notranslate"><span class="pre">NUMPY_SPECIAL_VALUES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.convert_gdx_to_np_svs"><code class="docutils literal notranslate"><span class="pre">convert_gdx_to_np_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.is_np_eps"><code class="docutils literal notranslate"><span class="pre">is_np_eps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.is_np_sv"><code class="docutils literal notranslate"><span class="pre">is_np_sv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.convert_np_to_gdx_svs"><code class="docutils literal notranslate"><span class="pre">convert_np_to_gdx_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.pd_isnan"><code class="docutils literal notranslate"><span class="pre">pd_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.pd_val_equal"><code class="docutils literal notranslate"><span class="pre">pd_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.gdx_isnan"><code class="docutils literal notranslate"><span class="pre">gdx_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.gdx_val_equal"><code class="docutils literal notranslate"><span class="pre">gdx_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.load_specials"><code class="docutils literal notranslate"><span class="pre">load_specials()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html">gdxpds.tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.NeedsGamsDir"><code class="docutils literal notranslate"><span class="pre">NeedsGamsDir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html">gdxpds.write_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.write_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.write_gdx.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">gdx-pandas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gdxpds.gdx</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gdxpds.gdx</h1><div class="highlight"><pre>
+<span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Backend functionality for reading and writing GDX files. </span>
+<span class="sd">The GdxFile and GdxSymbol classes are full-featured interfaces</span>
+<span class="sd">for going between the GDX format and pandas DataFrames,</span>
+<span class="sd">including translation between GDX and numpy special values. </span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">builtins</span><span class="w"> </span><span class="kn">import</span> <span class="nb">super</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">OrderedDict</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableSequence</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableSequence</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">ctypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">c_bool</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
+
+<span class="c1"># try to import gdx loading utility</span>
+<span class="n">HAVE_GDX2PY</span> <span class="o">=</span> <span class="kc">False</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="c1"># special Windows dll for optimized loading of GAMS parameters</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">gdx2py</span>
+    <span class="n">HAVE_GDX2PY</span> <span class="o">=</span> <span class="kc">True</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="k">pass</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Error</span><span class="p">,</span> <span class="n">NeedsGamsDir</span><span class="p">,</span> <span class="n">load_gdxcc</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">gams.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdx</span> <span class="k">as</span> <span class="n">gdxcc</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">gdxcc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds.special</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">special</span>
+<span class="c1"># Import some things for backward compatibility</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.special</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">convert_gdx_to_np_svs</span><span class="p">,</span>
+    <span class="n">convert_np_to_gdx_svs</span><span class="p">,</span>
+    <span class="n">gdx_isnan</span><span class="p">,</span>
+    <span class="n">gdx_val_equal</span><span class="p">,</span>
+    <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">,</span>
+    <span class="n">is_np_eps</span><span class="p">,</span>
+    <span class="n">is_np_sv</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="replace_df_column">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.replace_df_column">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">replace_df_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">colname</span><span class="p">,</span><span class="n">new_col</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utility function that replaces df[colname] with new_col. Special </span>
+<span class="sd">    care is taken for the case when df has multiple columns named &#39;*&#39;,</span>
+<span class="sd">    since this causes pandas to crash.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        edited in place by this function</span>
+<span class="sd">    colname : str</span>
+<span class="sd">        name of column in df whose data is to be replaced</span>
+<span class="sd">    new_col : vector, list, pandas.Series</span>
+<span class="sd">        new column data for df[colname]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">cols</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span>
+    <span class="n">tmpcols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">if</span> <span class="n">col</span> <span class="o">!=</span> <span class="s1">&#39;*&#39;</span> <span class="k">else</span> <span class="s1">&#39;aaa&#39;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">cols</span> <span class="p">]</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">tmpcols</span>
+    <span class="n">df</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_col</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">cols</span>
+    <span class="k">return</span></div>
+
+
+
+<div class="viewcode-block" id="GdxError">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GdxError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">H</span><span class="p">,</span> <span class="n">msg</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pulls information from gdxcc about the last encountered error and appends</span>
+<span class="sd">        it to msg.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        H : pointer or None</span>
+<span class="sd">            SWIG binding pointer to a GDX object</span>
+<span class="sd">        msg : str</span>
+<span class="sd">            gdxpds error message</span>
+
+<span class="sd">        Attributes</span>
+<span class="sd">        ----------</span>
+<span class="sd">        msg : str</span>
+<span class="sd">            msg that is passed in with a gdxErrorStr appended</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">H</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;. &quot;</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxErrorStr</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxGetLastError</span><span class="p">(</span><span class="n">H</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="GdxFile">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GdxFile</span><span class="p">(</span><span class="n">MutableSequence</span><span class="p">,</span> <span class="n">NeedsGamsDir</span><span class="p">):</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes a GdxFile object by connecting to GAMS and creating a pointer.</span>
+
+<span class="sd">        Throws a GdxError if either of those operations fail.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        gams_dir : None or str</span>
+<span class="sd">        lazy_load : bool</span>
+<span class="sd">            If True, :py:class:`GdxSymbol` data are not automatically loaded when the </span>
+<span class="sd">            symbols are initially :py:meth:`read`. Individual data tables can only be </span>
+<span class="sd">            accessed later after the corresponding calls to :py:meth:`GdxSymbol.load`. </span>
+<span class="sd">            If False, all data are automatically loaded and the full GDX file is </span>
+<span class="sd">            available in memory after the call to :py:meth:`read`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lazy_load</span> <span class="o">=</span> <span class="n">lazy_load</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_producer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+        <span class="n">NeedsGamsDir</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_gdx_object</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="bp">self</span>
+
+        <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="GdxFile.cleanup">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.cleanup">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
+
+<div class="viewcode-block" id="GdxFile.clone">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.clone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns a new GdxFile containing clones of the GdxSymbols in this </span>
+<span class="sd">        GdxFile. The clone will not be associated with a filename. The clone&#39;s</span>
+<span class="sd">        GdxSymbols will not have indexes. The clone will be ready to write to </span>
+<span class="sd">        a new file.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :py:class:`GdxFile`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span><span class="n">lazy_load</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">symbol</span><span class="o">.</span><span class="n">clone</span><span class="p">())</span>
+            <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">empty</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if this GdxFile object does not contain any symbols.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">H</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        GDX object handle</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_H</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Filename this :py:class:`GdxFile` is associated with, if any</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None or str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        GDX file version</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">producer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        What program wrote the GDX file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_producer</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_elements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Total number of records present in this file, summed over all symbols.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">sum</span><span class="p">([</span><span class="n">symbol</span><span class="o">.</span><span class="n">num_records</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">])</span>
+
+<div class="viewcode-block" id="GdxFile.read">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.read">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Opens gdx file at filename and reads meta-data. If not self.lazy_load, </span>
+<span class="sd">        also loads all symbols.</span>
+
+<span class="sd">        Throws an Error if not self.empty.</span>
+
+<span class="sd">        Throws a GdxError if any calls to gdxcc fail.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : pathlib.Path or str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;GdxFile.read can only be used if the GdxFile is .empty&quot;</span><span class="p">)</span>
+
+        <span class="c1"># open the file</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxOpenRead</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rc</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Could not open </span><span class="si">{</span><span class="n">filename</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">filename</span>
+
+        <span class="c1"># read in meta-data ...</span>
+        <span class="c1"># ... for the file</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_producer</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFileVersion</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span> 
+            <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Could not get file version&quot;</span><span class="p">)</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">symbol_count</span><span class="p">,</span> <span class="n">element_count</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxSystemInfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Opening &#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&#39; with </span><span class="si">{</span><span class="n">symbol_count</span><span class="si">}</span><span class="s2"> symbols and &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">element_count</span><span class="si">}</span><span class="s2"> elements with lazy_load = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">lazy_load</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="c1"># ... for the symbols</span>
+        <span class="n">ret</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">data_type</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxSymbolInfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Could not get symbol info for the universal set&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">data_type</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">symbol_count</span><span class="p">):</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">dims</span><span class="p">,</span> <span class="n">data_type</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxSymbolInfo</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="sa">f</span><span class="s2">&quot;Could not get symbol info for symbol </span><span class="si">{</span><span class="n">index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">sym</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">data_type</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to initialize GdxSymbol </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">, because </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. SKIPPING.&quot;</span><span class="p">)</span>            
+
+        <span class="c1"># read all symbols if not lazy_load</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="n">symbol</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="GdxFile.write">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes this :py:class:`GdxFile` to filename</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : pathlib.Path or str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># only write if all symbols loaded</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">symbol</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;All symbols must be loaded before this file can be written.&quot;</span><span class="p">)</span>
+
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxOpenWrite</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">filename</span><span class="p">),</span><span class="s2">&quot;gdxpds&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ret</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Could not open </span><span class="si">{</span><span class="n">filename</span><span class="si">!r}</span><span class="s2"> for writing. &quot;</span>
+                <span class="s2">&quot;Consider cloning this file (.clone()) before trying to write.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="n">filename</span>
+        
+        <span class="c1"># write the universal set</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">symbol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to write </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span><span class="n">filename</span><span class="p">))</span>
+                <span class="k">raise</span>
+
+        <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxClose</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;GdxFile(self,gams_dir=</span><span class="si">{}</span><span class="s2">,lazy_load=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">),</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="s2">&quot;GdxFile containing </span><span class="si">{}</span><span class="s2"> symbols and </span><span class="si">{}</span><span class="s2"> elements.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">num_elements</span><span class="p">)</span>
+        <span class="n">sep</span> <span class="o">=</span>  <span class="s2">&quot; Symbols:</span><span class="se">\n</span><span class="s2">  &quot;</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">+=</span> <span class="n">sep</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">symbol</span><span class="p">)</span>
+            <span class="n">sep</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">  &quot;</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+<div class="viewcode-block" id="GdxFile.__getitem__">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.__getitem__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Supports list-like indexing and symbol-based indexing</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : int or str</span>
+<span class="sd">            If int, the index into the list of symbols. If str, the name of the symbol to </span>
+<span class="sd">            be accessed.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :py:class:`GdxSymbol`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name_key</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="GdxFile.__setitem__">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.__setitem__">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Supports overwriting or adding a :py:class:`GdxSymbol` via a list-like interface</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : int</span>
+<span class="sd">            Must be an index into the list of symbols, within range(len(self)+1)</span>
+<span class="sd">        value : :py:class:`GdxSymbol`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_insert_setitem</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">value</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name_key</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_name_keys</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">assert</span> <span class="n">key</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes a symbol from this :py:class:`GdxFile`&#39;s collection</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : int or str</span>
+<span class="sd">            If int, the index into the list of symbols. If str, the name of the symbol to </span>
+<span class="sd">            be accessed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_name_key</span><span class="p">(</span><span class="n">key</span><span class="p">)]</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of :py:class:`GdxSymbol`s in this :py:class:`GdxFile`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">)</span>
+
+<div class="viewcode-block" id="GdxFile.insert">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.insert">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">insert</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inserts value at position key</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : int</span>
+<span class="sd">            Must be an index into the list of symbols, within range(len(self)+1)</span>
+<span class="sd">        value : :py:class:`GdxSymbol`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_insert_setitem</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+        <span class="n">value</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">and</span> <span class="n">value</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">:</span>
+            <span class="c1"># We can safely append the symbol. This is fast (O(log(n)) complexity)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">[</span><span class="n">value</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Need to insert inside the sequence. This is slow (O(n) complexity)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[(</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">key</span><span class="p">,(</span><span class="n">value</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">value</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns True if __getitem__ works with key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="fm">__getitem__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+<div class="viewcode-block" id="GdxFile.keys">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.keys">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of symbol names obtained by iterating through this :py:class:`GdxFile`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">]</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_name_key</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+        <span class="n">name_key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="nb">int</span><span class="p">):</span>
+            <span class="n">name_key</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">name_key</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_check_insert_setitem</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="n">GdxSymbol</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;GdxFiles only contain GdxSymbols. GdxFile was given a </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span><span class="nb">int</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;When adding or replacing GdxSymbols in GdxFiles, only integer, not name indices, may be used.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">&gt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Invalid key, </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fixup_name_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span> <span class="k">for</span> <span class="n">cur_key</span><span class="p">,</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">])</span>
+        <span class="k">return</span>        
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_gdx_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Idempotent: first call binds the library + populates SPECIAL_VALUES;</span>
+        <span class="c1"># subsequent calls validate self.gams_dir and warn on mismatch.</span>
+        <span class="n">load_gdxcc</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">)</span>
+        <span class="n">H</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">new_gdxHandle_tp</span><span class="p">()</span>
+        <span class="n">rc</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxCreateD</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SSSIZE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">rc</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">rc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">H</span></div>
+
+
+
+<div class="viewcode-block" id="GamsDataType">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsDataType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GamsDataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">Set</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_SET</span>
+    <span class="n">Parameter</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_PAR</span>
+    <span class="n">Variable</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_VAR</span>
+    <span class="n">Equation</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_EQU</span>
+    <span class="n">Alias</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_ALIAS</span></div>
+
+
+
+<div class="viewcode-block" id="GamsVariableType">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsVariableType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GamsVariableType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">Unknown</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_UNKNOWN</span>
+    <span class="n">Binary</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_BINARY</span>
+    <span class="n">Integer</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_INTEGER</span>
+    <span class="n">Positive</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_POSITIVE</span>
+    <span class="n">Negative</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_NEGATIVE</span>
+    <span class="n">Free</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_FREE</span>
+    <span class="n">SOS1</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_SOS1</span>
+    <span class="n">SOS2</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_SOS2</span>
+    <span class="n">Semicont</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_SEMICONT</span>
+    <span class="n">Semiint</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_SEMIINT</span></div>
+
+
+
+<div class="viewcode-block" id="GamsEquationType">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsEquationType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GamsEquationType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">Equality</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_E</span>
+    <span class="n">GreaterThan</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_G</span>
+    <span class="n">LessThan</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_L</span>
+    <span class="n">NothingEnforced</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_N</span>
+    <span class="n">External</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_X</span>
+    <span class="n">Conic</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_C</span></div>
+
+
+
+<div class="viewcode-block" id="GamsValueType">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsValueType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GamsValueType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="n">Level</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_LEVEL</span>       <span class="c1"># .l</span>
+    <span class="n">Marginal</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_MARGINAL</span> <span class="c1"># .m</span>
+    <span class="n">Lower</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_LOWER</span>       <span class="c1"># .lo</span>
+    <span class="n">Upper</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_UPPER</span>       <span class="c1"># .ub</span>
+    <span class="n">Scale</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_SCALE</span>       <span class="c1"># .scale</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_missing_</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="nb">str</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">value_type</span> <span class="ow">in</span> <span class="bp">cls</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">value_type</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">value_type</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;Value&#39;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">GamsValueType</span><span class="p">(</span><span class="n">GamsValueType</span><span class="o">.</span><span class="n">Level</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_missing_</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+
+
+
+<span class="n">GAMS_VALUE_COLS_MAP</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span> <span class="p">:</span> <span class="p">[(</span><span class="s1">&#39;Value&#39;</span><span class="p">,</span><span class="n">GamsValueType</span><span class="o">.</span><span class="n">Level</span><span class="o">.</span><span class="n">value</span><span class="p">)])</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">List of value columns provided for each :py:attr:`GamsValueType`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="n">GAMS_VALUE_COLS_MAP</span><span class="p">[</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Variable</span><span class="p">]</span> <span class="o">=</span> <span class="p">[(</span><span class="n">value_type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">value_type</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value_type</span> <span class="ow">in</span> <span class="n">GamsValueType</span><span class="p">]</span>
+<span class="n">GAMS_VALUE_COLS_MAP</span><span class="p">[</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Equation</span><span class="p">]</span> <span class="o">=</span> <span class="n">GAMS_VALUE_COLS_MAP</span><span class="p">[</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Variable</span><span class="p">]</span>
+
+
+<span class="n">GAMS_VALUE_DEFAULTS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Level</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Marginal</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+    <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Lower</span><span class="p">:</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+    <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Upper</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
+    <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Scale</span><span class="p">:</span> <span class="mf">1.0</span>
+<span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Default values for each :py:class:`GamsValueType`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Unknown</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Binary</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="mf">1.0</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Integer</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Positive</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Negative</span><span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span><span class="mf">0.0</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Free</span> <span class="p">:</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">SOS1</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">SOS2</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Semicont</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
+    <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Semiint</span><span class="p">:</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+<span class="p">}</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Default lower and upper bounds for each :py:class:`GamsVariableType`</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="GdxSymbol">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GdxSymbol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> 
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">data_type</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">variable_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">equation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        In-memory representation of a GAMS GDX Symbol</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        name : str</span>
+<span class="sd">        data_type : :py:class:`GamsDataType`</span>
+<span class="sd">        dims : int or list of str</span>
+<span class="sd">            If dims is set to an int, then that number of dimensions will be created, each </span>
+<span class="sd">            indicated with the wildcard name &#39;*&#39;. Otherwise, a list of strings is expected, </span>
+<span class="sd">            each string being a dimension name.</span>
+<span class="sd">        file : None or :py:class:`GdxFile`</span>
+<span class="sd">            Users should not set file. File is set by, e.g., :py:meth:`GdxFile.read` and</span>
+<span class="sd">            :py:meth:`GdxFile.append`.</span>
+<span class="sd">        index : None or int</span>
+<span class="sd">            Users should not set file. File is set by, e.g., :py:meth:`GdxFile.read` and</span>
+<span class="sd">            :py:meth:`GdxFile.append`.</span>
+<span class="sd">        description : str</span>
+<span class="sd">            Human readable description for this :py:class:`GdxSymbol`</span>
+<span class="sd">        variable_type : None or :py:class:`GamsVariableType`</span>
+<span class="sd">            Only expected if data_type == :py:attr:`GamsDataType.Variable`</span>
+<span class="sd">        equation_type : None or :py:class:`GamsEquationType`</span>
+<span class="sd">            Only expected if data_type == :py:attr:`GamsDataType.Equation`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_type</span> <span class="o">=</span> <span class="n">GamsDataType</span><span class="p">(</span><span class="n">data_type</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variable_type</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span> <span class="o">=</span> <span class="n">variable_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_equation_type</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span> <span class="o">=</span> <span class="n">equation_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span>       
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">file</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>       
+
+        <span class="c1"># adding this flag to implement ability to load set text instead of boolean values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_vals</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># reading from file</span>
+            <span class="c1"># get additional meta-data</span>
+            <span class="n">ret</span><span class="p">,</span> <span class="n">records</span><span class="p">,</span> <span class="n">userinfo</span><span class="p">,</span> <span class="n">description</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxSymbolInfoX</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Unable to get extended symbol information for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_num_records</span> <span class="o">=</span> <span class="n">records</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Variable</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span> <span class="o">=</span> <span class="n">GamsVariableType</span><span class="p">(</span><span class="n">userinfo</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Equation</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span> <span class="o">=</span> <span class="n">GamsEquationType</span><span class="p">(</span><span class="n">userinfo</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">ret</span><span class="p">,</span> <span class="n">gdx_domain</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxSymbolGetDomainX</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Unable to get domain information for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+                <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdx_domain</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">),</span> <span class="s2">&quot;Dimensional information read in from GDX should be consistent.&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">gdx_domain</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># universal set</span>
+                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span>
+        
+        <span class="c1"># writing new symbol</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span>
+
+<div class="viewcode-block" id="GdxSymbol.clone">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.clone">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a copy of this :py:class:`GdxSymbol`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :py:class:`GdxSymbol`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Symbol </span><span class="si">{}</span><span class="s2"> cannot be cloned because it is not yet loaded.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">,</span>
+                           <span class="n">dims</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
+                           <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                           <span class="n">variable_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span><span class="p">,</span>
+                           <span class="n">equation_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Name of this :py:class:`GdxSymbol`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_fixup_name_keys</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        GAMS data type of this :py:class:`GdxSymbol`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :py:class:`GamsDataType`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_type</span>
+
+    <span class="nd">@data_type</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Cannot change the data_type of a GdxSymbol that is yet to be read for file or contains records.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_type</span> <span class="o">=</span> <span class="n">GamsDataType</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_dataframe</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">variable_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Only not none if :py:attr:`data_type` == :py:attr:`GamsDataType.Variable`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None or :py:attr:`GamsDataType.Variable`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_variable_type</span>
+
+    <span class="nd">@variable_type</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">variable_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Variable</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># default to Free</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_variable_type</span> <span class="o">=</span> <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Free</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_variable_type</span> <span class="o">=</span> <span class="n">GamsVariableType</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_variable_type</span><span class="p">,</span><span class="n">GamsVariableType</span><span class="p">):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring invalid GamsVariableType request &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                        <span class="k">return</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting variable_type to </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Free</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_variable_type</span> <span class="o">=</span> <span class="n">GamsVariableType</span><span class="o">.</span><span class="n">Free</span>
+            <span class="k">return</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">!=</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Variable</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;GdxSymbol is not a Variable, so setting variable_type to None&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_variable_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">equation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Only not none if :py:attr:`data_type` == :py:attr:`GamsDataType.Equation`</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None or :py:attr:`GamsDataType.Equation`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_equation_type</span>
+
+    <span class="nd">@equation_type</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">equation_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Equation</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># default to Equality</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_equation_type</span> <span class="o">=</span> <span class="n">GamsEquationType</span><span class="o">.</span><span class="n">Equality</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_equation_type</span> <span class="o">=</span> <span class="n">GamsEquationType</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_equation_type</span><span class="p">,</span><span class="n">GamsEquationType</span><span class="p">):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Ignoring invalid GamsEquationType request &#39;</span><span class="si">{}</span><span class="s2">&#39;.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+                        <span class="k">return</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting equation_type to </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">GamsEquationType</span><span class="o">.</span><span class="n">Equality</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_equation_type</span> <span class="o">=</span> <span class="n">GamsEquationType</span><span class="o">.</span><span class="n">Equality</span>
+            <span class="k">return</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">!=</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Equation</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;GdxSymbol is not an Equation, so setting equation_type to None&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_equation_type</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">value_cols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of (name, GamsValueType.value) tuples that describe the </span>
+<span class="sd">        value columns in the dataframe, that is, the columns that follow the </span>
+<span class="sd">        self.dims columns.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of (str, int)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">GAMS_VALUE_COLS_MAP</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">value_col_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of value column names, that is, the columns that follow the self.dims columns.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">col_name</span> <span class="k">for</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">col_ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_cols</span><span class="p">]</span>    
+
+<div class="viewcode-block" id="GdxSymbol.get_value_col_default">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.get_value_col_default">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_value_col_default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value_col_name</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value_col_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value_col_name</span><span class="si">}</span><span class="s2"> is not one of the value columns for &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;this GdxSymbol, which is a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">value_col</span> <span class="o">=</span> <span class="n">GamsValueType</span><span class="p">(</span><span class="n">value_col_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">value_col</span> <span class="o">==</span> <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Level</span>
+            <span class="k">return</span> <span class="n">c_bool</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
+               <span class="p">(</span><span class="n">value_col</span> <span class="o">==</span> <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Lower</span><span class="p">)</span> <span class="ow">or</span> 
+               <span class="p">(</span><span class="n">value_col</span> <span class="o">==</span> <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Upper</span><span class="p">)):</span>
+            <span class="n">lb_default</span><span class="p">,</span> <span class="n">ub_default</span> <span class="o">=</span> <span class="n">GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">value_col</span> <span class="o">==</span> <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Lower</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">lb_default</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">assert</span> <span class="n">value_col</span> <span class="o">==</span> <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Upper</span>
+                <span class="k">return</span> <span class="n">ub_default</span>
+        <span class="k">return</span> <span class="n">GAMS_VALUE_DEFAULTS</span><span class="p">[</span><span class="n">value_col</span><span class="p">]</span> </div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">file</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :py:class:`GdxFile` file that contains this :py:class:`GdxSymbol`, if any</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None or :py:class:`GdxFile`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_file</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">index</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Index of this :py:class:`GdxSymbol` in its :py:class:`GdxFile`, if any</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None or int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_index</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">loaded</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Whether the data for this symbol has been loaded</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">full_typename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Parameter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;Scalar&#39;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Variable</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        List of dimension names over which this symbol is defined. If the :py:class:`GdxSymbol` was </span>
+<span class="sd">        constructed with dims set to an integer, all dimension names will be the wildcard &#39;*&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of str</span>
+<span class="sd">            length of list is equal to :py:attr:`num_dims`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span>
+
+    <span class="nd">@dims</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot set dims to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">, because the number of &quot;</span>
+                    <span class="s2">&quot;dimensions has already been set to </span><span class="si">{self.num_dims}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">value</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_init_dataframe</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s1">&#39;dims must be an int or a list. Was passed </span><span class="si">{}</span><span class="s1"> of type </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s1">&#39;Individual dimensions must be denoted by strings. Was passed </span><span class="si">{}</span><span class="s1"> as element of </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_dataframe</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of dimensions over which this symbol is defined</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>        
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Data table for this symbol. Dim columns are followed by value columns, left to right.</span>
+<span class="sd">        </span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        pd.DataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span>
+
+    <span class="nd">@dataframe</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>        
+            <span class="c1"># get data in common format and start dealing with dimensions    </span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">has_col_names</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+                <span class="n">has_col_names</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+                    <span class="c1"># clarify dimensionality, as needed for loading empty GdxSymbols</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">,</span><span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_cols</span><span class="p">)</span>
+            
+            <span class="c1"># finish handling dimensions</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="p">((</span><span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_cols</span><span class="p">))):</span>
+                    <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Cannot set dataframe to </span><span class="si">{}</span><span class="s2"> because the number &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span> <span class="o">+</span> \
+                        <span class="s2">&quot;of dimensions would change. This symbol has </span><span class="si">{}</span><span class="s2"> &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">)</span> <span class="o">+</span> \
+                        <span class="s2">&quot;dimensions, currently represented by </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">))</span>
+                <span class="n">num_dims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># num_dims not explicitly established yet. in this case we must </span>
+                <span class="c1"># assume value columns have been provided or dimensionality is 0</span>
+                <span class="n">num_dims</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">n</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_cols</span><span class="p">),</span><span class="mi">0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">num_dims</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">n</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">value_cols</span><span class="p">)):</span>
+                    <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Cannot set dataframe to </span><span class="si">{}</span><span class="s2"> because the number &quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">())</span> <span class="o">+</span> \
+                        <span class="s2">&quot;of dimensions cannot be established consistent with </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="p">(</span><span class="n">num_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Inferring </span><span class="si">{}</span><span class="s1"> to have </span><span class="si">{}</span><span class="s1"> dimensions. &#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="n">num_dims</span><span class="p">)</span> <span class="o">+</span> 
+                        <span class="s1">&#39;Recommended practice is to explicitly set gdxpds.gdx.GdxSymbol dims in the constructor.&#39;</span><span class="p">)</span>
+
+            <span class="n">replace_dims</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">has_col_names</span><span class="p">:</span>
+                <span class="n">dim_cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)[:</span><span class="n">num_dims</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">==</span> <span class="n">num_dims</span><span class="p">:</span>
+                <span class="n">dim_cols</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span>
+                <span class="n">replace_dims</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">dim_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_dims</span>            
+            <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">dim_cols</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">col</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">replace_dims</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Not using dataframe column names to set dimensions because </span><span class="si">{}</span><span class="s2"> is not a string.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">num_dims</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">num_dims</span>
+                    <span class="k">break</span>
+            <span class="k">if</span> <span class="n">replace_dims</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">dim_cols</span>
+            <span class="c1"># all done establishing dimensions</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">==</span> <span class="n">num_dims</span>
+
+            <span class="c1"># finalize the dataframe</span>
+            <span class="k">if</span> <span class="n">n</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_append_default_values</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+            <span class="n">df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="o">=</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to set dataframe for </span><span class="si">{}</span><span class="s2"> to</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n\n</span><span class="s2">In process dataframe: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">))</span>
+            <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_value</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span><span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">:</span>
+            <span class="n">colname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">replace_df_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span><span class="n">colname</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">c_bool</span><span class="p">))</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_append_default_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">df</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Applying default values to create valid dataframe for &#39;</span><span class="si">{self.name}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">value_col_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span><span class="p">:</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">value_col_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_value_col_default</span><span class="p">(</span><span class="n">value_col_name</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fixup_set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tricky to get boolean set values to come through right. </span>
+<span class="sd">        isinstance(True,Number) == True and float(True) = 1, but </span>
+<span class="sd">        isinstance(c_bool(True),Number) == False, and this keeps the default </span>
+<span class="sd">        value of 0.0.</span>
+
+<span class="sd">        Could just test for isinstance(,bool), but this fix has the added </span>
+<span class="sd">        advantage of speaking the GDX bindings data type language, and also </span>
+<span class="sd">        fills in any missing values, so users no longer need to actually specify</span>
+<span class="sd">        self.dataframe[&#39;Value&#39;] = True.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span>
+
+        <span class="n">colname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="n">colname</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="sa">f</span><span class="s2">&quot;Unexpected final column </span><span class="si">{</span><span class="n">colname</span><span class="si">!r}</span><span class="s2"> in Set dataframe&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Filling null values in </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> with True. To be &quot;</span>
+                <span class="s2">&quot;filled:</span><span class="se">\n</span><span class="s2">{self._dataframe[self._dataframe[colname].isnull()]}&quot;</span><span class="p">)</span>
+            <span class="n">replace_df_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span> <span class="n">colname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_vals</span><span class="p">:</span>
+            <span class="n">replace_df_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span><span class="n">colname</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">c_bool</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_vals</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">num_records</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Number of rows in the data table, per the DataFrame if :py:attr:`loaded`, or per GAMS.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_num_records</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;GdxSymbol(</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,</span><span class="si">{}</span><span class="s2">,file=</span><span class="si">{}</span><span class="s2">,index=</span><span class="si">{}</span><span class="s2">,description=</span><span class="si">{}</span><span class="s2">,variable_type=</span><span class="si">{}</span><span class="s2">,equation_type=</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">),</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">),</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">),</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">),</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">),</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span><span class="p">),</span>
+                   <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">description</span>    
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">full_typename</span>    
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;, </span><span class="si">{}</span><span class="s2"> records&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_records</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;, </span><span class="si">{}</span><span class="s2"> dims </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">+=</span> <span class="s2">&quot;, loaded&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="k">else</span> <span class="s2">&quot;, not loaded&quot;</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+<div class="viewcode-block" id="GdxSymbol.load">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.load">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads this :py:class:`GdxSymbol` from its :py:attr:`file`, thereby popluating</span>
+<span class="sd">        :py:attr:`dataframe`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        load_set_text : bool</span>
+<span class="sd">            If True (default is False) and this symbol is a :class:`GamsDataType.Set &lt;GamsDataType&gt;`,</span>
+<span class="sd">            loads the GDX Text field into the :py:attr:`dataframe` rather than a `c_bool`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Nothing to do. Symbol already loaded.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Cannot load </span><span class="si">{}</span><span class="s2"> because there is no file pointer&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Cannot load </span><span class="si">{}</span><span class="s2"> because there is no symbol index&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)))</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Parameter</span> <span class="ow">and</span> <span class="n">HAVE_GDX2PY</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">gdx2py</span><span class="o">.</span><span class="n">par2list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">filename</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">return</span>
+
+        <span class="n">_ret</span><span class="p">,</span> <span class="n">records</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxDataReadStrStart</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">reader</span><span class="p">():</span>
+            <span class="n">handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">records</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxDataReadStr</span><span class="p">(</span><span class="n">handle</span><span class="p">)</span>
+
+        <span class="n">vc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_cols</span>  <span class="c1"># do this for speed in the next line</span>
+        <span class="k">if</span> <span class="n">load_set_text</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">):</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">elements</span> <span class="o">+</span> <span class="p">[</span><span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxGetElemText</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="nb">int</span><span class="p">(</span><span class="n">values</span><span class="p">[</span><span class="n">col_ind</span><span class="p">]))[</span><span class="mi">1</span><span class="p">]</span> 
+                                <span class="k">for</span> <span class="n">_col_name</span><span class="p">,</span> <span class="n">col_ind</span> <span class="ow">in</span> <span class="n">vc</span><span class="p">]</span> 
+                    <span class="k">for</span> <span class="n">_ret</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">_afdim</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">()]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_vals</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">elements</span> <span class="o">+</span> <span class="p">[</span><span class="n">values</span><span class="p">[</span><span class="n">col_ind</span><span class="p">]</span> <span class="k">for</span> <span class="n">col_name</span><span class="p">,</span> <span class="n">col_ind</span> <span class="ow">in</span> <span class="n">vc</span><span class="p">]</span> <span class="k">for</span> <span class="n">ret</span><span class="p">,</span> <span class="n">elements</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">afdim</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">()]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">data</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">special</span><span class="o">.</span><span class="n">convert_gdx_to_np_svs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="GdxSymbol.unload">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.unload">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">unload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Drops this :py:class:`GdxSymbol`&#39;s :py:attr:`dataframe`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="GdxSymbol.write">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.write">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes this :py:class:`GdxSymbol` to its :py:attr:`file`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot write unloaded symbol </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot write </span><span class="si">{</span><span class="bp">self</span><span class="si">!r}</span><span class="s2"> because there is no file pointer&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_value</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># universal set</span>
+            <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxUELRegisterRawStart</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+            <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxUELRegisterRaw</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxUELRegisterDone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># write the data</span>
+        <span class="n">userinfo</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">userinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">userinfo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span><span class="o">.</span><span class="n">value</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxDataWriteStrStart</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
+                                          <span class="n">userinfo</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Could not start writing data for symbol </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
+        <span class="c1"># set domain information</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxSymbolSetDomainX</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Could not set domain information for </span><span class="si">{}</span><span class="s2">. Domains are </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Not writing domain information because symbol index is unknown.&quot;</span><span class="p">)</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">doubleArray</span><span class="p">(</span><span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_MAX</span><span class="p">)</span>
+        <span class="c1"># make sure index is clean -- needed for merging in convert_np_to_gdx_svs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">reset_index</span><span class="p">(</span><span class="n">drop</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># convert special numeric values if appropriate</span>
+        <span class="n">to_write</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">))</span> <span class="k">else</span> <span class="n">special</span><span class="o">.</span><span class="n">convert_np_to_gdx_svs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">)</span>
+        <span class="c1"># write each row</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">to_write</span><span class="o">.</span><span class="n">itertuples</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+            <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">row</span><span class="p">[:</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">]]</span>
+            <span class="n">vals</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">:]</span>
+            <span class="k">for</span> <span class="n">_col_name</span><span class="p">,</span> <span class="n">col_ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_cols</span><span class="p">:</span>
+                <span class="n">values</span><span class="p">[</span><span class="n">col_ind</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="mf">0.0</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">col_ind</span><span class="p">],</span><span class="n">Number</span><span class="p">):</span>
+                        <span class="n">values</span><span class="p">[</span><span class="n">col_ind</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">vals</span><span class="p">[</span><span class="n">col_ind</span><span class="p">])</span>
+                <span class="k">except</span><span class="p">:</span> 
+                    <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Unable to set element </span><span class="si">{}</span><span class="s2"> from </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">col_ind</span><span class="p">,</span><span class="n">vals</span><span class="p">))</span>
+            <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxDataWriteStr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="n">dims</span><span class="p">,</span><span class="n">values</span><span class="p">)</span>
+        <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxDataWriteDone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+        <span class="k">return</span></div>
+</div>
+
+
+
+<span class="c1"># ------------------------------------------------------------------------------</span>
+<span class="c1"># Helper functions</span>
+<span class="c1"># ------------------------------------------------------------------------------</span>
+
+<div class="viewcode-block" id="append_set">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.append_set">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">append_set</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">set_name</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function that appends set_name to gdx_file as a </span>
+<span class="sd">    :class:`GamsDataType.Set &lt;GamsDataType&gt;` :class:`GdxSymbol` using data in </span>
+<span class="sd">    df.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdx_file : :class:`GdxFile`</span>
+<span class="sd">        file to which new :class:`GdxSymbol` is to be added</span>
+<span class="sd">    set_name : str</span>
+<span class="sd">        name of the :class:`GdxSymbol` to be added</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        dataframe or data that can be used to construct a dataframe containing </span>
+<span class="sd">        the set data. assumes that all columns define dimensions (there is no </span>
+<span class="sd">        &#39;Value&#39; column)</span>
+<span class="sd">    cols : None or list of str</span>
+<span class="sd">        if not None, these are the columns in df to be used for the set </span>
+<span class="sd">        definition</span>
+<span class="sd">    dim_names : None or list of str</span>
+<span class="sd">        if provided, the columns of a copy of df (or of df[cols]) will be renamed</span>
+<span class="sd">        to these names, because the dimension names are taken from the final </span>
+<span class="sd">        dataframe, these will also be the dimension names</span>
+<span class="sd">    description : None or str</span>
+<span class="sd">        passed directly to :class:`GdxSymbol`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ensure df is DataFrame and not Series</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Defining set </span><span class="si">{</span><span class="n">set_name</span><span class="si">!r}</span><span class="s2"> based on:</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="c1"># select down to data we actually want</span>
+    <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dim_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tmp</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">dim_names</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">dim_names</span>
+    <span class="c1"># define the symbol</span>
+    <span class="n">gdx_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="n">set_name</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> 
+        <span class="n">dims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="p">))</span>
+    <span class="c1"># define the data for the symbol</span>
+    <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">tmp</span>
+    <span class="c1"># debug description of what happened</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added set </span><span class="si">{</span><span class="n">set_name</span><span class="si">!r}</span><span class="s2"> to </span><span class="si">{</span><span class="n">gdx_file</span><span class="si">!r}</span><span class="s2"> using processed data:</span><span class="se">\n</span><span class="si">{</span><span class="n">tmp</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span></div>
+
+
+
+<div class="viewcode-block" id="append_parameter">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.append_parameter">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">append_parameter</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function that appends param_name to gdx_file as a </span>
+<span class="sd">    :class:`GamsDataType.Parameter &lt;GamsDataType&gt;` :class:`GdxSymbol` using </span>
+<span class="sd">    data in df.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdx_file : :class:`GdxFile`</span>
+<span class="sd">        file to which new :class:`GdxSymbol` is to be added</span>
+<span class="sd">    param_name : str</span>
+<span class="sd">        name of the :class:`GdxSymbol` to be added</span>
+<span class="sd">    df : pandas.DataFrame</span>
+<span class="sd">        dataframe or data that can be used to construct a dataframe containing </span>
+<span class="sd">        the parameter data. assumes that the last selected column is the &#39;Value&#39; </span>
+<span class="sd">        column</span>
+<span class="sd">    cols : None or list of str</span>
+<span class="sd">        if not None, these are the columns in df to be used for the parameter</span>
+<span class="sd">        definition (dimension columns followed by value column)</span>
+<span class="sd">    dim_names : None or list of str</span>
+<span class="sd">        if provided, the columns of a copy of df (or of df[cols]) will be renamed</span>
+<span class="sd">        to these names + [&#39;Value&#39;]. because the dimension names are taken from </span>
+<span class="sd">        the final dataframe, these will also be the dimension names</span>
+<span class="sd">    description : None or str</span>
+<span class="sd">        passed directly to :class:`GdxSymbol`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># pre-process the data</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Defining parameter </span><span class="si">{</span><span class="n">param_name</span><span class="si">!r}</span><span class="s2"> based on:</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">[</span><span class="n">cols</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">dim_names</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tmp</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span> <span class="o">=</span> <span class="n">dim_names</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">tmp</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">dim_names</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+    <span class="c1"># define the symbol</span>
+    <span class="n">gdx_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Parameter</span><span class="p">,</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="p">))</span>
+    <span class="c1"># define the data for the symbol</span>
+    <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">tmp</span>
+    <span class="c1"># debug descripton of what happened</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added parameter </span><span class="si">{</span><span class="n">param_name</span><span class="si">!r}</span><span class="s2"> to </span><span class="si">{</span><span class="n">gdx_file</span><span class="si">!r}</span><span class="s2"> using processed data:</span><span class="se">\n</span><span class="si">{</span><span class="n">tmp</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, The Alliance for Energy Innovation, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <script src="../../_static/versions.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,149 @@
+.wy-nav-content {
+  max-width: none;
+}
+
+/* Version dropdown injected by _static/versions.js. Hidden until JS finds versions.json. */
+#gdxpds-version-selector {
+  padding: 0.5em 1.5em;
+  background: #2980b9;
+  color: #fcfcfc;
+  font-size: 0.85em;
+}
+#gdxpds-version-selector select {
+  margin-left: 0.5em;
+  background: #fcfcfc;
+  color: #404040;
+  border: none;
+  padding: 0.15em 0.3em;
+}
+.wy-table-responsive table td {
+  white-space: normal !important;
+}
+.wy-table-responsive {
+  overflow: visible !important;
+}
+
+/* Colors and text decoration.
+ For example, :black:`text in black` or :blink:`text blinking` in rST. */
+
+.black {
+    color: black;
+}
+
+.gray {
+    color: gray;
+}
+
+.grey {
+    color: gray;
+}
+
+.silver {
+    color: silver;
+}
+
+.white {
+    color: white;
+}
+
+.maroon {
+    color: maroon;
+}
+
+.red {
+    color: red;
+}
+
+.magenta {
+    color: magenta;
+}
+
+.fuchsia {
+    color: fuchsia;
+}
+
+.pink {
+    color: pink;
+}
+
+.orange {
+    color: orange;
+}
+
+.yellow {
+    color: yellow;
+}
+
+.lime {
+    color: lime;
+}
+
+.green {
+    color: green;
+}
+
+.olive {
+    color: olive;
+}
+
+.teal {
+    color: teal;
+}
+
+.cyan {
+    color: cyan;
+}
+
+.aqua {
+    color: aqua;
+}
+
+.blue {
+    color: blue;
+}
+
+.navy {
+    color: navy;
+}
+
+.purple {
+    color: purple;
+}
+
+.under {
+    text-decoration: underline;
+}
+
+.over {
+    text-decoration: overline;
+}
+
+
+.strike {
+    text-decoration: line-through;
+}
+
+.it {
+    font-style: italic;
+}
+
+.ob {
+    font-style: oblique;
+}
+
+.small {
+    font-size: small;
+}
+
+.large {
+    font-size: large;
+}
+
+.blink {
+    text-decoration: blink;
+}
+
+.it-small {
+    font-size: small;
+    font-style: italic;
+}
