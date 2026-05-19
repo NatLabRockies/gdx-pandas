@@ -52,6 +52,7 @@ def main(argv=None):
         return 0
     if args.command == "test":
         return _run_verify_install(args)
+    raise AssertionError(f"unhandled CLI command: {args.command!r}")
 
 
 def _run_verify_install(args) -> int:
