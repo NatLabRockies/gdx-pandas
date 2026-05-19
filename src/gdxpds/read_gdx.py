@@ -141,6 +141,50 @@ def get_data_types(gdx_file,gams_dir=None):
 
 
 
+def get_subset_relationships(gdx_file, gams_dir=None):
+    """
+    Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name. 
+    
+    Outputs a dict that maps each symbol name to a list of Set names over which the symbol is 
+    defined. If that information is not encoded in the gdx file at all, or is not provided for 
+    specific dimensions of the domain, ``None`` is used as a placeholder for all missing or self-
+    referential dimensions. The appearance of None values does not necessarily mean that the 
+    Symbol was not defined over specific sets, just that the information is not available in the 
+    GDX file. In all cases, the length of the list for a given symbol will match the number of 
+    dimensions in that symbol's domain, and any names that do appear will be in the correct 
+    position.
+    
+    Pure-relaxed (string-only) domains are reported by name; root Sets and any dimension recorded 
+    as ``'*'`` come through as ``None``.
+
+    Parameters
+    ----------
+    gdx_file : pathlib.Path or str
+        Path to the GDX file to read
+    gams_dir : None or pathlib.Path or str
+        optional path to GAMS directory
+
+    Returns
+    -------
+    dict of str to list of (str or None)
+        Map of symbol name to its domain. Pair this with :func:`to_dataframes` to recover the full
+        file shape.
+    """
+    result = OrderedDict()
+    gdx = GdxFile(gams_dir=gams_dir, lazy_load=True)
+    gdx.read(gdx_file)
+    for symbol in gdx:
+        if symbol.domain is not None:
+            result[symbol.name] = [
+                d.name if d is not None else None for d in symbol.domain
+            ]
+        else:
+            result[symbol.name] = [
+                None if d == '*' else d for d in symbol.dims
+            ]
+    return result
+
+
 def to_dataframe(gdx_file,symbol_name,gams_dir=None,old_interface=True,load_set_text=False):
     """
     Interface for getting the data for a single symbol

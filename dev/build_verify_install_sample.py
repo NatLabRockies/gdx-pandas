@@ -8,9 +8,10 @@ Usage (from repo root, with the venv active and $env:GAMS_DIR set):
     python dev\\build_verify_install_sample.py
 
 Schema (chosen to exercise the distinct code paths gdxpds handles):
-  Set       t : 1D, 3 elements
-  Parameter p : 2D over t x t, 6 records: 1 normal value + 5 specials
-  Variable  v : 1D over t, exercises the 5-value-column shape
+  Set       t     : 1D, 3 elements (root Set, domain_type == NONE)
+  Set       sub_t : 1D subset of t, 2 elements (strict / REGULAR domain)
+  Parameter p     : 2D over t x t, 6 records: 1 normal value + 5 specials
+  Variable  v     : 1D over t, exercises the 5-value-column shape
 """
 import os
 
@@ -34,6 +35,13 @@ def main():
             "t", gdxpds.gdx.GamsDataType.Set, dims=["t"]))
         gdx[-1].dataframe = pd.DataFrame(
             [["a", True], ["b", True], ["c", True]],
+            columns=["t", "Value"])
+
+        gdx.append(gdxpds.gdx.GdxSymbol(
+            "sub_t", gdxpds.gdx.GamsDataType.Set,
+            dims=["t"], domain=[gdx["t"]]))
+        gdx[-1].dataframe = pd.DataFrame(
+            [["a", True], ["c", True]],
             columns=["t", "Value"])
 
         gdx.append(gdxpds.gdx.GdxSymbol(
