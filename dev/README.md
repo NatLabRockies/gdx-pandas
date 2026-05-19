@@ -146,7 +146,7 @@ A helper script drives all four venvs in sequence and writes per-venv logs plus 
 bash dev/run_test_matrix.sh
 ```
 
-It runs, in each existing venv: `pytest tests` and `gdxpds test`. For `.venv-no-gams` it expects both commands to fail with clean exit codes (no segfaults, useful error messages).
+It runs, in each existing venv: `pytest tests` and `gdxpds test`. `.venv-no-gams` additionally runs `pip wheel --no-deps .` to confirm the wheel still builds without GAMS bindings (guards the static-attr `version` read in [pyproject.toml](../pyproject.toml)). For `.venv-no-gams`, pytest and gdxpds test should fail with clean exit codes (no segfaults, useful error messages); the wheel build should succeed.
 
 Invoke it from an interactive bash shell so the `module` function is in scope.
 

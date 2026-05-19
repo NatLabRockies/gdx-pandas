@@ -9,14 +9,17 @@
 #      pin GAMS_DIR per the patches in dev/README.md);
 #   2) runs `pytest tests`;
 #   3) runs `gdxpds test`;
-#   4) deactivates.
+#   4) in .venv-no-gams only, additionally runs `pip wheel --no-deps .` to
+#      confirm the wheel still builds without GAMS bindings (guards the
+#      static-attr `version` read in pyproject.toml);
+#   5) deactivates.
 #
 # Per-venv logs go to dev/test_matrix_logs/<venv>.log; a top-level
 # summary is printed to stdout and saved to dev/test_matrix_logs/summary.txt.
 #
-# For .venv-no-gams both commands are expected to FAIL cleanly (non-zero
-# exit, no segfault, useful error message). The script flips its verdict
-# accordingly.
+# For .venv-no-gams, pytest and gdxpds test are expected to FAIL cleanly
+# (non-zero exit, no segfault, useful error message) and the wheel build
+# is expected to SUCCEED. The script flips its verdict accordingly.
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
@@ -71,12 +74,26 @@ run_one_venv () {
     echo "gdxpds test exit: $gdxpds_rc" | tee -a "$log"
     echo | tee -a "$log"
 
+    local wheel_rc=0
+    if [ "$venv" = ".venv-no-gams" ]; then
+        echo "--- pip wheel (no-bindings build smoke) ---" | tee -a "$log"
+        local wheel_out="$LOG_DIR/wheel-no-gams"
+        rm -rf "$wheel_out"
+        pip wheel --no-deps -w "$wheel_out" "$REPO_ROOT" >>"$log" 2>&1
+        wheel_rc=$?
+        if [ "$wheel_rc" -eq 0 ] && ! ls "$wheel_out"/*.whl >/dev/null 2>&1; then
+            wheel_rc=1
+        fi
+        echo "pip wheel exit: $wheel_rc" | tee -a "$log"
+        echo | tee -a "$log"
+    fi
+
     local verdict
     if [ "$venv" = ".venv-no-gams" ]; then
-        if [ "$pytest_rc" -ne 0 ] && [ "$gdxpds_rc" -ne 0 ]; then
-            verdict="OK (both failed as expected for no-GAMS)"
+        if [ "$pytest_rc" -ne 0 ] && [ "$gdxpds_rc" -ne 0 ] && [ "$wheel_rc" -eq 0 ]; then
+            verdict="OK (pytest/gdxpds failed as expected; wheel built without bindings)"
         else
-            verdict="UNEXPECTED (no-GAMS venv had a passing command; pytest=$pytest_rc, gdxpds=$gdxpds_rc)"
+            verdict="UNEXPECTED (pytest=$pytest_rc, gdxpds=$gdxpds_rc, wheel=$wheel_rc)"
         fi
     else
         if [ "$pytest_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ]; then
