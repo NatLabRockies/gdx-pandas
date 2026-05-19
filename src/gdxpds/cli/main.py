@@ -116,6 +116,8 @@ def _check_read(sample_path, args, failures):
             names = {s.name for s in gdx}
             assert names == {"t", "sub_t", "p", "v"}, f"unexpected symbols: {names}"
             assert gdx["p"].num_records == 6
+            assert gdx["t"].domain_type == gdxpds.gdx.GamsDomainType.NONE, (
+                f"t.domain_type = {gdx['t'].domain_type}, expected NONE")
             sub_t = gdx["sub_t"]
             assert sub_t.domain_type == gdxpds.gdx.GamsDomainType.REGULAR, (
                 f"sub_t.domain_type = {sub_t.domain_type}, expected REGULAR")
