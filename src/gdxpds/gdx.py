@@ -818,6 +818,24 @@ class GdxSymbol:
         return
 
     @property
+    def description(self) -> str:
+        """
+        Human-readable description for this :py:class:`GdxSymbol`. Never ``None``:
+        a ``None`` assigned here (e.g. via the ``append_*`` helpers, which default
+        ``description`` to ``None``) is stored as ``""`` so :py:meth:`__str__` and
+        ``gdxDataWriteStrStart`` always get a string.
+
+        Returns
+        -------
+        str
+        """
+        return self._description
+
+    @description.setter
+    def description(self, value: str | None) -> None:
+        self._description = value if value is not None else ""
+
+    @property
     def data_type(self):
         """
         GAMS data type of this :py:class:`GdxSymbol`
