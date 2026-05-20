@@ -1,7 +1,12 @@
+from __future__ import annotations
+
 import logging
+import os
 from collections import OrderedDict
 
-from gdxpds.gdx import GdxFile
+import pandas as pd
+
+from gdxpds.gdx import GamsDataType, GdxFile
 from gdxpds.tools import Error
 
 logger = logging.getLogger(__name__)
@@ -75,7 +80,11 @@ class Translator:
         return self.__dataframes
 
 
-def to_dataframes(gdx_file, gams_dir=None, load_set_text=False):
+def to_dataframes(
+    gdx_file: str | os.PathLike[str],
+    gams_dir: str | os.PathLike[str] | None = None,
+    load_set_text: bool = False,
+) -> dict[str, pd.DataFrame]:
     """
     Primary interface for converting a GAMS GDX file to pandas DataFrames.
 
@@ -102,7 +111,10 @@ def to_dataframes(gdx_file, gams_dir=None, load_set_text=False):
     return Translator(gdx_file, gams_dir=gams_dir).dataframes
 
 
-def list_symbols(gdx_file, gams_dir=None):
+def list_symbols(
+    gdx_file: str | os.PathLike[str],
+    gams_dir: str | os.PathLike[str] | None = None,
+) -> list[str]:
     """
     Returns the list of symbols available in gdx_file.
 
@@ -121,7 +133,10 @@ def list_symbols(gdx_file, gams_dir=None):
     return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True).symbols
 
 
-def get_data_types(gdx_file, gams_dir=None):
+def get_data_types(
+    gdx_file: str | os.PathLike[str],
+    gams_dir: str | os.PathLike[str] | None = None,
+) -> dict[str, GamsDataType]:
     """
     Returns a dict of the symbols' :py:class:`GamsDataTypes <GamsDataType>`.
 
@@ -140,7 +155,10 @@ def get_data_types(gdx_file, gams_dir=None):
     return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True).data_types
 
 
-def get_subset_relationships(gdx_file, gams_dir=None):
+def get_subset_relationships(
+    gdx_file: str | os.PathLike[str],
+    gams_dir: str | os.PathLike[str] | None = None,
+) -> dict[str, list[str | None]]:
     """
     Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name.
 
@@ -178,7 +196,13 @@ def get_subset_relationships(gdx_file, gams_dir=None):
     return result
 
 
-def to_dataframe(gdx_file, symbol_name, gams_dir=None, old_interface=True, load_set_text=False):
+def to_dataframe(
+    gdx_file: str | os.PathLike[str],
+    symbol_name: str,
+    gams_dir: str | os.PathLike[str] | None = None,
+    old_interface: bool = True,
+    load_set_text: bool = False,
+) -> dict[str, pd.DataFrame] | pd.DataFrame:
     """
     Interface for getting the data for a single symbol
 

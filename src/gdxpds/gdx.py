@@ -5,11 +5,14 @@ for going between the GDX format and pandas DataFrames,
 including translation between GDX and numpy special values.
 """
 
+from __future__ import annotations
+
 import copy
 import logging
+import os
 import weakref
 from collections import OrderedDict, defaultdict
-from collections.abc import MutableSequence
+from collections.abc import MutableSequence, Sequence
 from ctypes import c_bool
 from enum import Enum
 from numbers import Number
@@ -98,7 +101,7 @@ def _stable_topological_sort(names, parents_of):
     return ordered, None
 
 
-def replace_df_column(df, colname, new_col):
+def replace_df_column(df: pd.DataFrame, colname: str, new_col) -> None:
     """
     Utility function that replaces df[colname] with new_col. Special
     care is taken for the case when df has multiple columns named '*',
@@ -157,7 +160,9 @@ class DomainError(Error):
 
 
 class GdxFile(MutableSequence, NeedsGamsDir):
-    def __init__(self, gams_dir=None, lazy_load=True):
+    def __init__(
+        self, gams_dir: str | os.PathLike[str] | None = None, lazy_load: bool = True
+    ) -> None:
         """
         Initializes a GdxFile object by connecting to GAMS and creating a pointer.
 
@@ -199,7 +204,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         self._finalizer = weakref.finalize(self, self._handle.close)
         return
 
-    def cleanup(self):
+    def cleanup(self) -> None:
         if self._finalizer is not None:
             self._finalizer()  # runs handle.close() at most once
         self._H = None
@@ -210,7 +215,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
     def __exit__(self, exc_type, exc_value, traceback):
         self.cleanup()
 
-    def clone(self):
+    def clone(self) -> GdxFile:
         """
         Returns a new GdxFile containing clones of the GdxSymbols in this
         GdxFile. The clone will not be associated with a filename. The clone's
@@ -281,7 +286,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         """
         return sum([symbol.num_records for symbol in self])
 
-    def read(self, filename):
+    def read(self, filename: str | os.PathLike[str]) -> None:
         """
         Opens gdx file at filename and reads meta-data. If not self.lazy_load,
         also loads all symbols.
@@ -377,7 +382,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             return
         self._symbols = OrderedDict((name, self._symbols[name]) for name in ordered)
 
-    def write(self, filename):
+    def write(self, filename: str | os.PathLike[str]) -> None:
         """
         Writes this :py:class:`GdxFile` to filename
 
@@ -481,7 +486,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         """
         return len(self._symbols)
 
-    def insert(self, key, value):
+    def insert(self, key: int, value: GdxSymbol) -> None:
         """
         Inserts value at position key
 
@@ -513,7 +518,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         except Exception:
             return False
 
-    def keys(self):
+    def keys(self) -> list[str]:
         """
         List of symbol names obtained by iterating through this :py:class:`GdxFile`
 
@@ -664,16 +669,16 @@ Default lower and upper bounds for each :py:class:`GamsVariableType`
 class GdxSymbol:
     def __init__(
         self,
-        name,
-        data_type,
-        dims=0,
-        file=None,
-        index=None,
-        description="",
-        variable_type=None,
-        equation_type=None,
-        domain=None,
-    ):
+        name: str,
+        data_type: GamsDataType | int,
+        dims: int | list[str] = 0,
+        file: GdxFile | None = None,
+        index: int | None = None,
+        description: str | None = "",
+        variable_type: GamsVariableType | int | None = None,
+        equation_type: GamsEquationType | int | None = None,
+        domain: Sequence[GdxSymbol | None] | None = None,
+    ) -> None:
         """
         In-memory representation of a GAMS GDX Symbol
 
@@ -766,7 +771,7 @@ class GdxSymbol:
         self._loaded = True
         return
 
-    def clone(self):
+    def clone(self) -> GdxSymbol:
         """
         Create a copy of this :py:class:`GdxSymbol`
 
@@ -1366,7 +1371,7 @@ class GdxSymbol:
         s += ", loaded" if self.loaded else ", not loaded"
         return s
 
-    def load(self, load_set_text=False):
+    def load(self, load_set_text: bool = False) -> None:
         """
         Loads this :py:class:`GdxSymbol` from its :py:attr:`file`, thereby popluating
         :py:attr:`dataframe`.
@@ -1419,14 +1424,14 @@ class GdxSymbol:
         self._loaded = True
         return
 
-    def unload(self):
+    def unload(self) -> None:
         """
         Drops this :py:class:`GdxSymbol`'s :py:attr:`dataframe`
         """
         self.dataframe = None
         self._loaded = False
 
-    def write(self, index=None, name_positions=None):
+    def write(self, index: int | None = None, name_positions: dict | None = None) -> None:
         """
         Writes this :py:class:`GdxSymbol` to its :py:attr:`file`
         """
@@ -1513,7 +1518,15 @@ class GdxSymbol:
 # ------------------------------------------------------------------------------
 
 
-def append_set(gdx_file, set_name, df, cols=None, dim_names=None, description=None, domain=None):
+def append_set(
+    gdx_file: GdxFile,
+    set_name: str,
+    df: pd.DataFrame,
+    cols: list[str] | None = None,
+    dim_names: list[str] | None = None,
+    description: str | None = None,
+    domain: Sequence[GdxSymbol | None] | None = None,
+) -> GdxSymbol:
     """
     Convenience function that appends set_name to gdx_file as a
     :class:`GamsDataType.Set <GamsDataType>` :class:`GdxSymbol` using data in
@@ -1578,8 +1591,14 @@ def append_set(gdx_file, set_name, df, cols=None, dim_names=None, description=No
 
 
 def append_parameter(
-    gdx_file, param_name, df, cols=None, dim_names=None, description=None, domain=None
-):
+    gdx_file: GdxFile,
+    param_name: str,
+    df: pd.DataFrame,
+    cols: list[str] | None = None,
+    dim_names: list[str] | None = None,
+    description: str | None = None,
+    domain: Sequence[GdxSymbol | None] | None = None,
+) -> GdxSymbol:
     """
     Convenience function that appends param_name to gdx_file as a
     :class:`GamsDataType.Parameter <GamsDataType>` :class:`GdxSymbol` using

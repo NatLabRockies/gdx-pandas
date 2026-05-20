@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import logging
 import os
 import re
@@ -135,12 +137,12 @@ class GamsDirFinder:
 
     gams_dir_cache = None
 
-    def __init__(self, gams_dir=None):
+    def __init__(self, gams_dir: str | os.PathLike[str] | None = None) -> None:
         self.__source = None
         self.gams_dir = gams_dir
 
     @property
-    def source(self):
+    def source(self) -> str | None:
         """Label describing which discovery branch produced ``gams_dir``.
 
         Set whenever a non-None ``gams_dir`` is resolved. Useful for diagnosing
@@ -150,15 +152,18 @@ class GamsDirFinder:
         return self.__source
 
     @property
-    def gams_dir(self):
+    def gams_dir(self) -> str:
         """The GAMS directory on this system."""
         if self.__gams_dir is None:
             raise RuntimeError("Unable to locate your GAMS directory.")
         return self.__gams_dir
 
     @gams_dir.setter
-    def gams_dir(self, value):
+    def gams_dir(self, value: str | os.PathLike[str] | None) -> None:
         self.__gams_dir = None
+        # Accept any path-like (e.g. pathlib.Path) by coercing it to str first.
+        if isinstance(value, os.PathLike):
+            value = os.fspath(value)
         if isinstance(value, str):
             self.__gams_dir = self.__clean_gams_dir(value)
             if self.__gams_dir is not None:
@@ -166,7 +171,7 @@ class GamsDirFinder:
         elif value is not None:
             logger.warning(
                 f"Unexpected gams_dir type {type(value)}. Ignoring "
-                f"input {value!r} because it is not a str."
+                f"input {value!r} because it is not a str or path-like."
             )
         if self.__gams_dir is None:
             self.__gams_dir = self.__find_gams()
@@ -295,11 +300,11 @@ class NeedsGamsDir:
     """Mix-in class that asserts that a GAMS directory is needed and provides the methods
     required to find and access it."""
 
-    def __init__(self, gams_dir=None):
+    def __init__(self, gams_dir: str | os.PathLike[str] | None = None) -> None:
         self.gams_dir = gams_dir
 
     @property
-    def gams_dir(self):
+    def gams_dir(self) -> str:
         """
         The GAMS directory whose value has either been directly set or has been found using
         the GamsDirFinder class.
@@ -311,13 +316,13 @@ class NeedsGamsDir:
         return self.__gams_dir
 
     @gams_dir.setter
-    def gams_dir(self, value):
+    def gams_dir(self, value: str | os.PathLike[str] | None) -> None:
         finder = GamsDirFinder(value)
         self.__gams_dir = finder.gams_dir
         self.__gams_dir_source = finder.source
 
     @property
-    def gams_dir_source(self):
+    def gams_dir_source(self) -> str | None:
         """Label for the discovery branch that produced :attr:`gams_dir`.
 
         Mirrors :attr:`GamsDirFinder.source`; lets GAMS-load errors name where
@@ -332,7 +337,7 @@ _bindings_source = None
 _loaded_gams_dir = None
 
 
-def load_gdxcc(gams_dir=None):
+def load_gdxcc(gams_dir: str | os.PathLike[str] | None = None) -> None:
     """Bind the GAMS library and initialize special-value conversion tables.
 
     Idempotent: safe to call repeatedly. The first successful call binds the
@@ -385,7 +390,7 @@ def load_gdxcc(gams_dir=None):
     _loaded_gams_dir = finder.gams_dir
 
 
-def info(gams_dir=None):
+def info(gams_dir: str | os.PathLike[str] | None = None) -> str:
     """Return a human-readable environment report as a string.
 
     Includes the gdxpds version, Python info, which GDX bindings are available

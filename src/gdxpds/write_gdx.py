@@ -1,4 +1,8 @@
+from __future__ import annotations
+
 import logging
+import os
+from collections.abc import Mapping, Sequence
 from numbers import Number
 
 import pandas as pd
@@ -195,7 +199,12 @@ class Translator:
         return GamsDataType.Set, num_dims
 
 
-def to_gdx(dataframes, path=None, gams_dir=None, domains=None):
+def to_gdx(
+    dataframes: Mapping[str, pd.DataFrame],
+    path: str | os.PathLike[str] | None = None,
+    gams_dir: str | os.PathLike[str] | None = None,
+    domains: Mapping[str, Sequence[str | None]] | None = None,
+) -> GdxFile:
     """
     Creates a :py:class:`gdxpds.gdx.GdxFile` from dataframes and optionally writes it to path
 
