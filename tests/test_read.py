@@ -45,7 +45,7 @@ def test_read_path(base_dir):
     dtypes = get_data_types(gdx_file)
     # this file is all parameters
     for val in dtypes.values():
-        val == gdxpds.gdx.GamsDataType.Parameter
+        assert val == gdxpds.gdx.GamsDataType.Parameter
 
 
 def test_unload(base_dir):

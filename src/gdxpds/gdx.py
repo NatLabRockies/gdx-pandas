@@ -414,7 +414,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         for i, symbol in enumerate(self, start=1):
             try:
                 symbol.write(index=i, name_positions=name_positions)
-            except:
+            except Exception:
                 logger.error(f"Unable to write {symbol} to {filename}")
                 raise
 
@@ -1311,7 +1311,7 @@ class GdxSymbol:
 
     def _append_default_values(self, df):
         assert len(df.columns) == self.num_dims
-        logger.debug("Applying default values to create valid dataframe for '{self.name}'.")
+        logger.debug(f"Applying default values to create valid dataframe for '{self.name}'.")
         for value_col_name in self.value_col_names:
             df[value_col_name] = self.get_value_col_default(value_col_name)
 
@@ -1336,7 +1336,7 @@ class GdxSymbol:
         if self._dataframe[colname].isnull().values.any():
             logger.warning(
                 f"Filling null values in {self} with True. To be "
-                "filled:\n{self._dataframe[self._dataframe[colname].isnull()]}"
+                f"filled:\n{self._dataframe[self._dataframe[colname].isnull()]}"
             )
             replace_df_column(self._dataframe, colname, self._dataframe[colname].fillna(value=True))
         if self._fixup_set_vals:
