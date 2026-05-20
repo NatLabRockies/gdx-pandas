@@ -1,0 +1,10 @@
+gdxpds.cli.main
+===============
+
+.. automodule:: gdxpds.cli.main
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+
