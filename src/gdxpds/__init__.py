@@ -7,7 +7,13 @@ from gdxpds.tools import (
     load_gdxcc,
     info,
 )
-from gdxpds.read_gdx import to_dataframes, list_symbols, to_dataframe, get_data_types
+from gdxpds.read_gdx import (
+    to_dataframes,
+    list_symbols,
+    to_dataframe,
+    get_data_types,
+    get_subset_relationships,
+)
 from gdxpds.write_gdx import to_gdx
 from gdxpds.gdx import GdxError
 
@@ -23,5 +29,6 @@ __all__ = [
     "to_dataframe",
     "list_symbols",
     "get_data_types",
+    "get_subset_relationships",
     "to_gdx",
 ]

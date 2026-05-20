@@ -8,9 +8,10 @@ Usage (from repo root, with the venv active and $env:GAMS_DIR set):
     python dev\\build_verify_install_sample.py
 
 Schema (chosen to exercise the distinct code paths gdxpds handles):
-  Set       t : 1D, 3 elements
-  Parameter p : 2D over t x t, 6 records: 1 normal value + 5 specials
-  Variable  v : 1D over t, exercises the 5-value-column shape
+  Set       t     : 1D wildcard root Set, 3 elements (domain_type == NONE)
+  Set       sub_t : 1D subset of t, 2 elements (strict / REGULAR domain)
+  Parameter p     : 2D over t x t, 6 records: 1 normal value + 5 specials
+  Variable  v     : 1D over t, exercises the 5-value-column shape
 """
 import os
 
@@ -30,10 +31,18 @@ def main():
     eps = np.finfo(float).eps
 
     with gdxpds.gdx.GdxFile() as gdx:
+        # Root Set with a wildcard domain: domain_type == NONE on read.
         gdx.append(gdxpds.gdx.GdxSymbol(
-            "t", gdxpds.gdx.GamsDataType.Set, dims=["t"]))
+            "t", gdxpds.gdx.GamsDataType.Set, dims=["*"]))
         gdx[-1].dataframe = pd.DataFrame(
             [["a", True], ["b", True], ["c", True]],
+            columns=["*", "Value"])
+
+        gdx.append(gdxpds.gdx.GdxSymbol(
+            "sub_t", gdxpds.gdx.GamsDataType.Set,
+            dims=["t"], domain=[gdx["t"]]))
+        gdx[-1].dataframe = pd.DataFrame(
+            [["a", True], ["c", True]],
             columns=["t", "Value"])
 
         gdx.append(gdxpds.gdx.GdxSymbol(
