@@ -13,10 +13,7 @@ class Translator(object):
         self.__dataframes = None
 
     def __exit__(self, *args):
-        self.__gdx.__exit__(self, *args)
-
-    def __del__(self):
-        self.__gdx.__del__()
+        self.__gdx.__exit__(*args)
 
     @property
     def gams_dir(self):
@@ -32,7 +29,7 @@ class Translator(object):
 
     @gdx_file.setter
     def gdx_file(self,value):
-        self.__gdx.__del__()
+        self.__gdx.cleanup()
         self.__gdx = GdxFile(gams_dir=self.gdx.gams_dir,lazy_load=self.gdx.lazy_load)
         self.__gdx.read(value)
         self.__dataframes = None

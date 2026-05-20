@@ -24,18 +24,17 @@ class Translator(object):
 
     def __exit__(self, *args):
         if self.__gdx is not None:
-            self.__gdx.__exit__(self, *args)
-
-    def __del__(self):
-        if self.__gdx is not None:
-            self.__gdx.__del__()
+            self.__gdx.__exit__(*args)
 
     def release(self):
         """
-        Relinquish ownership of the built :class:`GdxFile`. After this call
-        the Translator's cleanup (:meth:`__del__` / :meth:`__exit__`) will
-        not free the GdxFile's GDX handle, so a GdxFile handed to a caller
-        stays valid. The Translator should not be reused afterward.
+        Relinquish ownership of the built :class:`GdxFile` by dropping this
+        Translator's reference to it. A GdxFile handed to a caller then stays
+        valid: the caller's reference keeps it alive, and its GDX handle is
+        freed exactly once via the GdxFile's own ``weakref.finalize`` (or an
+        explicit :meth:`GdxFile.cleanup`) once the caller is done. Neither this
+        Translator's :meth:`__exit__` nor its garbage collection will free that
+        handle. The Translator should not be reused afterward.
         """
         self.__gdx = None
 

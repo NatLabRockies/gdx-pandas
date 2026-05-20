@@ -66,6 +66,58 @@ def _check_gdx_create_rc(H, rc, gdxcc, gams_dir, source):
     )
 
 
+class _GdxHandle:
+    """Own the new -> create -> (use) -> free -> delete lifecycle of one SWIG gdx handle.
+
+    The SWIG gdx handle has two separable resources: the wrapper struct from
+    ``new_gdxHandle_tp()`` (a plain ``calloc``) and the gdx object that
+    ``gdxCreateD`` builds inside it. They tear down differently:
+
+    - success: ``gdxFree`` (frees the object) then ``delete_gdxHandle_tp`` (frees the wrapper);
+    - failure: ``delete_gdxHandle_tp`` ONLY -- on a failed ``gdxCreateD`` the library never
+      loaded, so ``XFree`` is unbound and ``gdxFree`` would segfault.
+
+    ``close()`` is idempotent (run-once: a second ``gdxFree`` is a double free). There is no
+    ``__del__`` on purpose -- native cleanup never runs from a destructor (which would fire at
+    interpreter teardown after module state is partially gone). Short-lived handles use ``with``;
+    a long-lived owner (e.g. ``GdxFile``) keeps the instance and drives :meth:`close` from a
+    ``weakref.finalize`` callback -- safe because ``close`` is a bound method that does not
+    reference the owner and uses gdxcc callables bound at construction (not module globals).
+
+    ``gdxcc`` is passed in because :mod:`gdxpds.tools` does not import a binding at module level.
+    """
+    def __init__(self, gdxcc, gams_dir, source):
+        # Bind the callables now so close() does not look them up through module
+        # globals during interpreter shutdown.
+        self._free = gdxcc.gdxFree
+        self._delete = gdxcc.delete_gdxHandle_tp
+        self._created = self._closed = False
+        self.H = None
+        self.H = gdxcc.new_gdxHandle_tp()
+        try:
+            rc = gdxcc.gdxCreateD(self.H, gams_dir, gdxcc.GMS_SSSIZE)
+            _check_gdx_create_rc(self.H, rc, gdxcc, gams_dir, source)  # raises on failure
+            self._created = True
+        except BaseException:
+            self.close()   # _created is False -> delete-only, never gdxFree
+            raise
+
+    def close(self):
+        if self._closed or self.H is None:
+            return
+        self._closed = True
+        H, self.H = self.H, None
+        if self._created:
+            self._free(H)
+        self._delete(H)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
+
 class GamsDirFinder(object):
     """
     Class for finding and accessing the system's GAMS directory. 
@@ -253,7 +305,18 @@ class NeedsGamsDir(object):
         
     @gams_dir.setter
     def gams_dir(self, value):
-        self.__gams_dir = GamsDirFinder(value).gams_dir
+        finder = GamsDirFinder(value)
+        self.__gams_dir = finder.gams_dir
+        self.__gams_dir_source = finder.source
+
+    @property
+    def gams_dir_source(self):
+        """Label for the discovery branch that produced :attr:`gams_dir`.
+
+        Mirrors :attr:`GamsDirFinder.source`; lets GAMS-load errors name where
+        the directory came from, consistently with the other handle-create sites.
+        """
+        return self.__gams_dir_source
 
 
 # Process-global state for the bound GAMS library. Populated by the first
@@ -304,10 +367,8 @@ def load_gdxcc(gams_dir=None):
     except ImportError:
         import gdxcc
         _bindings_source = "gdxcc"
-    H = gdxcc.new_gdxHandle_tp()
-    rc = gdxcc.gdxCreateD(H, finder.gams_dir, gdxcc.GMS_SSSIZE)
-    _check_gdx_create_rc(H, rc, gdxcc, finder.gams_dir, finder.source)
-    gdxcc.gdxFree(H)
+    with _GdxHandle(gdxcc, finder.gams_dir, finder.source):
+        pass
     # Deferred to break the tools <-> special import cycle.
     from gdxpds.special import load_specials
     load_specials(finder)

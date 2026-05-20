@@ -8,7 +8,7 @@ including translation between GDX and numpy special values.
 from __future__ import absolute_import, print_function
 from builtins import super
 
-import atexit
+import weakref
 from collections import defaultdict, OrderedDict
 
 try:
@@ -30,7 +30,7 @@ try:
     HAVE_GDX2PY = True
 except ImportError: pass
 
-from gdxpds.tools import Error, NeedsGamsDir, load_gdxcc
+from gdxpds.tools import Error, NeedsGamsDir, load_gdxcc, _GdxHandle
 
 try:
     from gams.core import gdx as gdxcc
@@ -168,7 +168,8 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         """
         Initializes a GdxFile object by connecting to GAMS and creating a pointer.
 
-        Throws a GdxError if either of those operations fail.
+        Raises a :class:`gdxpds.tools.GamsLoadError` if GAMS cannot be located or
+        loaded, or if the GDX object cannot be created.
 
         Parameters
         ----------
@@ -185,25 +186,35 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         self._producer = None
         self._filename = None
         self._symbols = OrderedDict()
+        # Set before anything that can raise, so cleanup() is safe if create fails.
+        self._H = None
+        self._handle = None
+        self._finalizer = None
 
         NeedsGamsDir.__init__(self,gams_dir=gams_dir)
-        self._H = self._create_gdx_object()
+        self._handle = self._create_gdx_object()
+        self._H = self._handle.H
         self.universal_set = GdxSymbol('*',GamsDataType.Set,dims=1,file=None,index=0)
         self.universal_set._file = self
 
-        atexit.register(gdxcc.gdxFree, self.H)
+        # Free the gdx object + wrapper exactly once, at the first of: cleanup(),
+        # garbage collection, or interpreter exit. The callback is the handle's own
+        # close() -- a bound method of self._handle, not self -- so it never keeps
+        # this GdxFile alive (which would defeat GC-time finalization) and stays
+        # valid at interpreter shutdown (close() uses callables bound when the
+        # handle was created, not module-global lookups).
+        self._finalizer = weakref.finalize(self, self._handle.close)
         return
 
     def cleanup(self):
-        gdxcc.gdxFree(self.H)
+        if self._finalizer is not None:
+            self._finalizer()      # runs handle.close() at most once
+        self._H = None
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.cleanup()
-
-    def __del__(self):
         self.cleanup()
 
     def clone(self):
@@ -538,11 +549,10 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         # Idempotent: first call binds the library + populates SPECIAL_VALUES;
         # subsequent calls validate self.gams_dir and warn on mismatch.
         load_gdxcc(gams_dir=self.gams_dir)
-        H = gdxcc.new_gdxHandle_tp()
-        rc = gdxcc.gdxCreateD(H, self.gams_dir, gdxcc.GMS_SSSIZE)
-        if not rc:
-            raise GdxError(H, rc[1])
-        return H
+        # _GdxHandle validates the create (raising GamsLoadError on failure, and
+        # deleting the wrapper without an unsafe gdxFree). This GdxFile keeps the
+        # handle; its weakref.finalize calls handle.close() to free+delete.
+        return _GdxHandle(gdxcc, self.gams_dir, self.gams_dir_source)
 
 
 class GamsDataType(Enum):
