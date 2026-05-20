@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import os
-import warnings
 from collections import OrderedDict
 
 import pandas as pd
@@ -201,9 +200,8 @@ def to_dataframe(
     gdx_file: str | os.PathLike[str],
     symbol_name: str,
     gams_dir: str | os.PathLike[str] | None = None,
-    old_interface: bool = True,
     load_set_text: bool = False,
-) -> dict[str, pd.DataFrame] | pd.DataFrame:
+) -> pd.DataFrame:
     """
     Interface for getting the data for a single symbol
 
@@ -215,32 +213,15 @@ def to_dataframe(
         Name of the symbol whose data are to be read
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
-    old_interface : bool
-        Whether to use the old interface and return a dict, or the new interface,
-        and simply return a pd.DataFrame
     load_set_text : bool
         If True (default is False) and symbol_name is a Set, loads the GDX Text
         field into the dataframe rather than a `c_bool`.
 
     Returns
     -------
-    dict of str to pd.DataFrame OR pd.DataFrame
-        If old_interface (the default), returns a dict with a single entry,
-        where the key is symbol_name and the value is the corresponding
-        pd.DataFrame. Otherwise (if not old_interface), returns just the
-        pd.DataFrame.
+    pd.DataFrame
+        The data for symbol_name as a pandas DataFrame.
     """
-    df = Translator(gdx_file, gams_dir=gams_dir, lazy_load=True).dataframe(
+    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True).dataframe(
         symbol_name, load_set_text=load_set_text
     )
-    if old_interface:
-        warnings.warn(
-            "to_dataframe() returning a {symbol_name: DataFrame} dict "
-            "(old_interface=True) is deprecated; the old_interface argument will "
-            "be removed in gdxpds 2.0.0, after which to_dataframe() always returns "
-            "a plain DataFrame. Pass old_interface=False to get that behavior now.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        return {symbol_name: df}
-    return df
