@@ -1,5 +1,5 @@
-"""Tests for subset (domain) relationships between Sets.
-"""
+"""Tests for subset (domain) relationships between Sets."""
+
 import logging
 import os
 
@@ -22,10 +22,13 @@ def _set_df(rows, col="t"):
     return pd.DataFrame([[r, True] for r in rows], columns=[col, "Value"])
 
 
-def _make_parent_child(parent_name="t", child_name="sub_t",
-                       parent_rows=("a", "b", "c"),
-                       child_rows=("a", "c"),
-                       strict=True):
+def _make_parent_child(
+    parent_name="t",
+    child_name="sub_t",
+    parent_rows=("a", "b", "c"),
+    child_rows=("a", "c"),
+    strict=True,
+):
     """Return a new GdxFile with a parent Set and child subset."""
     gdx = GdxFile()
     parent = GdxSymbol(parent_name, GamsDataType.Set, dims=[parent_name])
@@ -33,8 +36,9 @@ def _make_parent_child(parent_name="t", child_name="sub_t",
     gdx[-1].dataframe = _set_df(parent_rows, col=parent_name)
 
     if strict:
-        child = GdxSymbol(child_name, GamsDataType.Set, dims=[parent_name],
-                          domain=[gdx[parent_name]])
+        child = GdxSymbol(
+            child_name, GamsDataType.Set, dims=[parent_name], domain=[gdx[parent_name]]
+        )
     else:
         child = GdxSymbol(child_name, GamsDataType.Set, dims=[parent_name])
     gdx.append(child)
@@ -101,8 +105,7 @@ def test_wildcard_inside_strict(run_dir):
         gdx.append(parent)
         gdx[-1].dataframe = _set_df(["a1", "a2"], col="a")
 
-        child = GdxSymbol("mix", GamsDataType.Set, dims=["a", "b"],
-                          domain=[gdx["a"], None])
+        child = GdxSymbol("mix", GamsDataType.Set, dims=["a", "b"], domain=[gdx["a"], None])
         gdx.append(child)
         gdx[-1].dataframe = pd.DataFrame(
             [["a1", "x", True], ["a2", "y", True]],
@@ -443,11 +446,9 @@ def test_get_subset_relationships_round_trips_through_to_gdx(run_dir):
     out1 = os.path.join(run_dir, "rels_rt_1.gdx")
     out2 = os.path.join(run_dir, "rels_rt_2.gdx")
     dataframes = {
-        "a":     pd.DataFrame([["a1", True], ["a2", True], ["a3", True]],
-                              columns=["a", "Value"]),
-        "sub_a": pd.DataFrame([["a1", True], ["a3", True]],
-                              columns=["a", "Value"]),
-        "free":  pd.DataFrame([["x1", True]], columns=["*", "Value"]),
+        "a": pd.DataFrame([["a1", True], ["a2", True], ["a3", True]], columns=["a", "Value"]),
+        "sub_a": pd.DataFrame([["a1", True], ["a3", True]], columns=["a", "Value"]),
+        "free": pd.DataFrame([["x1", True]], columns=["*", "Value"]),
     }
     # Build with a genuine subset (sub_a -> a) and a wildcard set (free).
     gdxpds.to_gdx(dataframes, out1, domains={"sub_a": ["a"], "free": [None]})

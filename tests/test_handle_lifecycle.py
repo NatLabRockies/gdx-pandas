@@ -7,6 +7,7 @@ deterministically with a fake gdxcc passed into _GdxHandle's constructor
 (dependency injection, no monkeypatching, no GAMS needed). The remaining tests
 exercise the real GdxFile teardown and skip when no GAMS is discoverable.
 """
+
 import gc
 import os
 import subprocess
@@ -41,6 +42,7 @@ requires_gams = pytest.mark.skipif(
 # gdxCreateD return code. _check_gdx_create_rc treats code == 1 as success and,
 # because we supply a message in the rc list, never reaches gdxErrorStr -- so the
 # fake needs only these four functions plus GMS_SSSIZE.
+
 
 class FakeGdxcc:
     GMS_SSSIZE = 256
@@ -111,6 +113,7 @@ def test_needsgamsdir_records_source():
 
 # ------------------------------------------------------------------------ GdxFile
 
+
 @requires_gams
 def test_gdxfile_cleanup_is_idempotent():
     # "Idempotent" = a second/third cleanup() (and a later GC) has the same effect
@@ -119,14 +122,14 @@ def test_gdxfile_cleanup_is_idempotent():
     # so asserting the True -> False transition proves cleanup ran exactly once
     # (a bare "did not crash" check would also pass on a silent double-free).
     f = gdxpds.gdx.GdxFile()
-    assert f._finalizer.alive            # handle live, not yet freed
+    assert f._finalizer.alive  # handle live, not yet freed
     f.cleanup()
-    assert not f._finalizer.alive        # freed, exactly once
+    assert not f._finalizer.alive  # freed, exactly once
     assert f._H is None
-    f.cleanup()                          # second call: safe no-op
+    f.cleanup()  # second call: safe no-op
     assert not f._finalizer.alive
     del f
-    gc.collect()                         # GC of an already-cleaned file must not re-free
+    gc.collect()  # GC of an already-cleaned file must not re-free
 
 
 @requires_gams
@@ -162,9 +165,7 @@ def test_many_gdxfiles_exit_cleanly():
         "fs = [gdxpds.gdx.GdxFile() for _ in range(50)]\n"
         "del fs; gc.collect()\n"
     )
-    result = subprocess.run(
-        [sys.executable, "-c", code], capture_output=True, text=True
-    )
+    result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
     assert result.returncode == 0, f"non-clean exit:\n{result.stderr}"
 
 
@@ -175,7 +176,9 @@ def test_invalid_gams_dir_fails_cleanly():
     env = {**os.environ, "GAMS_DIR": NOT_GAMS_DIR}
     result = subprocess.run(
         [sys.executable, "-c", "import gdxpds.gdx; gdxpds.gdx.GdxFile()"],
-        capture_output=True, text=True, env=env,
+        capture_output=True,
+        text=True,
+        env=env,
     )
     assert result.returncode == 1, (
         f"expected a clean non-zero exit, got {result.returncode}\n{result.stderr}"

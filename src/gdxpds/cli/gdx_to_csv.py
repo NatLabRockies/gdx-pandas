@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 def convert_gdx_to_csv(in_gdx, out_dir, gams_dir=None):
     # check inputs
     if not os.path.exists(os.path.dirname(out_dir)):
-        raise RuntimeError("Parent directory of output directory '{}' does not exist.".format(out_dir))
+        raise RuntimeError(f"Parent directory of output directory '{out_dir}' does not exist.")
 
     # convert to pandas.DataFrames
     dataframes = gdxpds.to_dataframes(in_gdx, gams_dir)
@@ -23,21 +23,34 @@ def convert_gdx_to_csv(in_gdx, out_dir, gams_dir=None):
     for symbol_name, df in dataframes.items():
         csv_path = os.path.join(out_dir, symbol_name + ".csv")
         if os.path.exists(csv_path):
-            logger.info("Overwriting '{}'".format(csv_path))
-        df.to_csv(csv_path,
-                  na_rep='NaN',
-                  index=False)
+            logger.info(f"Overwriting '{csv_path}'")
+        df.to_csv(csv_path, na_rep="NaN", index=False)
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description='''Reads a gdx file into
-        pandas dataframes, and then writes them out as csv files.''')
-    parser.add_argument('-i', '--in_gdx', help='''Input gdx file to be read
-                        and exported as one csv per symbol.''')
-    parser.add_argument('-o', '--out_dir', default='./gdx_data/',
-                        help='''Directory to which csvs are to be written.''')
-    parser.add_argument('-g', '--gams_dir', help='''Path to GAMS installation
-                        directory.''', default=None)
+    parser = argparse.ArgumentParser(
+        description="""Reads a gdx file into
+        pandas dataframes, and then writes them out as csv files."""
+    )
+    parser.add_argument(
+        "-i",
+        "--in_gdx",
+        help="""Input gdx file to be read
+                        and exported as one csv per symbol.""",
+    )
+    parser.add_argument(
+        "-o",
+        "--out_dir",
+        default="./gdx_data/",
+        help="""Directory to which csvs are to be written.""",
+    )
+    parser.add_argument(
+        "-g",
+        "--gams_dir",
+        help="""Path to GAMS installation
+                        directory.""",
+        default=None,
+    )
 
     args = parser.parse_args(argv)
 

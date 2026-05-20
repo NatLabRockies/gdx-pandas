@@ -20,11 +20,13 @@ def run_cli(*args):
     """Invoke the gdxpds CLI in a subprocess, PATH-independent."""
     return subprocess.run(
         [sys.executable, "-m", "gdxpds.cli.main", *args],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
     )
 
 
 # ---------------------------------------------------------------- gdxpds.info()
+
 
 def test_info_returns_str_with_expected_fields():
     # load_gdxcc shows up only on failure, by design.
@@ -47,6 +49,7 @@ def test_info_override_reflected_in_report():
 
 # ----------------------------------------------------------------- GamsDirFinder
 
+
 def test_gams_dir_finder_explicit_override_recorded():
     finder = gdxpds.tools.GamsDirFinder(gams_dir=NOT_GAMS_DIR)
     assert finder.source == "explicit override"
@@ -62,6 +65,7 @@ def test_gams_dir_finder_records_source_in_env():
 
 
 # -------------------------------------------------------------------- load_gdxcc
+
 
 def test_load_gdxcc_raises_for_non_gams_dir():
     # load_gdxcc validates the dir only on the first (binding) call; once a
@@ -92,6 +96,7 @@ def test_load_gdxcc_warns_and_returns_when_already_bound(caplog):
 
 
 # ---------------------------------------------------------------- CLI surface
+
 
 def test_cli_version_flag():
     result = run_cli("--version")

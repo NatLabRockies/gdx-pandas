@@ -4,17 +4,18 @@ For now only one subcommand exists: `gdxpds test`, which verifies a fresh
 installation against the local GAMS environment. If more subcommands are
 added, split the dispatcher and per-command logic into separate modules.
 """
+
 import argparse
 import os
 import sys
 import tempfile
 from importlib.resources import as_file, files
 
+import numpy as np
+
 import gdxpds
 import gdxpds.gdx
 import gdxpds.tools
-
-import numpy as np
 
 
 def main(argv=None):
@@ -23,7 +24,9 @@ def main(argv=None):
         description="gdx-pandas command-line utilities.",
     )
     parser.add_argument(
-        "--version", action="version", version=f"gdxpds {gdxpds.__version__}",
+        "--version",
+        action="version",
+        version=f"gdxpds {gdxpds.__version__}",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -32,19 +35,22 @@ def main(argv=None):
         help="Print gdxpds environment info (Python, bindings, GAMS_DIR, load status).",
     )
     info_parser.add_argument(
-        "-g", "--gams_dir", default=None,
-        help="Probe this GAMS directory instead of the loaded / discovered one.")
+        "-g",
+        "--gams_dir",
+        default=None,
+        help="Probe this GAMS directory instead of the loaded / discovered one.",
+    )
 
     test_parser = subparsers.add_parser(
         "test",
         help="Verify the gdxpds installation against the local GAMS environment.",
     )
     test_parser.add_argument(
-        "-v", "--verbose", action="store_true",
-        help="Print exception tracebacks on failure.")
+        "-v", "--verbose", action="store_true", help="Print exception tracebacks on failure."
+    )
     test_parser.add_argument(
-        "-g", "--gams_dir", default=None,
-        help="Use this GAMS directory for the verification run.")
+        "-g", "--gams_dir", default=None, help="Use this GAMS directory for the verification run."
+    )
 
     args = parser.parse_args(argv)
     if args.command == "info":
@@ -89,8 +95,10 @@ def _check_gams_install(args, failures):
         return finder.gams_dir
     except Exception as exc:
         _fail("Could not locate a GAMS installation", exc, args)
-        _hint("Set $env:GAMS_DIR (PowerShell) or $GAMS_DIR (POSIX) to your "
-              "GAMS install directory, put `gams` on PATH, or pass -g/--gams_dir.")
+        _hint(
+            "Set $env:GAMS_DIR (PowerShell) or $GAMS_DIR (POSIX) to your "
+            "GAMS install directory, put `gams` on PATH, or pass -g/--gams_dir."
+        )
         failures.append("gams_install")
         return None
 
@@ -98,11 +106,11 @@ def _check_gams_install(args, failures):
 def _check_bindings(args, failures):
     source = gdxpds.tools._bindings_source
     if source is None:
-        _fail("GDX bindings not loaded",
-              RuntimeError("see info() output above for details"),
-              args)
-        _hint("Install `gamsapi` matched to your GAMS version: "
-              "pip install gamsapi[transfer]==<your GAMS version>")
+        _fail("GDX bindings not loaded", RuntimeError("see info() output above for details"), args)
+        _hint(
+            "Install `gamsapi` matched to your GAMS version: "
+            "pip install gamsapi[transfer]==<your GAMS version>"
+        )
         failures.append("bindings")
         return False
     _ok(f"GDX bindings loaded: {source}")
@@ -117,12 +125,15 @@ def _check_read(sample_path, args, failures):
             assert names == {"t", "sub_t", "p", "v"}, f"unexpected symbols: {names}"
             assert gdx["p"].num_records == 6
             assert gdx["t"].domain_type == gdxpds.gdx.GamsDomainType.NONE, (
-                f"t.domain_type = {gdx['t'].domain_type}, expected NONE")
+                f"t.domain_type = {gdx['t'].domain_type}, expected NONE"
+            )
             sub_t = gdx["sub_t"]
             assert sub_t.domain_type == gdxpds.gdx.GamsDomainType.REGULAR, (
-                f"sub_t.domain_type = {sub_t.domain_type}, expected REGULAR")
+                f"sub_t.domain_type = {sub_t.domain_type}, expected REGULAR"
+            )
             assert sub_t.domain is not None and sub_t.domain[0] is gdx["t"], (
-                "sub_t.domain[0] does not resolve to gdx['t']")
+                "sub_t.domain[0] does not resolve to gdx['t']"
+            )
         _ok(f"Read embedded sample.gdx ({sample_path})")
         return True
     except Exception as exc:
@@ -141,7 +152,8 @@ def _check_roundtrip(sample_path, out_path, args, failures):
             gdx.read(out_path)
             assert {s.name for s in gdx} == {"t", "sub_t", "p", "v"}
             assert gdx["sub_t"].domain_type == gdxpds.gdx.GamsDomainType.REGULAR, (
-                "sub_t.domain_type did not survive round-trip as REGULAR")
+                "sub_t.domain_type did not survive round-trip as REGULAR"
+            )
         _ok("Round-trip write->read preserves all symbols")
         return True
     except Exception as exc:
@@ -176,6 +188,7 @@ def _fail(msg, exc, args):
     print(f"  [FAIL] {msg}: {exc}", file=sys.stderr)
     if args.verbose:
         import traceback
+
         traceback.print_exception(exc, file=sys.stderr)
 
 

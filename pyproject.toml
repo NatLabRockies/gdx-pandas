@@ -31,6 +31,9 @@ docs = [
 ]
 dev = [
     "gdxpds[test,docs]",
+    "ruff",
+    "pyright",
+    "pre-commit",
 ]
 
 [project.urls]
@@ -54,9 +57,42 @@ version = {attr = "gdxpds.__version__"}
 where = ["src"]
 
 [tool.setuptools.package-data]
+"gdxpds" = ["py.typed"]
 "gdxpds._verify_install" = ["*.gdx"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 log_file = "tests/pytest.log"
 log_file_level = "INFO"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100          # wider than ruff's 88 default to cut wrapping churn; adjustable
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# Conservative starting set; B (bugbear) and D (docstrings) are good cheap follow-ups.
+select = ["E", "F", "I", "UP", "W"]   # pycodestyle, pyflakes, isort, pyupgrade, warnings
+# The formatter owns code line length (enforced via `ruff format --check`); E501 would
+# otherwise only nag about long strings/comments/docstrings it cannot reflow.
+ignore = ["E501"]
+
+[tool.pyright]
+include = ["src/gdxpds"]
+pythonVersion = "3.11"
+# Basic mode: type the public API surface without forcing strictness on the
+# SWIG-bound gdxcc interop and pandas-heavy internals (which have no/partial stubs).
+typeCheckingMode = "basic"
+reportMissingImports = false   # gdxcc / gams.core / gdx2py have no stubs
+# Public-API typing rollout: the public signatures are annotated and checked
+# (return types, undefined names, etc. remain errors), but the internals carry
+# latent None-safety gaps (attributes initialized to None, dynamically-shaped
+# dims). Surface those as warnings so CI gates on the public contract without a
+# full internal refactor. Tighten back to "error" as the internals get typed.
+reportOptionalMemberAccess = "warning"
+reportOptionalSubscript = "warning"
+reportOptionalOperand = "warning"
+reportOptionalIterable = "warning"
+reportArgumentType = "warning"
+reportOperatorIssue = "warning"
+reportAttributeAccessIssue = "warning"

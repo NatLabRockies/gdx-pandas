@@ -1,0 +1,11 @@
+# Local lint/format hooks. Install once with `pre-commit install`.
+# Ruff never imports the project, so these run without a GAMS install.
+# Pyright is intentionally not a hook (it needs deps installed) -- it runs in
+# CI and your editor instead.
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.13
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format

@@ -13,18 +13,25 @@ Schema (chosen to exercise the distinct code paths gdxpds handles):
   Parameter p     : 2D over t x t, 6 records: 1 normal value + 5 specials
   Variable  v     : 1D over t, exercises the 5-value-column shape
 """
-import os
 
-import gdxpds
-import gdxpds.gdx
+import os
 
 import numpy as np
 import pandas as pd
 
-OUT_PATH = os.path.abspath(os.path.join(
-    os.path.dirname(__file__),
-    "..", "src", "gdxpds", "_verify_install", "sample.gdx",
-))
+import gdxpds
+import gdxpds.gdx
+
+OUT_PATH = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "src",
+        "gdxpds",
+        "_verify_install",
+        "sample.gdx",
+    )
+)
 
 
 def main():
@@ -32,33 +39,39 @@ def main():
 
     with gdxpds.gdx.GdxFile() as gdx:
         # Root Set with a wildcard domain: domain_type == NONE on read.
-        gdx.append(gdxpds.gdx.GdxSymbol(
-            "t", gdxpds.gdx.GamsDataType.Set, dims=["*"]))
+        gdx.append(gdxpds.gdx.GdxSymbol("t", gdxpds.gdx.GamsDataType.Set, dims=["*"]))
         gdx[-1].dataframe = pd.DataFrame(
-            [["a", True], ["b", True], ["c", True]],
-            columns=["*", "Value"])
+            [["a", True], ["b", True], ["c", True]], columns=["*", "Value"]
+        )
 
-        gdx.append(gdxpds.gdx.GdxSymbol(
-            "sub_t", gdxpds.gdx.GamsDataType.Set,
-            dims=["t"], domain=[gdx["t"]]))
+        gdx.append(
+            gdxpds.gdx.GdxSymbol(
+                "sub_t", gdxpds.gdx.GamsDataType.Set, dims=["t"], domain=[gdx["t"]]
+            )
+        )
+        gdx[-1].dataframe = pd.DataFrame([["a", True], ["c", True]], columns=["t", "Value"])
+
+        gdx.append(gdxpds.gdx.GdxSymbol("p", gdxpds.gdx.GamsDataType.Parameter, dims=["t1", "t2"]))
         gdx[-1].dataframe = pd.DataFrame(
-            [["a", True], ["c", True]],
-            columns=["t", "Value"])
+            [
+                ["a", "a", 1.0],
+                ["a", "b", None],
+                ["b", "a", np.nan],
+                ["b", "b", np.inf],
+                ["c", "a", -np.inf],
+                ["c", "b", eps],
+            ],
+            columns=["t1", "t2", "Value"],
+        )
 
-        gdx.append(gdxpds.gdx.GdxSymbol(
-            "p", gdxpds.gdx.GamsDataType.Parameter, dims=["t1", "t2"]))
-        gdx[-1].dataframe = pd.DataFrame([
-            ["a", "a", 1.0],
-            ["a", "b", None],
-            ["b", "a", np.nan],
-            ["b", "b", np.inf],
-            ["c", "a", -np.inf],
-            ["c", "b", eps],
-        ], columns=["t1", "t2", "Value"])
-
-        gdx.append(gdxpds.gdx.GdxSymbol(
-            "v", gdxpds.gdx.GamsDataType.Variable, dims=["t"],
-            variable_type=gdxpds.gdx.GamsVariableType.Free))
+        gdx.append(
+            gdxpds.gdx.GdxSymbol(
+                "v",
+                gdxpds.gdx.GamsDataType.Variable,
+                dims=["t"],
+                variable_type=gdxpds.gdx.GamsVariableType.Free,
+            )
+        )
         v_df = pd.DataFrame([["a"], ["b"], ["c"]], columns=["t"])
         for col in gdx[-1].value_col_names:
             v_df[col] = gdx[-1].get_value_col_default(col)

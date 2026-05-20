@@ -6,7 +6,35 @@ To get all of the development dependencies for Python:
 pip install -e .[dev]
 ```
 
-That meta-extra pulls in `[test]` (pytest) and `[docs]` (sphinx, sphinx_rtd_theme, myst-parser). Use `.[test]` or `.[docs]` if you only want one. Build/release tooling (`build`, `twine`, etc.) is no longer a local concern — see [Releases](#create-a-new-release) below.
+That meta-extra pulls in `[test]` (pytest), `[docs]` (sphinx, sphinx_rtd_theme, myst-parser), and the lint/type tooling (`ruff`, `pyright`, `pre-commit`). Use `.[test]` or `.[docs]` if you only want one. Build/release tooling (`build`, `twine`, etc.) is no longer a local concern — see [Releases](#create-a-new-release) below.
+
+## Code style and type-checking
+
+`ruff` handles linting and formatting; `pyright` (basic mode) type-checks the public API. Both are configured in [pyproject.toml](../pyproject.toml) (`[tool.ruff]`, `[tool.pyright]`) and installed by the `[dev]` extra.
+
+Install the local git hooks once so commits are auto-formatted and linted (ruff only — it needs no GAMS install):
+
+```
+pre-commit install
+```
+
+Or run the checks by hand before pushing:
+
+```
+ruff check --fix
+ruff format
+pyright
+```
+
+CI ([lint.yml](../.github/workflows/lint.yml)) runs the same pinned ruff hooks plus pyright on every PR and on `main`; neither needs a GAMS install. Tests are not in CI — run them locally (below).
+
+Only the **public API** is annotated; the SWIG-bound internals stay untyped, so pyright's None-safety diagnostic categories are downgraded to warnings in `[tool.pyright]` (tighten them back to errors as internals get typed). `E501` (line length) is left to the formatter rather than the linter.
+
+The one-time bulk reformat is listed in [.git-blame-ignore-revs](../.git-blame-ignore-revs). Keep `git blame` readable past it with:
+
+```
+git config blame.ignoreRevsFile .git-blame-ignore-revs
+```
 
 ## Maintain multiple .venvs for testing
 

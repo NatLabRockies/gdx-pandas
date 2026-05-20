@@ -1,3 +1,10 @@
+v1.6.0, 05/20/26 -- ship PEP 561 type information with a py.typed marker and type
+                    annotations on the public API
+                    add developer tooling: ruff (lint + format), pyright, and
+                    pre-commit hooks, enforced by a new GAMS-free lint CI job
+                    deprecate to_dataframe()'s old_interface argument; pass
+                    old_interface=False to get a plain DataFrame. The dict-returning
+                    default is deprecated and old_interface will be removed in v2.0.0
 v1.5.0, 05/20/26 -- support modern gamsapi bindings (gams.core.gdx); the standalone gdxcc
                     package moves to a [legacy] extra
                     require Python >= 3.11, pandas >= 2.2, numpy >= 2.0

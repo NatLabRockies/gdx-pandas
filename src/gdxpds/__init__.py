@@ -1,21 +1,21 @@
-__version__ = "1.5.0"
+__version__ = "1.6.0"
 
-from gdxpds.tools import (
-    Error,
-    GamsLoadError,
-    GamsDirFinder,
-    load_gdxcc,
-    info,
-)
+from gdxpds.gdx import GdxError
 from gdxpds.read_gdx import (
-    to_dataframes,
-    list_symbols,
-    to_dataframe,
     get_data_types,
     get_subset_relationships,
+    list_symbols,
+    to_dataframe,
+    to_dataframes,
+)
+from gdxpds.tools import (
+    Error,
+    GamsDirFinder,
+    GamsLoadError,
+    info,
+    load_gdxcc,
 )
 from gdxpds.write_gdx import to_gdx
-from gdxpds.gdx import GdxError
 
 __all__ = [
     "__version__",
