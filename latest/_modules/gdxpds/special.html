@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.special &mdash; gdx-pandas 1.5.0 documentation</title>
+  <title>gdxpds.special &mdash; gdx-pandas 1.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=e0a75244"></script>
+      <script src="../../_static/documentation_options.js?v=72d88caf"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -163,8 +163,7 @@
            <div itemprop="articleBody">
              
   <h1>Source code for gdxpds.special</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">gams.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdx</span> <span class="k">as</span> <span class="n">gdxcc</span>
@@ -177,7 +176,7 @@
 
 <span class="c1">#                      1E300,  2E300,  3E300,   4E300,               5E300</span>
 <span class="n">NUMPY_SPECIAL_VALUES</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">]</span>
-<span class="sd">&quot;&quot;&quot;List of numpy special values in gdxGetSpecialValues order, i.e., </span>
+<span class="sd">&quot;&quot;&quot;List of numpy special values in gdxGetSpecialValues order, i.e.,</span>
 <span class="sd">[None, np.nan, np.inf, -np.inf, np.finfo(float).eps]</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
@@ -207,8 +206,9 @@
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
     <span class="c1"># apply the map to the value columns and merge with the dimensional information</span>
-    <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">num_dims</span><span class="p">])</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">num_dims</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">GDX_TO_NP_SVS</span><span class="p">),</span>
-                                         <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">num_dims</span><span class="p">])</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">num_dims</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">GDX_TO_NP_SVS</span><span class="p">),</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">tmp</span></div>
 
 
@@ -277,11 +277,15 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">num_dims</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">NP_TO_GDX_SVS</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="c1"># DataFrame.replace is generally not sufficient to identify EPS values</span>
-        <span class="n">values</span><span class="p">[(</span><span class="n">values</span> <span class="o">-</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">SPECIAL_VALUES</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="n">values</span><span class="p">[(</span><span class="n">values</span> <span class="o">-</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">SPECIAL_VALUES</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
+        <span class="p">)</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">num_dims</span><span class="p">])</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to convert numpy special values to GDX special values.&quot;</span> <span class="o">+</span> \
-                     <span class="s2">&quot;num_dims: </span><span class="si">{}</span><span class="s2">, dataframe:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_dims</span><span class="p">,</span> <span class="n">df</span><span class="p">))</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+            <span class="s2">&quot;Unable to convert numpy special values to GDX special values. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;num_dims: </span><span class="si">{</span><span class="n">num_dims</span><span class="si">}</span><span class="s2">, dataframe:</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
         <span class="k">raise</span>
     <span class="k">return</span> <span class="n">tmp</span></div>
 
@@ -335,7 +339,7 @@
 
 <div class="viewcode-block" id="gdx_isnan">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.special.html#gdxpds.special.gdx_isnan">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">gdx_isnan</span><span class="p">(</span><span class="n">val</span><span class="p">,</span><span class="n">gdxf</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gdx_isnan</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">gdxf</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility function for equating the GDX special values that map to None or NaN</span>
 <span class="sd">    (which are indistinguishable in pandas).</span>
@@ -359,7 +363,7 @@
 
 <div class="viewcode-block" id="gdx_val_equal">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.special.html#gdxpds.special.gdx_val_equal">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">gdx_val_equal</span><span class="p">(</span><span class="n">val1</span><span class="p">,</span><span class="n">val2</span><span class="p">,</span><span class="n">gdxf</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">gdx_val_equal</span><span class="p">(</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">,</span> <span class="n">gdxf</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Utility function used to test special value conversions.</span>
 
@@ -403,7 +407,8 @@
     <span class="k">global</span> <span class="n">GDX_TO_NP_SVS</span>
     <span class="k">global</span> <span class="n">NP_TO_GDX_SVS</span>
 
-    <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">_require_gams_installation</span><span class="p">,</span> <span class="n">_GdxHandle</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">_GdxHandle</span><span class="p">,</span> <span class="n">_require_gams_installation</span>
+
     <span class="n">_require_gams_installation</span><span class="p">(</span><span class="n">gams_dir_finder</span><span class="p">)</span>
 
     <span class="k">with</span> <span class="n">_GdxHandle</span><span class="p">(</span><span class="n">gdxcc</span><span class="p">,</span> <span class="n">gams_dir_finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gams_dir_finder</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="k">as</span> <span class="n">h</span><span class="p">:</span>

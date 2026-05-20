@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.tools &mdash; gdx-pandas 1.5.0 documentation</title>
+  <title>gdxpds.tools &mdash; gdx-pandas 1.6.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=e0a75244"></script>
+      <script src="../_static/documentation_options.js?v=72d88caf"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -187,7 +187,7 @@ version skew, missing shared library, etc.).</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gdxpds.tools.GamsDirFinder">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gdxpds.tools.</span></span><span class="sig-name descname"><span class="pre">GamsDirFinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/tools.html#GamsDirFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.tools.GamsDirFinder" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gdxpds.tools.</span></span><span class="sig-name descname"><span class="pre">GamsDirFinder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/tools.html#GamsDirFinder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.tools.GamsDirFinder" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Class for finding and accessing the system’s GAMS directory.</p>
 <p>The find function first looks for the ‘GAMS_DIR’ environment variable. If
@@ -204,7 +204,7 @@ to clean up your input. (Even on Windows, the GAMS path must use ‘/’ rather 
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gdxpds.tools.GamsDirFinder.source">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">source</span></span><a class="headerlink" href="#gdxpds.tools.GamsDirFinder.source" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">source</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#gdxpds.tools.GamsDirFinder.source" title="Link to this definition"></a></dt>
 <dd><p>Label describing which discovery branch produced <code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>.</p>
 <p>Set whenever a non-None <code class="docutils literal notranslate"><span class="pre">gams_dir</span></code> is resolved. Useful for diagnosing
 “wrong GAMS directory got picked” reports. <code class="docutils literal notranslate"><span class="pre">None</span></code> if no GAMS directory
@@ -213,7 +213,7 @@ could be resolved.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gdxpds.tools.GamsDirFinder.gams_dir">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gams_dir</span></span><a class="headerlink" href="#gdxpds.tools.GamsDirFinder.gams_dir" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gams_dir</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#gdxpds.tools.GamsDirFinder.gams_dir" title="Link to this definition"></a></dt>
 <dd><p>The GAMS directory on this system.</p>
 </dd></dl>
 
@@ -221,13 +221,13 @@ could be resolved.</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="gdxpds.tools.NeedsGamsDir">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gdxpds.tools.</span></span><span class="sig-name descname"><span class="pre">NeedsGamsDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/tools.html#NeedsGamsDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.tools.NeedsGamsDir" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gdxpds.tools.</span></span><span class="sig-name descname"><span class="pre">NeedsGamsDir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/tools.html#NeedsGamsDir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.tools.NeedsGamsDir" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Mix-in class that asserts that a GAMS directory is needed and provides the methods
 required to find and access it.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="gdxpds.tools.NeedsGamsDir.gams_dir">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gams_dir</span></span><a class="headerlink" href="#gdxpds.tools.NeedsGamsDir.gams_dir" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gams_dir</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></span><a class="headerlink" href="#gdxpds.tools.NeedsGamsDir.gams_dir" title="Link to this definition"></a></dt>
 <dd><p>The GAMS directory whose value has either been directly set or has been found using
 the GamsDirFinder class.</p>
 <dl class="field-list simple">
@@ -239,7 +239,7 @@ the GamsDirFinder class.</p>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="gdxpds.tools.NeedsGamsDir.gams_dir_source">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gams_dir_source</span></span><a class="headerlink" href="#gdxpds.tools.NeedsGamsDir.gams_dir_source" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">gams_dir_source</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#gdxpds.tools.NeedsGamsDir.gams_dir_source" title="Link to this definition"></a></dt>
 <dd><p>Label for the discovery branch that produced <a class="reference internal" href="#gdxpds.tools.NeedsGamsDir.gams_dir" title="gdxpds.tools.NeedsGamsDir.gams_dir"><code class="xref py py-attr docutils literal notranslate"><span class="pre">gams_dir</span></code></a>.</p>
 <p>Mirrors <a class="reference internal" href="#gdxpds.tools.GamsDirFinder.source" title="gdxpds.tools.GamsDirFinder.source"><code class="xref py py-attr docutils literal notranslate"><span class="pre">GamsDirFinder.source</span></code></a>; lets GAMS-load errors name where
 the directory came from, consistently with the other handle-create sites.</p>
@@ -249,7 +249,7 @@ the directory came from, consistently with the other handle-create sites.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gdxpds.tools.load_gdxcc">
-<span class="sig-prename descclassname"><span class="pre">gdxpds.tools.</span></span><span class="sig-name descname"><span class="pre">load_gdxcc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/tools.html#load_gdxcc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.tools.load_gdxcc" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">gdxpds.tools.</span></span><span class="sig-name descname"><span class="pre">load_gdxcc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/gdxpds/tools.html#load_gdxcc"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.tools.load_gdxcc" title="Link to this definition"></a></dt>
 <dd><p>Bind the GAMS library and initialize special-value conversion tables.</p>
 <p>Idempotent: safe to call repeatedly. The first successful call binds the
 GDX shared library at the resolved <code class="docutils literal notranslate"><span class="pre">gams_dir</span></code> and populates the
@@ -274,7 +274,7 @@ default-install walk).</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="gdxpds.tools.info">
-<span class="sig-prename descclassname"><span class="pre">gdxpds.tools.</span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/tools.html#info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.tools.info" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">gdxpds.tools.</span></span><span class="sig-name descname"><span class="pre">info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/gdxpds/tools.html#info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.tools.info" title="Link to this definition"></a></dt>
 <dd><p>Return a human-readable environment report as a string.</p>
 <p>Includes the gdxpds version, Python info, which GDX bindings are available
 and which (if any) is currently bound, the resolved GAMS directory plus the
