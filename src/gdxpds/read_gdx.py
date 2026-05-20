@@ -147,7 +147,7 @@ def get_subset_relationships(gdx_file, gams_dir=None):
 
     Outputs a dict that maps each symbol name to a list with one entry per dimension, giving the
     parent Set name recorded for that dimension. A dimension whose domain is the wildcard
-    (``'*'``) -- or for which the GDX file records no domain information at all -- comes through
+    (``'*'``), or for which the GDX file records no domain information at all, comes through
     as ``None``. Every other dimension is reported by its recorded name verbatim, including the
     self-referential case where a (typically root) Set's dimension names the Set itself.
 
