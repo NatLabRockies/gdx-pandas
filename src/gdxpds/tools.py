@@ -1,7 +1,7 @@
 import logging
 import os
-import subprocess as subp
 import re
+import subprocess as subp
 import sys
 
 logger = logging.getLogger(__name__)
@@ -47,13 +47,13 @@ def _check_gdx_create_rc(H, rc, gdxcc, gams_dir, source):
     """
     if isinstance(rc, (list, tuple)):
         code = rc[0]
-        msg = rc[1] if len(rc) > 1 else ''
+        msg = rc[1] if len(rc) > 1 else ""
     else:
         code = rc
-        msg = ''
+        msg = ""
     if code == 1:
         return
-    if not msg and hasattr(gdxcc, 'gdxErrorStr') and hasattr(gdxcc, 'gdxGetLastError'):
+    if not msg and hasattr(gdxcc, "gdxErrorStr") and hasattr(gdxcc, "gdxGetLastError"):
         try:
             msg = gdxcc.gdxErrorStr(None, gdxcc.gdxGetLastError(H))[1]
         except Exception:
@@ -86,6 +86,7 @@ class _GdxHandle:
 
     ``gdxcc`` is passed in because :mod:`gdxpds.tools` does not import a binding at module level.
     """
+
     def __init__(self, gdxcc, gams_dir, source):
         # Bind the callables now so close() does not look them up through module
         # globals during interpreter shutdown.
@@ -99,7 +100,7 @@ class _GdxHandle:
             _check_gdx_create_rc(self.H, rc, gdxcc, gams_dir, source)  # raises on failure
             self._created = True
         except BaseException:
-            self.close()   # _created is False -> delete-only, never gdxFree
+            self.close()  # _created is False -> delete-only, never gdxFree
             raise
 
     def close(self):
@@ -118,22 +119,23 @@ class _GdxHandle:
         self.close()
 
 
-class GamsDirFinder(object):
+class GamsDirFinder:
     """
-    Class for finding and accessing the system's GAMS directory. 
+    Class for finding and accessing the system's GAMS directory.
 
-    The find function first looks for the 'GAMS_DIR' environment variable. If 
-    that is unsuccessful, it next uses 'which gams' for POSIX systems, and the 
+    The find function first looks for the 'GAMS_DIR' environment variable. If
+    that is unsuccessful, it next uses 'which gams' for POSIX systems, and the
     default install location, 'C:/GAMS', for Windows systems. In the latter case
     it prefers the largest version number.
-    
-    You can always specify the GAMS directory directly, and this class will attempt 
-    to clean up your input. (Even on Windows, the GAMS path must use '/' rather than 
+
+    You can always specify the GAMS directory directly, and this class will attempt
+    to clean up your input. (Even on Windows, the GAMS path must use '/' rather than
     '\'.)
     """
+
     gams_dir_cache = None
 
-    def __init__(self,gams_dir=None):
+    def __init__(self, gams_dir=None):
         self.__source = None
         self.gams_dir = gams_dir
 
@@ -162,11 +164,13 @@ class GamsDirFinder(object):
             if self.__gams_dir is not None:
                 self.__source = "explicit override"
         elif value is not None:
-            logger.warning(f"Unexpected gams_dir type {type(value)}. Ignoring "
-                f"input {value!r} because it is not a str.")
+            logger.warning(
+                f"Unexpected gams_dir type {type(value)}. Ignoring "
+                f"input {value!r} because it is not a str."
+            )
         if self.__gams_dir is None:
             self.__gams_dir = self.__find_gams()
-            
+
     def __find_gams_root_in(self, parent):
         """Search direct subdirectories of `parent` for a GAMS installation,
         identified by the presence of gams.exe. If multiple are found, prefer
@@ -177,7 +181,7 @@ class GamsDirFinder(object):
         try:
             for name in os.listdir(parent):
                 d = os.path.join(parent, name)
-                if os.path.isdir(d) and os.path.exists(os.path.join(d, 'gams.exe')):
+                if os.path.isdir(d) and os.path.exists(os.path.join(d, "gams.exe")):
                     roots.append(d)
         except OSError:
             return None
@@ -185,12 +189,14 @@ class GamsDirFinder(object):
             return None
         if len(roots) == 1:
             return roots[0]
+
         def _parse(d):
             name = os.path.basename(d)
             try:
-                return tuple(int(p) for p in name.split('.'))
+                return tuple(int(p) for p in name.split("."))
             except ValueError:
                 return None
+
         valid = [(p, d) for p, d in ((_parse(d), d) for d in roots) if p is not None]
         if valid:
             pad = max(len(p) for p, _ in valid)
@@ -198,76 +204,76 @@ class GamsDirFinder(object):
             return max(padded)[1]
         return roots[0]
 
-    def __clean_gams_dir(self,value):
+    def __clean_gams_dir(self, value):
         """
         Cleans up the path string.
         """
         if value is None:
             return None
-        assert(isinstance(value, str))
+        assert isinstance(value, str)
         ret = os.path.realpath(value)
         if not os.path.exists(ret):
             return None
-        ret = re.sub('\\\\','/',ret)
+        ret = re.sub("\\\\", "/", ret)
         return ret
-        
+
     def __find_gams(self):
         """
         For all systems, the first place we examine is the GAMS_DIR environment
         variable, and the second is GAMSDIR.
 
-        For Windows, the next step is to try 'where gams'. Then we look in the 
-        default install location (C:/GAMS), preferring win64 to win32 and the 
+        For Windows, the next step is to try 'where gams'. Then we look in the
+        default install location (C:/GAMS), preferring win64 to win32 and the
         most recent version.
-        
+
         For all others, the next step is 'which gams'.
-        
+
         Returns
         -------
         str or None
             If not None, the return value is the found gams_dir
         """
         # check for environment variable
-        ret = os.environ.get('GAMS_DIR')
+        ret = os.environ.get("GAMS_DIR")
         ret = self.__clean_gams_dir(ret)
         if ret is not None:
             self.__source = "GAMS_DIR env var"
 
         if ret is None:
-            ret = os.environ.get('GAMSDIR')
+            ret = os.environ.get("GAMSDIR")
             ret = self.__clean_gams_dir(ret)
             if ret is not None:
                 self.__source = "GAMSDIR env var"
 
-        if ret is None and os.name == 'nt':
+        if ret is None and os.name == "nt":
             # windows systems
             try:
-                ret = os.path.dirname(subp.check_output(['where', 'gams']).decode().split("\n")[0])
-            except:
+                ret = os.path.dirname(subp.check_output(["where", "gams"]).decode().split("\n")[0])
+            except Exception:
                 ret = None
             ret = self.__clean_gams_dir(ret)
             if ret is not None:
                 self.__source = "where gams"
 
-        if ret is None and os.name == 'nt':
+        if ret is None and os.name == "nt":
             # search in default installation location. Modern GAMS (v42+)
             # installs to C:\GAMS\<version>\; legacy installs went to
             # C:\GAMS\win64\<version>\. A GAMS root is identified by the
             # presence of gams.exe.
-            ret = self.__find_gams_root_in(r'C:\GAMS')
+            ret = self.__find_gams_root_in(r"C:\GAMS")
             if ret is not None:
                 self.__source = r"C:\GAMS default-location walk (modern layout)"
             else:
-                ret = self.__find_gams_root_in(os.path.join(r'C:\GAMS', 'win64'))
+                ret = self.__find_gams_root_in(os.path.join(r"C:\GAMS", "win64"))
                 if ret is not None:
                     self.__source = r"C:\GAMS\win64 default-location walk (legacy layout)"
             ret = self.__clean_gams_dir(ret)
 
-        if ret is None and os.name != 'nt':
+        if ret is None and os.name != "nt":
             # posix systems
             try:
-                ret = os.path.dirname(subp.check_output(['which', 'gams']).decode().split("\n")[0])
-            except:
+                ret = os.path.dirname(subp.check_output(["which", "gams"]).decode().split("\n")[0])
+            except Exception:
                 ret = None
             ret = self.__clean_gams_dir(ret)
             if ret is not None:
@@ -283,26 +289,27 @@ class GamsDirFinder(object):
                 self.__source = "cached"
 
         return ret
-        
-class NeedsGamsDir(object):
-    """Mix-in class that asserts that a GAMS directory is needed and provides the methods 
+
+
+class NeedsGamsDir:
+    """Mix-in class that asserts that a GAMS directory is needed and provides the methods
     required to find and access it."""
 
-    def __init__(self,gams_dir=None):
+    def __init__(self, gams_dir=None):
         self.gams_dir = gams_dir
-        
+
     @property
     def gams_dir(self):
         """
-        The GAMS directory whose value has either been directly set or has been found using 
+        The GAMS directory whose value has either been directly set or has been found using
         the GamsDirFinder class.
 
         Returns
         -------
-        str    
+        str
         """
         return self.__gams_dir
-        
+
     @gams_dir.setter
     def gams_dir(self, value):
         finder = GamsDirFinder(value)
@@ -363,14 +370,17 @@ def load_gdxcc(gams_dir=None):
     _require_gams_installation(finder)
     try:
         from gams.core import gdx as gdxcc
+
         _bindings_source = "gams.core.gdx"
     except ImportError:
         import gdxcc
+
         _bindings_source = "gdxcc"
     with _GdxHandle(gdxcc, finder.gams_dir, finder.source):
         pass
     # Deferred to break the tools <-> special import cycle.
     from gdxpds.special import load_specials
+
     load_specials(finder)
     _loaded_gams_dir = finder.gams_dir
 
@@ -402,6 +412,7 @@ def info(gams_dir=None):
     import importlib
     import importlib.metadata
     import importlib.util
+
     # Deferred to break the tools <-> __init__ import cycle.
     from gdxpds import __version__
 
@@ -453,9 +464,6 @@ def info(gams_dir=None):
 
     if load_failure is not None:
         lines.append("")
-        lines.append(
-            f"load_gdxcc FAILED: {type(load_failure).__name__}: {load_failure}"
-        )
+        lines.append(f"load_gdxcc FAILED: {type(load_failure).__name__}: {load_failure}")
 
     return "\n".join(lines)
-

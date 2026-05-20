@@ -60,3 +60,15 @@ where = ["src"]
 testpaths = ["tests"]
 log_file = "tests/pytest.log"
 log_file_level = "INFO"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100          # wider than ruff's 88 default to cut wrapping churn; adjustable
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+# Conservative starting set; B (bugbear) and D (docstrings) are good cheap follow-ups.
+select = ["E", "F", "I", "UP", "W"]   # pycodestyle, pyflakes, isort, pyupgrade, warnings
+# The formatter owns code line length (enforced via `ruff format --check`); E501 would
+# otherwise only nag about long strings/comments/docstrings it cannot reflow.
+ignore = ["E501"]

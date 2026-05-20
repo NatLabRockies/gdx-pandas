@@ -1,25 +1,26 @@
 import logging
 from numbers import Number
 
-from gdxpds.tools import Error
+import pandas as pd
+
 from gdxpds.gdx import (
+    GAMS_VALUE_COLS_MAP,
+    DomainError,
+    GamsDataType,
     GdxFile,
     GdxSymbol,
-    GAMS_VALUE_COLS_MAP,
-    GamsDataType,
-    DomainError,
     _stable_topological_sort,
 )
-
-import pandas as pd
+from gdxpds.tools import Error
 
 logger = logging.getLogger(__name__)
 
-class Translator(object):
-    def __init__(self,dataframes,gams_dir=None,domains=None):
+
+class Translator:
+    def __init__(self, dataframes, gams_dir=None, domains=None):
         self.dataframes = dataframes
         self.__domains = domains
-        self.__gams_dir=gams_dir
+        self.__gams_dir = gams_dir
         self.__gdx = None
 
     def __exit__(self, *args):
@@ -43,13 +44,16 @@ class Translator(object):
         return self.__dataframes
 
     @dataframes.setter
-    def dataframes(self,value):
+    def dataframes(self, value):
         err_msg = "Expecting map of name, pandas.DataFrame pairs."
         try:
             for symbol_name, df in value.items():
-                if not isinstance(symbol_name, str): raise Error(err_msg)
-                if not isinstance(df, pd.DataFrame): raise Error(err_msg)
-        except AttributeError: raise Error(err_msg)
+                if not isinstance(symbol_name, str):
+                    raise Error(err_msg)
+                if not isinstance(df, pd.DataFrame):
+                    raise Error(err_msg)
+        except AttributeError:
+            raise Error(err_msg)
         self.__dataframes = value
         self.__gdx = None
 
@@ -82,16 +86,16 @@ class Translator(object):
                 self.__wire_domains(domains, gdx_file)
         return self.__gdx
 
-    def save_gdx(self,path,gams_dir=None):
+    def save_gdx(self, path, gams_dir=None):
         if gams_dir is not None:
-            self.__gams_dir=gams_dir
+            self.__gams_dir = gams_dir
         self.gdx.write(path)
 
     def __add_symbol_to_gdx(self, symbol_name, df):
-        data_type, num_dims = self.__infer_data_type(symbol_name,df)
-        logger.info("Inferred data type of {} to be {}.".format(symbol_name,data_type.name))
+        data_type, num_dims = self.__infer_data_type(symbol_name, df)
+        logger.info(f"Inferred data type of {symbol_name} to be {data_type.name}.")
 
-        self.__gdx.append(GdxSymbol(symbol_name,data_type,dims=num_dims))
+        self.__gdx.append(GdxSymbol(symbol_name, data_type, dims=num_dims))
         self.__gdx[symbol_name].dataframe = df
         return
 
@@ -109,9 +113,7 @@ class Translator(object):
         parents_of = {}
         for child_name, parents in domains.items():
             if child_name not in dataframes:
-                raise DomainError(
-                    f"to_gdx: domains key {child_name!r} is not in dataframes"
-                )
+                raise DomainError(f"to_gdx: domains key {child_name!r} is not in dataframes")
             if not isinstance(parents, (list, tuple)):
                 raise DomainError(
                     f"to_gdx: domains[{child_name!r}] must be a list or tuple, "
@@ -153,11 +155,9 @@ class Translator(object):
                     f"to_gdx: domains[{child_name!r}] has length "
                     f"{len(parents)} but symbol has {child.num_dims} dims"
                 )
-            child.domain = [
-                None if p is None else gdx_file[p] for p in parents
-            ]
+            child.domain = [None if p is None else gdx_file[p] for p in parents]
 
-    def __infer_data_type(self,symbol_name,df):
+    def __infer_data_type(self, symbol_name, df):
         """
         Returns
         -------
@@ -165,15 +165,17 @@ class Translator(object):
             symbol type and number of dimensions implied by df
         """
         # See if structure implies that symbol_name may be a Variable or an Equation
-        # If so, break tie based on naming convention--Variables start with upper case, 
+        # If so, break tie based on naming convention--Variables start with upper case,
         # equations start with lower case
-        var_or_eqn = False        
+        var_or_eqn = False
         df_col_names = df.columns
-        var_eqn_col_names = [col_name for col_name, col_ind in GAMS_VALUE_COLS_MAP[GamsDataType.Variable]]
+        var_eqn_col_names = [
+            col_name for col_name, col_ind in GAMS_VALUE_COLS_MAP[GamsDataType.Variable]
+        ]
         if len(df_col_names) >= len(var_eqn_col_names):
             # might be variable or equation
             var_or_eqn = True
-            trunc_df_col_names = df_col_names[len(df_col_names) - len(var_eqn_col_names):]
+            trunc_df_col_names = df_col_names[len(df_col_names) - len(var_eqn_col_names) :]
             for i, df_col in enumerate(trunc_df_col_names):
                 if df_col and (df_col.lower() != var_eqn_col_names[i].lower()):
                     var_or_eqn = False
@@ -188,12 +190,12 @@ class Translator(object):
         # Parameter or set
         num_dims = len(df_col_names) - 1
         if len(df.index) > 0:
-            if isinstance(df.iloc[0,-1],Number):
+            if isinstance(df.iloc[0, -1], Number):
                 return GamsDataType.Parameter, num_dims
         return GamsDataType.Set, num_dims
 
 
-def to_gdx(dataframes,path=None,gams_dir=None,domains=None):
+def to_gdx(dataframes, path=None, gams_dir=None, domains=None):
     """
     Creates a :py:class:`gdxpds.gdx.GdxFile` from dataframes and optionally writes it to path
 
@@ -228,4 +230,3 @@ def to_gdx(dataframes,path=None,gams_dir=None,domains=None):
     # its GDX handle when it is garbage-collected at function exit.
     translator.release()
     return gdx
-

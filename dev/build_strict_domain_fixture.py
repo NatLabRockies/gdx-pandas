@@ -14,32 +14,36 @@ Usage (from repo root, with the venv active and $env:GAMS_DIR set):
 
     python dev\\build_strict_domain_fixture.py
 """
+
 import os
 
 import pandas as pd
 
 import gdxpds.gdx
 
-OUT_PATH = os.path.abspath(os.path.join(
-    os.path.dirname(__file__),
-    "..", "tests", "strict_domain_fixture.gdx",
-))
+OUT_PATH = os.path.abspath(
+    os.path.join(
+        os.path.dirname(__file__),
+        "..",
+        "tests",
+        "strict_domain_fixture.gdx",
+    )
+)
 
 
 def main():
     with gdxpds.gdx.GdxFile() as gdx:
-        gdx.append(gdxpds.gdx.GdxSymbol(
-            "t", gdxpds.gdx.GamsDataType.Set, dims=["t"]))
+        gdx.append(gdxpds.gdx.GdxSymbol("t", gdxpds.gdx.GamsDataType.Set, dims=["t"]))
         gdx[-1].dataframe = pd.DataFrame(
-            [["a", True], ["b", True], ["c", True]],
-            columns=["t", "Value"])
+            [["a", True], ["b", True], ["c", True]], columns=["t", "Value"]
+        )
 
-        gdx.append(gdxpds.gdx.GdxSymbol(
-            "sub_t", gdxpds.gdx.GamsDataType.Set,
-            dims=["t"], domain=[gdx["t"]]))
-        gdx[-1].dataframe = pd.DataFrame(
-            [["a", True], ["c", True]],
-            columns=["t", "Value"])
+        gdx.append(
+            gdxpds.gdx.GdxSymbol(
+                "sub_t", gdxpds.gdx.GamsDataType.Set, dims=["t"], domain=[gdx["t"]]
+            )
+        )
+        gdx[-1].dataframe = pd.DataFrame([["a", True], ["c", True]], columns=["t", "Value"])
 
         os.makedirs(os.path.dirname(OUT_PATH), exist_ok=True)
         gdx.write(OUT_PATH)
