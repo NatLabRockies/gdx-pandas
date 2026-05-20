@@ -114,8 +114,15 @@ def _check_read(sample_path, args, failures):
         with gdxpds.gdx.GdxFile(gams_dir=args.gams_dir, lazy_load=False) as gdx:
             gdx.read(sample_path)
             names = {s.name for s in gdx}
-            assert names == {"t", "p", "v"}, f"unexpected symbols: {names}"
+            assert names == {"t", "sub_t", "p", "v"}, f"unexpected symbols: {names}"
             assert gdx["p"].num_records == 6
+            assert gdx["t"].domain_type == gdxpds.gdx.GamsDomainType.NONE, (
+                f"t.domain_type = {gdx['t'].domain_type}, expected NONE")
+            sub_t = gdx["sub_t"]
+            assert sub_t.domain_type == gdxpds.gdx.GamsDomainType.REGULAR, (
+                f"sub_t.domain_type = {sub_t.domain_type}, expected REGULAR")
+            assert sub_t.domain is not None and sub_t.domain[0] is gdx["t"], (
+                "sub_t.domain[0] does not resolve to gdx['t']")
         _ok(f"Read embedded sample.gdx ({sample_path})")
         return True
     except Exception as exc:
@@ -132,7 +139,9 @@ def _check_roundtrip(sample_path, out_path, args, failures):
                 gdx2.write(out_path)
         with gdxpds.gdx.GdxFile(gams_dir=args.gams_dir, lazy_load=False) as gdx:
             gdx.read(out_path)
-            assert {s.name for s in gdx} == {"t", "p", "v"}
+            assert {s.name for s in gdx} == {"t", "sub_t", "p", "v"}
+            assert gdx["sub_t"].domain_type == gdxpds.gdx.GamsDomainType.REGULAR, (
+                "sub_t.domain_type did not survive round-trip as REGULAR")
         _ok("Round-trip write->read preserves all symbols")
         return True
     except Exception as exc:

@@ -54,6 +54,56 @@ from gdxpds.special import (
 logger = logging.getLogger(__name__)
 
 
+def _stable_topological_sort(names, parents_of):
+    """
+    Stable topological sort.
+
+    Parameters
+    ----------
+    names : sequence of str
+        The items to sort, in their original order. Original position is
+        used to break ties between ready items.
+    parents_of : dict of str to iterable of str
+        For each name, the names it depends on (must precede it).
+        Self-references and parent names not in ``names`` are ignored.
+
+    Returns
+    -------
+    (list of str or None, dict of str to set of str, or None)
+        ``(ordered, cycle)``.
+
+        - ``cycle`` is a ``{name: set_of_unresolved_parents}`` dict
+          describing the names that couldn't be ordered when the input
+          contains a cycle, else ``None``. Iterating it (e.g.
+          ``sorted(cycle)``) yields the involved names.
+        - ``ordered`` is the topologically sorted sequence when a reorder
+          was actually needed. It is ``None`` when the input was already
+          in dependency order (no reorder needed) or when a cycle was
+          detected (callers should consult ``cycle`` and react).
+    """
+    name_to_pos = {n: i for i, n in enumerate(names)}
+    remaining = {
+        n: {p for p in parents_of.get(n, ()) if p in name_to_pos and p != n}
+        for n in names
+    }
+    ordered = []
+    while remaining:
+        ready = sorted(
+            (n for n in remaining if not remaining[n]),
+            key=lambda n: name_to_pos[n],
+        )
+        if not ready:
+            return None, remaining
+        for name in ready:
+            ordered.append(name)
+            del remaining[name]
+            for deps in remaining.values():
+                deps.discard(name)
+    if ordered == list(names):
+        return None, None
+    return ordered, None
+
+
 def replace_df_column(df,colname,new_col):
     """
     Utility function that replaces df[colname] with new_col. Special 
@@ -98,6 +148,18 @@ class GdxError(Error):
         if H:
             msg += ". " + gdxcc.gdxErrorStr(H, gdxcc.gdxGetLastError(H))[1] + "."
         super().__init__(msg)
+
+
+class DomainError(Error):
+    """
+    Raised for any invalid input to the dim/domain layer of a symbol:
+    cycle in parent-child references, unknown parent name, wrong-length
+    list against a fixed-dimension symbol, wrong outer type for ``dims``
+    or ``domain``, or a malformed element (non-string in ``dims``; plain
+    string passed to :py:attr:`GdxSymbol.domain` instead of a
+    :py:class:`GdxSymbol` reference). Subclass of :class:`Error` so
+    callers may continue catching the broader category if they wish.
+    """
 
 
 class GdxFile(MutableSequence, NeedsGamsDir):
@@ -270,13 +332,54 @@ class GdxFile(MutableSequence, NeedsGamsDir):
                 sym = GdxSymbol(name,data_type,dims=dims,file=self,index=index)
                 self.append(sym)
             except Exception as e:
-                logger.error(f"Unable to initialize GdxSymbol {name!r}, because {e}. SKIPPING.")            
+                logger.error(f"Unable to initialize GdxSymbol {name!r}, because {e}. SKIPPING.")
+
+        # Self-heal strict-domain refs whose parent appeared at a higher
+        # GDX index than the child (malformed but readable). No-op for
+        # well-formed files — each symbol's in-line attempt already
+        # succeeded.
+        for symbol in self:
+            symbol.resolve_domain()
 
         # read all symbols if not lazy_load
         if not self.lazy_load:
             for symbol in self:
                 symbol.load()
         return
+
+    def reorder_for_strict_domains(self):
+        """
+        Reorder ``self._symbols`` in place so every symbol with a strict (``GdxSymbol``-ref) 
+        ``domain`` follows all of its parents. Stable topological sort: symbols that don't 
+        reference each other keep their current relative order. No-ops on cycles (logs a warning
+        and leaves the original order untouched).
+
+        Strict-domain writes require the parent's ``gdxDataWriteDone`` to have completed before 
+        the child's write starts. Calling this before :py:meth:`write` is the easy way to satisfy 
+        that constraint when symbols were appended in an unordered way.
+        """
+        names = list(self._symbols.keys())
+        parents_of = {}
+        for s in self._symbols.values():
+            ps = set()
+            if s.domain is not None:
+                for d in s.domain:
+                    if d is None or d is s:
+                        continue
+                    ps.add(d.name)
+            parents_of[s.name] = ps
+
+        ordered, cycle = _stable_topological_sort(names, parents_of)
+        if cycle is not None:
+            logger.warning(
+                "reorder_for_strict_domains: cyclic domain references "
+                "detected; leaving symbol order untouched. Cycle "
+                "involves: %s",
+                sorted(cycle))
+            return
+        if ordered is None:
+            return
+        self._symbols = OrderedDict((name, self._symbols[name]) for name in ordered)
 
     def write(self,filename):
         """
@@ -300,9 +403,13 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         # write the universal set
         self.universal_set.write()
 
+        # Build the {name: position} map once so each symbol's strict-domain
+        # eligibility check is O(1) per parent rather than O(N).
+        name_positions = {name: i for i, name in enumerate(self._symbols.keys())}
+
         for i, symbol in enumerate(self,start=1):
             try:
-                symbol.write(index=i)
+                symbol.write(index=i, name_positions=name_positions)
             except:
                 logger.error("Unable to write {} to {}".format(symbol,filename))
                 raise
@@ -435,8 +542,8 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         return
 
     def _fixup_name_keys(self):
-        self._symbols = OrderedDict([(symbol.name, symbol) for cur_key, symbol in self._symbols])
-        return        
+        self._symbols = OrderedDict([(symbol.name, symbol) for _cur_key, symbol in self._symbols.items()])
+        return
 
     def _create_gdx_object(self):
         # Idempotent: first call binds the library + populates SPECIAL_VALUES;
@@ -476,6 +583,24 @@ class GamsEquationType(Enum):
     NothingEnforced = 53 + gdxcc.GMS_EQUTYPE_N
     External = 53 + gdxcc.GMS_EQUTYPE_X
     Conic = 53 + gdxcc.GMS_EQUTYPE_C
+
+
+class GamsDomainType(Enum):
+    """
+    Domain status of a :py:class:`GdxSymbol`. Member ``.value`` matches the
+    :c:func:`gdxSymbolGetDomainX` return code (1, 2, or 3 — see
+    ``gdxcc.h``); ``gdxcc`` does not expose these as symbolic constants,
+    so the integers are written out explicitly here.
+
+    - ``NONE`` (1): no domain information stored.
+    - ``RELAXED`` (2): domain stored as plain string names (via
+      :c:func:`gdxSymbolSetDomainX`), no validation.
+    - ``REGULAR`` (3): strict domain (via :c:func:`gdxSymbolSetDomain`),
+      each non-wildcard dimension references an existing Set/Alias.
+    """
+    NONE = 1
+    RELAXED = 2
+    REGULAR = 3
 
 
 class GamsValueType(Enum):
@@ -532,9 +657,10 @@ Default lower and upper bounds for each :py:class:`GamsVariableType`
 """
 
 
-class GdxSymbol(object): 
+class GdxSymbol(object):
     def __init__(self,name,data_type,dims=0,file=None,index=None,
-                 description='',variable_type=None,equation_type=None): 
+                 description='',variable_type=None,equation_type=None,
+                 domain=None):
         """
         In-memory representation of a GAMS GDX Symbol
 
@@ -543,8 +669,8 @@ class GdxSymbol(object):
         name : str
         data_type : :py:class:`GamsDataType`
         dims : int or list of str
-            If dims is set to an int, then that number of dimensions will be created, each 
-            indicated with the wildcard name '*'. Otherwise, a list of strings is expected, 
+            If dims is set to an int, then that number of dimensions will be created, each
+            indicated with the wildcard name '*'. Otherwise, a list of strings is expected,
             each string being a dimension name.
         file : None or :py:class:`GdxFile`
             Users should not set file. File is set by, e.g., :py:meth:`GdxFile.read` and
@@ -558,6 +684,12 @@ class GdxSymbol(object):
             Only expected if data_type == :py:attr:`GamsDataType.Variable`
         equation_type : None or :py:class:`GamsEquationType`
             Only expected if data_type == :py:attr:`GamsDataType.Equation`
+        domain : None or list/tuple of (:py:class:`GdxSymbol` or None)
+            Strict (regular) domain references, one per dimension. ``None`` entries map to the 
+            GAMS wildcard (``'*'``). When supplied, this flags the symbol for strict 
+            :c:func:`gdxSymbolSetDomain` writes (subject to the parent existing in the file at 
+            write time; otherwise the symbol falls back to relaxed). Plain strings are not 
+            accepted here; use ``dims`` for string-only domains.
         """
         self._name = name
         self.description = description
@@ -566,10 +698,14 @@ class GdxSymbol(object):
         self._variable_type = None; self.variable_type = variable_type
         self._equation_type = None; self.equation_type = equation_type
         self._dataframe = None; self._dims = None
-        self.dims = dims       
+        self._domain = None
+        self._strict_on_disk = False
+        self.dims = dims
+        if domain is not None:
+            self.domain = domain
         assert self._dataframe is not None
         self._file = file
-        self._index = index       
+        self._index = index
 
         # adding this flag to implement ability to load set text instead of boolean values
         self._fixup_set_vals = True
@@ -592,6 +728,14 @@ class GdxSymbol(object):
                     raise GdxError(self.file.H,"Unable to get domain information for {}".format(self.name))
                 assert len(gdx_domain) == len(self.dims), "Dimensional information read in from GDX should be consistent."
                 self.dims = gdx_domain
+                if ret == 3:
+                    # Stored via strict gdxSymbolSetDomain. Mark so a later retry can distinguish 
+                    # strict-but-unresolved from truly relaxed, then try to resolve names to same-file
+                    # GdxSymbol refs. Symbols with lower indices are already in self.file._symbols at 
+                    # this point; for well-formed GDX, this succeeds. GdxFile.read() also retries at the
+                    # end to self-heal symbols whose parents had higher indices (malformed files).
+                    self._strict_on_disk = True
+                    self.resolve_domain()
             else:
                 # universal set
                 assert self.index == 0
@@ -614,11 +758,15 @@ class GdxSymbol(object):
             raise Error("Symbol {} cannot be cloned because it is not yet loaded.".format(repr(self.name)))
 
         assert self.loaded
+        # Pass _domain directly to the constructor: the domain setter copies the list, so the 
+        # clone has its own slot list pointing at the same parent GdxSymbols. Write-time name 
+        # lookup resolves against whatever file the clone ends up in.
         result = GdxSymbol(self.name,self.data_type,
                            dims=self.dims,
                            description=self.description,
                            variable_type=self.variable_type,
-                           equation_type=self.equation_type)
+                           equation_type=self.equation_type,
+                           domain=self._domain)
         result.dataframe = copy.deepcopy(self.dataframe)
         assert result.loaded
         return result
@@ -825,25 +973,184 @@ class GdxSymbol(object):
 
     @dims.setter
     def dims(self, value):
+        self._set_dims_internal(value)
+        # Assigning dims by string drops any strict (GdxSymbol-ref) domain.
+        self._domain = None
+
+    def _set_dims_internal(self, value):
+        """
+        Shared implementation for the ``dims`` setter and the ``domain`` setter.
+        Updates ``self._dims`` and either initializes the dataframe (no records
+        yet) or reflows the dataframe columns in place. Does NOT touch
+        ``self._domain``; callers are responsible for that. Raises
+        :class:`DomainError` on bad shape/type input.
+        """
         if (self._dims is not None) and (self.loaded and ((self.num_dims > 0) or (self.num_records > 0))):
             if not isinstance(value,list) or len(value) != self.num_dims:
-                raise Error(f"Cannot set dims to {value}, because the number of "
-                    "dimensions has already been set to {self.num_dims}.")
+                raise DomainError(f"Cannot set dims to {value}, because the number of "
+                    f"dimensions has already been set to {self.num_dims}.")
         if isinstance(value, int):
             self._dims = ['*'] * value
             self._init_dataframe()
             return
         if not isinstance(value, list):
-            raise Error('dims must be an int or a list. Was passed {} of type {}.'.format(value, type(value)))
+            raise DomainError('dims must be an int or a list. Was passed {} of type {}.'.format(value, type(value)))
         for dim in value:
             if not isinstance(dim, str):
-                raise Error('Individual dimensions must be denoted by strings. Was passed {} as element of {}.'.format(dim, value))
+                raise DomainError('Individual dimensions must be denoted by strings. Was passed {} as element of {}.'.format(dim, value))
         assert (self._dims is None) or (self.loaded and (self.num_dims == 0) and (self.num_records == 0)) or (len(value) == self.num_dims)
         self._dims = value
         if self.loaded and self.num_records > 0:
             self._dataframe.columns = self.dims + self.value_col_names
             return
         self._init_dataframe()
+
+    @property
+    def domain(self):
+        """
+        Strict (regular) domain references: one :py:class:`GdxSymbol` per dimension, or 
+        ``None`` per slot meaning the GAMS wildcard (``'*'``). The whole attribute is 
+        ``None`` when no strict refs are known.
+
+        Setting ``domain`` rewrites :py:attr:`dims` to the stringified version (parent name 
+        per slot, ``'*'`` for ``None`` slots), reflowing DataFrame column headers in place. 
+        Setting ``dims`` instead clears ``domain``.
+
+        Returns
+        -------
+        list of (:py:class:`GdxSymbol` or None), or None
+        """
+        return self._domain
+
+    @domain.setter
+    def domain(self, value):
+        if value is None:
+            self._domain = None
+            return
+        if not isinstance(value, (list, tuple)):
+            raise DomainError(
+                'domain must be a list or tuple of (GdxSymbol | None), or None. '
+                'Was passed {} of type {}.'.format(value, type(value))
+            )
+        for d in value:
+            if d is None:
+                continue
+            if isinstance(d, str):
+                raise DomainError(
+                    'domain entries must be GdxSymbol references or None. '
+                    'Use the dims attribute for string-only domains. '
+                    'Was passed string {!r} as element of {}.'.format(d, value)
+                )
+            if not isinstance(d, GdxSymbol):
+                raise DomainError(
+                    'domain entries must be GdxSymbol references or None. '
+                    'Was passed {} of type {} as element of {}.'.format(d, type(d), value)
+                )
+        if (self._dims is not None) and self.loaded and ((self.num_dims > 0) or (self.num_records > 0)):
+            if len(value) != self.num_dims:
+                raise DomainError(
+                    f"Cannot set domain to length {len(value)}, because the "
+                    f"number of dimensions has already been set to {self.num_dims}."
+                )
+        stringified = [d.name if isinstance(d, GdxSymbol) else '*' for d in value]
+        self._set_dims_internal(stringified)
+        self._domain = list(value)
+
+    @property
+    def domain_type(self):
+        """
+        Derived domain status. See :py:class:`GamsDomainType` for the codes.
+
+        Returns
+        -------
+        :py:class:`GamsDomainType`
+        """
+        if self._domain is not None and any(isinstance(d, GdxSymbol) for d in self._domain):
+            return GamsDomainType.REGULAR
+        if self._dims is not None and all(d == '*' for d in self._dims):
+            return GamsDomainType.NONE
+        return GamsDomainType.RELAXED
+
+    def resolve_domain(self):
+        """
+        Attempt to populate :py:attr:`domain` with live :py:class:`GdxSymbol` references 
+        by looking up each entry in :py:attr:`dims` against ``self.file._symbols``. Idempotent; 
+        no-ops when ``domain`` is already set, when there's no associated file, or when the 
+        symbol's on-disk domain wasn't strict (``REGULAR``).
+
+        Useful when:
+
+        - A GDX file was read whose strict-domain parent has a higher index than the child 
+          (malformed; rare). The in-line resolution during read fails for that symbol; calling 
+          this method after read picks the parent up.
+        - The user has manipulated ``self.file`` after reading (e.g. appended or replaced the 
+          parent symbol) and wants the ``REGULAR`` write path re-enabled.
+
+        Returns
+        -------
+        bool
+            True if ``domain`` was populated as a result of this call, False otherwise.
+        """
+        if self._domain is not None:
+            return False
+        if self.file is None or not self._strict_on_disk:
+            return False
+        if not self._dims:
+            return False
+        resolved = []
+        for d in self._dims:
+            if d == '*':
+                resolved.append(None)
+            elif d in self.file._symbols:
+                resolved.append(self.file._symbols[d])
+            else:
+                logger.warning(
+                    "resolve_domain: symbol %r references strict-domain "
+                    "parent %r which is not in this file; leaving domain "
+                    "unresolved (RELAXED on the next write).",
+                    self.name, d)
+                return False
+        self._domain = resolved
+        return True
+
+    def _strict_domain_writeable(self, name_positions=None):
+        """
+        Internal: True iff this symbol's ``_domain`` can be written using strict
+        :c:func:`gdxSymbolSetDomain` at this point in the file's write sequence. Requires every
+        non-``None`` entry to name a parent that (a) exists in ``self.file._symbols`` and
+        (b) precedes this symbol in insertion order (so the parent has already been
+        ``gdxDataWriteDone``-ed and is in the GDX symbol table). Returns False for
+        self-referential 1-dim sets.
+
+        ``name_positions`` is an optional ``{name: insertion_position}`` map for
+        ``self.file._symbols``. :py:meth:`GdxFile.write` builds it once and passes it
+        through so eligibility checks stay O(1) per parent rather than O(N) across a
+        whole-file write. When omitted (standalone calls) it is built on demand.
+        """
+        if self._domain is None:
+            return False
+        if self.file is None:
+            return False
+        if name_positions is None:
+            name_positions = {name: i for i, name in enumerate(self.file._symbols.keys())}
+        my_pos = name_positions.get(self.name)
+        if my_pos is None:
+            return False
+        for d in self._domain:
+            if d is None:
+                continue
+            if d is self:
+                # Self-referential set: parent isn't yet in the GDX symbol
+                # table when its own write starts.
+                return False
+            parent_pos = name_positions.get(d.name)
+            if parent_pos is None:
+                # Parent not in this file.
+                return False
+            if parent_pos >= my_pos:
+                # Parent hasn't been written yet in this pass.
+                return False
+        return True
 
     @property
     def num_dims(self):
@@ -915,7 +1222,9 @@ class GdxSymbol(object):
                     if num_dims != self.num_dims:
                         self.dims = num_dims
                     break
-            if replace_dims:
+            if replace_dims and dim_cols != self._dims:
+                # Going through the dims setter clears any strict (GdxSymbol-ref)
+                # domain. Only do that when the names are actually changing.
                 self.dims = dim_cols
             # all done establishing dimensions
             assert self.num_dims == num_dims
@@ -1056,7 +1365,7 @@ class GdxSymbol(object):
         self.dataframe = None
         self._loaded = False
 
-    def write(self,index=None): 
+    def write(self,index=None,name_positions=None):
         """
         Writes this :py:class:`GdxSymbol` to its :py:attr:`file`
         """
@@ -1091,9 +1400,20 @@ class GdxSymbol(object):
                                           self.data_type.value,
                                           userinfo):
             raise GdxError(self.file.H,"Could not start writing data for symbol {}".format(repr(self.name)))
-        # set domain information
+        # set domain information: prefer strict gdxSymbolSetDomain when every
+        # entry of self._domain either is None ('*') or refers to a parent
+        # already written to this file; otherwise fall back to relaxed
+        # gdxSymbolSetDomainX. Decision is per-symbol because GDX itself only
+        # supports per-symbol strict/relaxed.
         if self.num_dims > 0:
-            if self.index:
+            domain = self._domain if self._strict_domain_writeable(name_positions) else None
+            if domain is not None:
+                names = [d.name if d is not None else '*' for d in domain]
+                if not gdxcc.gdxSymbolSetDomain(self.file.H, names):
+                    raise GdxError(self.file.H,
+                        "Could not set strict domain information for {}. "
+                        "Domains are {}".format(repr(self.name), repr(names)))
+            elif self.index:
                 if not gdxcc.gdxSymbolSetDomainX(self.file.H,self.index,self.dims):
                     raise GdxError(self.file.H,"Could not set domain information for {}. Domains are {}".format(repr(self.name),repr(self.dims)))
             else:
@@ -1123,11 +1443,11 @@ class GdxSymbol(object):
 # Helper functions
 # ------------------------------------------------------------------------------
 
-def append_set(gdx_file, set_name, df, cols=None, dim_names=None, 
-        description=None):
+def append_set(gdx_file, set_name, df, cols=None, dim_names=None,
+        description=None, domain=None):
     """
-    Convenience function that appends set_name to gdx_file as a 
-    :class:`GamsDataType.Set <GamsDataType>` :class:`GdxSymbol` using data in 
+    Convenience function that appends set_name to gdx_file as a
+    :class:`GamsDataType.Set <GamsDataType>` :class:`GdxSymbol` using data in
     df.
 
     Parameters
@@ -1137,18 +1457,28 @@ def append_set(gdx_file, set_name, df, cols=None, dim_names=None,
     set_name : str
         name of the :class:`GdxSymbol` to be added
     df : pandas.DataFrame
-        dataframe or data that can be used to construct a dataframe containing 
-        the set data. assumes that all columns define dimensions (there is no 
+        dataframe or data that can be used to construct a dataframe containing
+        the set data. assumes that all columns define dimensions (there is no
         'Value' column)
     cols : None or list of str
-        if not None, these are the columns in df to be used for the set 
+        if not None, these are the columns in df to be used for the set
         definition
     dim_names : None or list of str
         if provided, the columns of a copy of df (or of df[cols]) will be renamed
-        to these names, because the dimension names are taken from the final 
+        to these names, because the dimension names are taken from the final
         dataframe, these will also be the dimension names
     description : None or str
         passed directly to :class:`GdxSymbol`
+    domain : None or list/tuple of (:class:`GdxSymbol` or None)
+        strict (regular) domain references, one per dimension. ``None`` slots
+        mean the wildcard (``'*'``). When supplied, the new symbol is
+        flagged for strict :c:func:`gdxSymbolSetDomain` writes.
+
+    Returns
+    -------
+    :class:`GdxSymbol`
+        The freshly appended symbol — useful for ``child = append_set(...,
+        domain=[parent])`` chains.
     """
     # ensure df is DataFrame and not Series
     logger.debug(f"Defining set {set_name!r} based on:\n{df!r}")
@@ -1162,20 +1492,20 @@ def append_set(gdx_file, set_name, df, cols=None, dim_names=None,
         else:
             tmp.columns = dim_names
     # define the symbol
-    gdx_file.append(GdxSymbol(set_name, GamsDataType.Set, 
-        dims = list(tmp.columns), description = description))
+    gdx_file.append(GdxSymbol(set_name, GamsDataType.Set,
+        dims = list(tmp.columns), description = description, domain=domain))
     # define the data for the symbol
     gdx_file[-1].dataframe = tmp
     # debug description of what happened
     logger.debug(f"Added set {set_name!r} to {gdx_file!r} using processed data:\n{tmp!r}")
-    return
+    return gdx_file[-1]
 
 
-def append_parameter(gdx_file, param_name, df, cols=None, dim_names=None, 
-        description=None):
+def append_parameter(gdx_file, param_name, df, cols=None, dim_names=None,
+        description=None, domain=None):
     """
-    Convenience function that appends param_name to gdx_file as a 
-    :class:`GamsDataType.Parameter <GamsDataType>` :class:`GdxSymbol` using 
+    Convenience function that appends param_name to gdx_file as a
+    :class:`GamsDataType.Parameter <GamsDataType>` :class:`GdxSymbol` using
     data in df.
 
     Parameters
@@ -1185,18 +1515,28 @@ def append_parameter(gdx_file, param_name, df, cols=None, dim_names=None,
     param_name : str
         name of the :class:`GdxSymbol` to be added
     df : pandas.DataFrame
-        dataframe or data that can be used to construct a dataframe containing 
-        the parameter data. assumes that the last selected column is the 'Value' 
+        dataframe or data that can be used to construct a dataframe containing
+        the parameter data. assumes that the last selected column is the 'Value'
         column
     cols : None or list of str
         if not None, these are the columns in df to be used for the parameter
         definition (dimension columns followed by value column)
     dim_names : None or list of str
         if provided, the columns of a copy of df (or of df[cols]) will be renamed
-        to these names + ['Value']. because the dimension names are taken from 
+        to these names + ['Value']. because the dimension names are taken from
         the final dataframe, these will also be the dimension names
     description : None or str
         passed directly to :class:`GdxSymbol`
+    domain : None or list/tuple of (:class:`GdxSymbol` or None)
+        strict (regular) domain references, one per dimension. ``None`` slots
+        mean the wildcard (``'*'``). When supplied, the new symbol is
+        flagged for strict :c:func:`gdxSymbolSetDomain` writes.
+
+    Returns
+    -------
+    :class:`GdxSymbol`
+        The freshly appended symbol — useful for chaining further
+        ``domain=[returned_param]`` references.
     """
     # pre-process the data
     logger.debug(f"Defining parameter {param_name!r} based on:\n{df!r}")
@@ -1210,9 +1550,9 @@ def append_parameter(gdx_file, param_name, df, cols=None, dim_names=None,
             tmp.columns = dim_names + ['Value']
     # define the symbol
     gdx_file.append(GdxSymbol(param_name, GamsDataType.Parameter,
-        dims = list(tmp.columns)[:-1], description = description))
+        dims = list(tmp.columns)[:-1], description = description, domain=domain))
     # define the data for the symbol
     gdx_file[-1].dataframe = tmp
     # debug descripton of what happened
     logger.debug(f"Added parameter {param_name!r} to {gdx_file!r} using processed data:\n{tmp!r}")
-    return
+    return gdx_file[-1]

@@ -138,6 +138,48 @@ def get_data_types(gdx_file,gams_dir=None):
 
 
 
+def get_subset_relationships(gdx_file, gams_dir=None):
+    """
+    Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name.
+
+    Outputs a dict that maps each symbol name to a list with one entry per dimension, giving the
+    parent Set name recorded for that dimension. A dimension whose domain is the wildcard
+    (``'*'``), or for which the GDX file records no domain information at all, comes through
+    as ``None``. Every other dimension is reported by its recorded name verbatim, including the
+    self-referential case where a (typically root) Set's dimension names the Set itself.
+
+    The length of each list matches the symbol's number of dimensions, and names appear in
+    dimension order. The output shape matches the ``domains=`` argument of :func:`to_gdx`, so a
+    value read here can be fed straight back in (``None`` round-trips as the wildcard).
+
+    Parameters
+    ----------
+    gdx_file : pathlib.Path or str
+        Path to the GDX file to read
+    gams_dir : None or pathlib.Path or str
+        optional path to GAMS directory
+
+    Returns
+    -------
+    dict of str to list of (str or None)
+        Map of symbol name to its domain. Pair this with :func:`to_dataframes` to recover the full
+        file shape.
+    """
+    result = OrderedDict()
+    gdx = GdxFile(gams_dir=gams_dir, lazy_load=True)
+    gdx.read(gdx_file)
+    for symbol in gdx:
+        if symbol.domain is not None:
+            result[symbol.name] = [
+                d.name if d is not None else None for d in symbol.domain
+            ]
+        else:
+            result[symbol.name] = [
+                None if d == '*' else d for d in symbol.dims
+            ]
+    return result
+
+
 def to_dataframe(gdx_file,symbol_name,gams_dir=None,old_interface=True,load_set_text=False):
     """
     Interface for getting the data for a single symbol

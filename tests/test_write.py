@@ -1,5 +1,6 @@
 from ctypes import c_bool
 import copy
+import gc
 import logging
 import os
 
@@ -7,6 +8,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import gdxpds
 import gdxpds.gdx
 from gdxpds.tools import Error
 
@@ -351,3 +353,30 @@ def test_parameter_with_nulls(run_dir):
         assert gdx[-1].dataframe['Value'].isnull().values.any()
 
         gdx.write(os.path.join(outdir, 'parameter_with_nulls_test.gdx'))
+
+
+def test_to_gdx_returned_handle_survives_translator_gc(run_dir):
+    # Regression: to_gdx returns a GdxFile while the transient Translator
+    # goes out of scope. The Translator must not free the returned object's
+    # GDX handle on cleanup, or reusing the GdxFile would hit a freed handle.
+    outdir = os.path.join(run_dir, 'to_gdx_handle_lifetime')
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    out1 = os.path.join(outdir, 'first.gdx')
+    out2 = os.path.join(outdir, 'second.gdx')
+
+    dataframes = {'a': pd.DataFrame([['a1', True], ['a2', True]],
+                                    columns=['a', 'Value'])}
+    gdx = gdxpds.to_gdx(dataframes, out1)
+    # Force the transient Translator (now unreferenced) to be collected so
+    # any premature handle-free would have happened before we reuse gdx.
+    gc.collect()
+
+    # The handle must still be valid: a second write through the same object
+    # would raise GdxError (or crash) if the handle had been freed.
+    gdx.write(out2)
+
+    with gdxpds.gdx.GdxFile(lazy_load=False) as check:
+        check.read(out2)
+        assert {s.name for s in check} == {'a'}
+        assert check['a'].num_records == 2
