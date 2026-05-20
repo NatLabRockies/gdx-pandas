@@ -22,15 +22,16 @@ def convert_csv_to_gdx(input_files, output_file, gams_dir=None):
         if os.path.splitext(ifile)[1] == ".csv":
             ifiles.append(ifile)
         else:
-            # must be .txt
-            f = open(ifile)
-            for line in f:
-                if not line == "":
-                    if os.path.splitext(line.strip())[1] == ".csv":
-                        ifiles.append(line.strip())
+            # must be a .txt file listing one CSV path per line
+            with open(ifile) as f:
+                for line in f:
+                    entry = line.strip()
+                    if not entry:
+                        continue
+                    if os.path.splitext(entry)[1] == ".csv":
+                        ifiles.append(entry)
                     else:
-                        print(f"Skipping '{line}' found in '{ifile}'.")
-            f.close()
+                        print(f"Skipping '{entry}' found in '{ifile}'.")
     if len(ifiles) == 0:
         raise RuntimeError("Nothing to convert.")
 

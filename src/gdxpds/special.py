@@ -107,8 +107,8 @@ def convert_np_to_gdx_svs(df, num_dims):
         tmp = (tmp.iloc[:, :num_dims]).merge(values, left_index=True, right_index=True)
     except Exception:
         logger.error(
-            "Unable to convert numpy special values to GDX special values."
-            + f"num_dims: {num_dims}, dataframe:\n{df}"
+            "Unable to convert numpy special values to GDX special values. "
+            f"num_dims: {num_dims}, dataframe:\n{df}"
         )
         raise
     return tmp
