@@ -13,10 +13,7 @@ class Translator(object):
         self.__dataframes = None
 
     def __exit__(self, *args):
-        self.__gdx.__exit__(self, *args)
-
-    def __del__(self):
-        self.__gdx.cleanup()
+        self.__gdx.__exit__(*args)
 
     @property
     def gams_dir(self):
