@@ -1,0 +1,10 @@
+gdxpds.special
+==============
+
+.. automodule:: gdxpds.special
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+
