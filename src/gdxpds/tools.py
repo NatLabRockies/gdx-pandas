@@ -416,7 +416,6 @@ def info(gams_dir: str | os.PathLike[str] | None = None) -> str:
     """
     import importlib
     import importlib.metadata
-    import importlib.util
 
     # Deferred to break the tools <-> __init__ import cycle.
     from gdxpds import __version__
@@ -459,13 +458,6 @@ def info(gams_dir: str | os.PathLike[str] | None = None) -> str:
         lines.append("GAMS_DIR:      (not found)")
     except Exception as e:
         lines.append(f"GAMS_DIR:      (probe failed: {type(e).__name__}: {e})")
-
-    try:
-        gdx2py_spec = importlib.util.find_spec("gdx2py")
-    except Exception:
-        gdx2py_spec = None
-    gdx2py_status = "importable" if gdx2py_spec else "not importable"
-    lines.append(f"gdx2py:        {gdx2py_status}  (optional fast path)")
 
     if load_failure is not None:
         lines.append("")

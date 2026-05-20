@@ -1,6 +1,5 @@
 import argparse
 import os
-import warnings
 
 import pandas as pd
 
@@ -77,16 +76,6 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     convert_csv_to_gdx(args.input, args.output, args.gams_dir)
-
-
-def main_py_alias(argv=None):
-    warnings.warn(
-        "The 'csv_to_gdx.py' command is deprecated; use 'csv_to_gdx' (no .py). "
-        "This alias will be removed in a future release.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return main(argv)
 
 
 if __name__ == "__main__":

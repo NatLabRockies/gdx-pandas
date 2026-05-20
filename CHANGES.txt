@@ -1,3 +1,11 @@
+v2.0.0, 05/20/26 -- BREAKING: to_dataframe() now always returns a plain DataFrame;
+                    the old_interface argument is removed. Migrate by dropping any
+                    old_interface=False from calls (old_interface=True previously
+                    returned a {symbol_name: DataFrame} dict)
+                    BREAKING: removed the deprecated .py-suffixed commands
+                    csv_to_gdx.py / gdx_to_csv.py; use csv_to_gdx / gdx_to_csv
+                    removed the optional gdx2py read accelerator (not an API change);
+                    Parameter reads now use the standard gdxDataReadStr path
 v1.6.0, 05/20/26 -- ship PEP 561 type information with a py.typed marker and type
                     annotations on the public API
                     add developer tooling: ruff (lint + format), pyright, and

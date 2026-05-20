@@ -1,7 +1,6 @@
 import argparse
 import logging
 import os
-import warnings
 
 import gdxpds
 
@@ -55,16 +54,6 @@ def main(argv=None):
     args = parser.parse_args(argv)
 
     convert_gdx_to_csv(args.in_gdx, os.path.realpath(args.out_dir), args.gams_dir)
-
-
-def main_py_alias(argv=None):
-    warnings.warn(
-        "The 'gdx_to_csv.py' command is deprecated; use 'gdx_to_csv' (no .py). "
-        "This alias will be removed in a future release.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return main(argv)
 
 
 if __name__ == "__main__":

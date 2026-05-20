@@ -41,14 +41,6 @@ try:
 except ImportError:
     import gdxcc
 
-# Optional Windows-only fast path for loading GAMS parameters.
-try:
-    import gdx2py
-
-    HAVE_GDX2PY = True
-except ImportError:
-    HAVE_GDX2PY = False
-
 logger = logging.getLogger(__name__)
 
 
@@ -1407,11 +1399,6 @@ class GdxSymbol:
             raise Error(f"Cannot load {repr(self)} because there is no file pointer")
         if not self.index:
             raise Error(f"Cannot load {repr(self)} because there is no symbol index")
-
-        if self.data_type == GamsDataType.Parameter and HAVE_GDX2PY:
-            self.dataframe = gdx2py.par2list(self.file.filename, self.name)
-            self._loaded = True
-            return
 
         _ret, records = gdxcc.gdxDataReadStrStart(self.file.H, self.index)
 
