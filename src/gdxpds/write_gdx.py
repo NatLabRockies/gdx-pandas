@@ -19,7 +19,7 @@ class Translator(object):
 
     def __del__(self):
         if self.__gdx is not None:
-            self.__gdx.__del__()
+            self.__gdx.cleanup()
 
     @property
     def dataframes(self):

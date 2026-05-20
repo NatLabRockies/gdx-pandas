@@ -212,28 +212,24 @@ def load_specials(gams_dir_finder):
     global GDX_TO_NP_SVS
     global NP_TO_GDX_SVS
 
-    from gdxpds.tools import _require_gams_installation, _check_gdx_create_rc
+    from gdxpds.tools import _require_gams_installation, _GdxHandle
     _require_gams_installation(gams_dir_finder)
 
-    H = gdxcc.new_gdxHandle_tp()
-    rc = gdxcc.gdxCreateD(H, gams_dir_finder.gams_dir, gdxcc.GMS_SSSIZE)
-    _check_gdx_create_rc(H, rc, gdxcc, gams_dir_finder.gams_dir, gams_dir_finder.source)
-    # get special values
-    special_values = gdxcc.doubleArray(gdxcc.GMS_SVIDX_MAX)
-    gdxcc.gdxGetSpecialValues(H, special_values)
+    with _GdxHandle(gdxcc, gams_dir_finder.gams_dir, gams_dir_finder.source) as h:
+        # get special values
+        special_values = gdxcc.doubleArray(gdxcc.GMS_SVIDX_MAX)
+        gdxcc.gdxGetSpecialValues(h.H, special_values)
 
-    SPECIAL_VALUES = []
-    GDX_TO_NP_SVS = {}
-    NP_TO_GDX_SVS = {}
-    for i in range(gdxcc.GMS_SVIDX_MAX):
-        if i >= len(NUMPY_SPECIAL_VALUES):
-            break
-        SPECIAL_VALUES.append(special_values[i])
-        gdx_val = special_values[i]
-        GDX_TO_NP_SVS[gdx_val] = NUMPY_SPECIAL_VALUES[i]
-        NP_TO_GDX_SVS[NUMPY_SPECIAL_VALUES[i]] = gdx_val
-
-    gdxcc.gdxFree(H)
+        SPECIAL_VALUES = []
+        GDX_TO_NP_SVS = {}
+        NP_TO_GDX_SVS = {}
+        for i in range(gdxcc.GMS_SVIDX_MAX):
+            if i >= len(NUMPY_SPECIAL_VALUES):
+                break
+            SPECIAL_VALUES.append(special_values[i])
+            gdx_val = special_values[i]
+            GDX_TO_NP_SVS[gdx_val] = NUMPY_SPECIAL_VALUES[i]
+            NP_TO_GDX_SVS[NUMPY_SPECIAL_VALUES[i]] = gdx_val
 
 
 # These values are populated by load_specials, called in load_gdxcc
