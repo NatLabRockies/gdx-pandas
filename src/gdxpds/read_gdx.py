@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import os
+import warnings
 from collections import OrderedDict
 
 import pandas as pd
@@ -232,4 +233,14 @@ def to_dataframe(
     df = Translator(gdx_file, gams_dir=gams_dir, lazy_load=True).dataframe(
         symbol_name, load_set_text=load_set_text
     )
-    return {symbol_name: df} if old_interface else df
+    if old_interface:
+        warnings.warn(
+            "to_dataframe() returning a {symbol_name: DataFrame} dict "
+            "(old_interface=True) is deprecated; the old_interface argument will "
+            "be removed in gdxpds 2.0.0, after which to_dataframe() always returns "
+            "a plain DataFrame. Pass old_interface=False to get that behavior now.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return {symbol_name: df}
+    return df
