@@ -6,6 +6,7 @@ gdx-pandas is a python package to translate between gdx (GAMS data) and pandas.
 
 [Install](#install) | [Documentation](https://NatLabRockies.github.io/gdx-pandas) | [Uninstall](#uninstall)
 
+<!-- begin-install -->
 ## Install
 
 ### Preliminaries
@@ -80,3 +81,4 @@ to the `tests` folder.
 ```
 pip uninstall gdxpds
 ```
+<!-- end-install -->
