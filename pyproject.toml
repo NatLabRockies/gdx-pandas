@@ -31,6 +31,9 @@ docs = [
 ]
 dev = [
     "gdxpds[test,docs]",
+    "ruff",
+    "pyright",
+    "pre-commit",
 ]
 
 [project.urls]

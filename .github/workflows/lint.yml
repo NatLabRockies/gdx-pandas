@@ -1,0 +1,60 @@
+name: Lint and type-check
+
+on:
+  pull_request:
+    paths:
+      - 'src/**'
+      - 'tests/**'
+      - 'pyproject.toml'
+      - '.pre-commit-config.yaml'
+      - '.github/workflows/lint.yml'
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+
+      - name: Cache pre-commit environments
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      # Runs ruff check + ruff format from the pinned rev in
+      # .pre-commit-config.yaml, so CI and local hooks stay in lockstep.
+      - name: Run ruff via pre-commit
+        run: |
+          python -m pip install --upgrade pip pre-commit
+          pre-commit run --all-files --show-diff-on-failure
+
+  pyright:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+          cache: 'pip'
+          cache-dependency-path: pyproject.toml
+
+      - name: Install package + tooling
+        # [legacy] pulls in the gdxcc PyPI binding, importable without a real
+        # GAMS install. pyright never executes code, so no GAMS_DIR is needed.
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[dev,legacy]
+
+      - name: Run pyright
+        run: pyright
