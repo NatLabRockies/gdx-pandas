@@ -1,24 +1,19 @@
-v1.5.0, XX/XX/XX -- migrate to pyproject.toml; require Python >= 3.11, pandas >= 2.2, numpy >= 2.0
-                    support modern gamsapi bindings (gams.core.gdx); the older standalone gdxcc
+v1.5.0, 05/20/26 -- support modern gamsapi bindings (gams.core.gdx); the standalone gdxcc
                     package moves to a [legacy] extra
-                    GamsDirFinder handles the modern C:\GAMS\<version>\ layout
-                    adopt src layout (src/gdxpds/); tests live in top-level tests/ and no longer
-                    ship in the wheel
-                    new csv_to_gdx and gdx_to_csv console commands; the old csv_to_gdx.py and
-                    gdx_to_csv.py names continue to work but are deprecated and will be removed
-                    in a future release
-                    new `gdxpds test` command verifies a fresh install end-to-end against the
-                    local GAMS environment
-                    new `gdxpds info` / `gdxpds.info()` print an environment report;
-                    `gdxpds --version` prints the version
-                    non-GAMS directories now raise gdxpds.tools.Error instead of crashing Python
-                    (Windows access violation); record discovery source as GamsDirFinder.source
-                    `import gdxpds` no longer needs to precede `import pandas` on Linux; the
-                    import-order requirement has been removed
-                    the GAMS library is now bound on the first GDX operation rather than at
-                    `import gdxpds`. The `gams_dir=` passed to that first call selects which GAMS
-                    install is used; subsequent calls that request a different gams_dir get a
-                    warning and the originally bound install
+                    require Python >= 3.11, pandas >= 2.2, numpy >= 2.0
+                    new get_subset_relationships() reads Set subset (domain) relationships,
+                    and to_gdx() gains a domains= argument to record them on write
+                    the GdxFile returned by to_gdx() is now safe to reuse (previously a
+                    Windows crash / double-free)
+                    invalid GAMS directories raise gdxpds.tools.Error instead of crashing
+                    Python, and GDX handle teardown no longer segfaults or double-frees
+                    new CLI commands `gdxpds test`, `gdxpds info`, and `gdxpds --version`,
+                    plus csv_to_gdx / gdx_to_csv (the old .py-suffixed names are deprecated)
+                    `import gdxpds` no longer needs to precede `import pandas`; GAMS is now
+                    bound on the first GDX operation, whose gams_dir= selects the install
+                    GamsDirFinder handles the modern C:\GAMS\<version>\ install layout
+                    packaging modernized: pyproject.toml and a src layout (tests no longer
+                    ship in the wheel)
 v1.4.0, 07/21/23 -- add get_data_types function that maps symbol name to gdx.GamsDataType;
                     add load_set_text kwarg to gdx.GdxSymbol.load, to_dataframe, and to_dataframes
 v1.3.0, 05/09/23 -- performance improvements (faster read and write)
