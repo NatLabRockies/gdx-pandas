@@ -47,7 +47,10 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
@@ -67,6 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
@@ -77,10 +81,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType"><code class="docutils literal notranslate"><span class="pre">GamsDomainType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
@@ -95,6 +101,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 </ul>
 </li>
@@ -311,6 +318,51 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span><span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">data_types</span></div>
 
+
+
+
+<div class="viewcode-block" id="get_subset_relationships">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.get_subset_relationships">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">get_subset_relationships</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name.</span>
+
+<span class="sd">    Outputs a dict that maps each symbol name to a list with one entry per dimension, giving the</span>
+<span class="sd">    parent Set name recorded for that dimension. A dimension whose domain is the wildcard</span>
+<span class="sd">    (``&#39;*&#39;``), or for which the GDX file records no domain information at all, comes through</span>
+<span class="sd">    as ``None``. Every other dimension is reported by its recorded name verbatim, including the</span>
+<span class="sd">    self-referential case where a (typically root) Set&#39;s dimension names the Set itself.</span>
+
+<span class="sd">    The length of each list matches the symbol&#39;s number of dimensions, and names appear in</span>
+<span class="sd">    dimension order. The output shape matches the ``domains=`` argument of :func:`to_gdx`, so a</span>
+<span class="sd">    value read here can be fed straight back in (``None`` round-trips as the wildcard).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdx_file : pathlib.Path or str</span>
+<span class="sd">        Path to the GDX file to read</span>
+<span class="sd">    gams_dir : None or pathlib.Path or str</span>
+<span class="sd">        optional path to GAMS directory</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict of str to list of (str or None)</span>
+<span class="sd">        Map of symbol name to its domain. Pair this with :func:`to_dataframes` to recover the full</span>
+<span class="sd">        file shape.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+    <span class="n">gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">gdx</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">gdx</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">symbol</span><span class="o">.</span><span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">symbol</span><span class="o">.</span><span class="n">domain</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="kc">None</span> <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="k">else</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">symbol</span><span class="o">.</span><span class="n">dims</span>
+            <span class="p">]</span>
+    <span class="k">return</span> <span class="n">result</span></div>
 
 
 

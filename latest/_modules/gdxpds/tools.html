@@ -47,7 +47,10 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
@@ -67,6 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
@@ -77,10 +81,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType"><code class="docutils literal notranslate"><span class="pre">GamsDomainType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
@@ -95,6 +101,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 </ul>
 </li>

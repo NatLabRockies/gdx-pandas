@@ -47,7 +47,10 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
@@ -67,6 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
@@ -77,10 +81,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType"><code class="docutils literal notranslate"><span class="pre">GamsDomainType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
@@ -95,6 +101,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 </ul>
 </li>
@@ -212,6 +219,56 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
+<span class="k">def</span><span class="w"> </span><span class="nf">_stable_topological_sort</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">parents_of</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Stable topological sort.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    names : sequence of str</span>
+<span class="sd">        The items to sort, in their original order. Original position is</span>
+<span class="sd">        used to break ties between ready items.</span>
+<span class="sd">    parents_of : dict of str to iterable of str</span>
+<span class="sd">        For each name, the names it depends on (must precede it).</span>
+<span class="sd">        Self-references and parent names not in ``names`` are ignored.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    (list of str or None, dict of str to set of str, or None)</span>
+<span class="sd">        ``(ordered, cycle)``.</span>
+
+<span class="sd">        - ``cycle`` is a ``{name: set_of_unresolved_parents}`` dict</span>
+<span class="sd">          describing the names that couldn&#39;t be ordered when the input</span>
+<span class="sd">          contains a cycle, else ``None``. Iterating it (e.g.</span>
+<span class="sd">          ``sorted(cycle)``) yields the involved names.</span>
+<span class="sd">        - ``ordered`` is the topologically sorted sequence when a reorder</span>
+<span class="sd">          was actually needed. It is ``None`` when the input was already</span>
+<span class="sd">          in dependency order (no reorder needed) or when a cycle was</span>
+<span class="sd">          detected (callers should consult ``cycle`` and react).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">name_to_pos</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">names</span><span class="p">)}</span>
+    <span class="n">remaining</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">n</span><span class="p">:</span> <span class="p">{</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parents_of</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="p">())</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">name_to_pos</span> <span class="ow">and</span> <span class="n">p</span> <span class="o">!=</span> <span class="n">n</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">names</span>
+    <span class="p">}</span>
+    <span class="n">ordered</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">while</span> <span class="n">remaining</span><span class="p">:</span>
+        <span class="n">ready</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">n</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">remaining</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">remaining</span><span class="p">[</span><span class="n">n</span><span class="p">]),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">n</span><span class="p">:</span> <span class="n">name_to_pos</span><span class="p">[</span><span class="n">n</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">ready</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="n">remaining</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ready</span><span class="p">:</span>
+            <span class="n">ordered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">remaining</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">deps</span> <span class="ow">in</span> <span class="n">remaining</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+                <span class="n">deps</span><span class="o">.</span><span class="n">discard</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">ordered</span> <span class="o">==</span> <span class="nb">list</span><span class="p">(</span><span class="n">names</span><span class="p">):</span>
+        <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
+    <span class="k">return</span> <span class="n">ordered</span><span class="p">,</span> <span class="kc">None</span>
+
+
 <div class="viewcode-block" id="replace_df_column">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.replace_df_column">[docs]</a>
 <span class="k">def</span><span class="w"> </span><span class="nf">replace_df_column</span><span class="p">(</span><span class="n">df</span><span class="p">,</span><span class="n">colname</span><span class="p">,</span><span class="n">new_col</span><span class="p">):</span>
@@ -261,6 +318,21 @@
         <span class="k">if</span> <span class="n">H</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;. &quot;</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxErrorStr</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxGetLastError</span><span class="p">(</span><span class="n">H</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="DomainError">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.DomainError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DomainError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised for any invalid input to the dim/domain layer of a symbol:</span>
+<span class="sd">    cycle in parent-child references, unknown parent name, wrong-length</span>
+<span class="sd">    list against a fixed-dimension symbol, wrong outer type for ``dims``</span>
+<span class="sd">    or ``domain``, or a malformed element (non-string in ``dims``; plain</span>
+<span class="sd">    string passed to :py:attr:`GdxSymbol.domain` instead of a</span>
+<span class="sd">    :py:class:`GdxSymbol` reference). Subclass of :class:`Error` so</span>
+<span class="sd">    callers may continue catching the broader category if they wish.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 
@@ -433,13 +505,57 @@
                 <span class="n">sym</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">data_type</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="n">dims</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to initialize GdxSymbol </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">, because </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. SKIPPING.&quot;</span><span class="p">)</span>            
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to initialize GdxSymbol </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">, because </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. SKIPPING.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Self-heal strict-domain refs whose parent appeared at a higher</span>
+        <span class="c1"># GDX index than the child (malformed but readable). No-op for</span>
+        <span class="c1"># well-formed files — each symbol&#39;s in-line attempt already</span>
+        <span class="c1"># succeeded.</span>
+        <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
+            <span class="n">symbol</span><span class="o">.</span><span class="n">resolve_domain</span><span class="p">()</span>
 
         <span class="c1"># read all symbols if not lazy_load</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="n">symbol</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
         <span class="k">return</span></div>
+
+
+<div class="viewcode-block" id="GdxFile.reorder_for_strict_domains">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.reorder_for_strict_domains">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reorder_for_strict_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reorder ``self._symbols`` in place so every symbol with a strict (``GdxSymbol``-ref) </span>
+<span class="sd">        ``domain`` follows all of its parents. Stable topological sort: symbols that don&#39;t </span>
+<span class="sd">        reference each other keep their current relative order. No-ops on cycles (logs a warning</span>
+<span class="sd">        and leaves the original order untouched).</span>
+
+<span class="sd">        Strict-domain writes require the parent&#39;s ``gdxDataWriteDone`` to have completed before </span>
+<span class="sd">        the child&#39;s write starts. Calling this before :py:meth:`write` is the easy way to satisfy </span>
+<span class="sd">        that constraint when symbols were appended in an unordered way.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">parents_of</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+            <span class="n">ps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">domain</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">d</span> <span class="ow">is</span> <span class="n">s</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">ps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">parents_of</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ps</span>
+
+        <span class="n">ordered</span><span class="p">,</span> <span class="n">cycle</span> <span class="o">=</span> <span class="n">_stable_topological_sort</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">parents_of</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;reorder_for_strict_domains: cyclic domain references &quot;</span>
+                <span class="s2">&quot;detected; leaving symbol order untouched. Cycle &quot;</span>
+                <span class="s2">&quot;involves: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="nb">sorted</span><span class="p">(</span><span class="n">cycle</span><span class="p">))</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="n">ordered</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">[</span><span class="n">name</span><span class="p">])</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">ordered</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GdxFile.write">
@@ -466,9 +582,13 @@
         <span class="c1"># write the universal set</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
 
+        <span class="c1"># Build the {name: position} map once so each symbol&#39;s strict-domain</span>
+        <span class="c1"># eligibility check is O(1) per parent rather than O(N).</span>
+        <span class="n">name_positions</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="o">.</span><span class="n">keys</span><span class="p">())}</span>
+
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">symbol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">)</span>
+                <span class="n">symbol</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">i</span><span class="p">,</span> <span class="n">name_positions</span><span class="o">=</span><span class="n">name_positions</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Unable to write </span><span class="si">{}</span><span class="s2"> to </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">symbol</span><span class="p">,</span><span class="n">filename</span><span class="p">))</span>
                 <span class="k">raise</span>
@@ -614,8 +734,8 @@
         <span class="k">return</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_fixup_name_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span> <span class="k">for</span> <span class="n">cur_key</span><span class="p">,</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="p">])</span>
-        <span class="k">return</span>        
+        <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([(</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">symbol</span><span class="p">)</span> <span class="k">for</span> <span class="n">_cur_key</span><span class="p">,</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="o">.</span><span class="n">items</span><span class="p">()])</span>
+        <span class="k">return</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_create_gdx_object</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Idempotent: first call binds the library + populates SPECIAL_VALUES;</span>
@@ -665,6 +785,27 @@
     <span class="n">NothingEnforced</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_N</span>
     <span class="n">External</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_X</span>
     <span class="n">Conic</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_C</span></div>
+
+
+
+<div class="viewcode-block" id="GamsDomainType">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsDomainType">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GamsDomainType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Domain status of a :py:class:`GdxSymbol`. Member ``.value`` matches the</span>
+<span class="sd">    :c:func:`gdxSymbolGetDomainX` return code (1, 2, or 3 — see</span>
+<span class="sd">    ``gdxcc.h``); ``gdxcc`` does not expose these as symbolic constants,</span>
+<span class="sd">    so the integers are written out explicitly here.</span>
+
+<span class="sd">    - ``NONE`` (1): no domain information stored.</span>
+<span class="sd">    - ``RELAXED`` (2): domain stored as plain string names (via</span>
+<span class="sd">      :c:func:`gdxSymbolSetDomainX`), no validation.</span>
+<span class="sd">    - ``REGULAR`` (3): strict domain (via :c:func:`gdxSymbolSetDomain`),</span>
+<span class="sd">      each non-wildcard dimension references an existing Set/Alias.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">NONE</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">RELAXED</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">REGULAR</span> <span class="o">=</span> <span class="mi">3</span></div>
 
 
 
@@ -727,9 +868,10 @@
 
 <div class="viewcode-block" id="GdxSymbol">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">GdxSymbol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span> 
+<span class="k">class</span><span class="w"> </span><span class="nc">GdxSymbol</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">name</span><span class="p">,</span><span class="n">data_type</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">variable_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">equation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
+                 <span class="n">description</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span><span class="n">variable_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">equation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In-memory representation of a GAMS GDX Symbol</span>
 
@@ -738,8 +880,8 @@
 <span class="sd">        name : str</span>
 <span class="sd">        data_type : :py:class:`GamsDataType`</span>
 <span class="sd">        dims : int or list of str</span>
-<span class="sd">            If dims is set to an int, then that number of dimensions will be created, each </span>
-<span class="sd">            indicated with the wildcard name &#39;*&#39;. Otherwise, a list of strings is expected, </span>
+<span class="sd">            If dims is set to an int, then that number of dimensions will be created, each</span>
+<span class="sd">            indicated with the wildcard name &#39;*&#39;. Otherwise, a list of strings is expected,</span>
 <span class="sd">            each string being a dimension name.</span>
 <span class="sd">        file : None or :py:class:`GdxFile`</span>
 <span class="sd">            Users should not set file. File is set by, e.g., :py:meth:`GdxFile.read` and</span>
@@ -753,6 +895,12 @@
 <span class="sd">            Only expected if data_type == :py:attr:`GamsDataType.Variable`</span>
 <span class="sd">        equation_type : None or :py:class:`GamsEquationType`</span>
 <span class="sd">            Only expected if data_type == :py:attr:`GamsDataType.Equation`</span>
+<span class="sd">        domain : None or list/tuple of (:py:class:`GdxSymbol` or None)</span>
+<span class="sd">            Strict (regular) domain references, one per dimension. ``None`` entries map to the </span>
+<span class="sd">            GAMS wildcard (``&#39;*&#39;``). When supplied, this flags the symbol for strict </span>
+<span class="sd">            :c:func:`gdxSymbolSetDomain` writes (subject to the parent existing in the file at </span>
+<span class="sd">            write time; otherwise the symbol falls back to relaxed). Plain strings are not </span>
+<span class="sd">            accepted here; use ``dims`` for string-only domains.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
@@ -761,10 +909,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_variable_type</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span> <span class="o">=</span> <span class="n">variable_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_equation_type</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span> <span class="o">=</span> <span class="n">equation_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="o">=</span> <span class="kc">None</span><span class="p">;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span>       
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_strict_on_disk</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span>
+        <span class="k">if</span> <span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">file</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>       
+        <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
 
         <span class="c1"># adding this flag to implement ability to load set text instead of boolean values</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_vals</span> <span class="o">=</span> <span class="kc">True</span>
@@ -787,6 +939,14 @@
                     <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Unable to get domain information for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
                 <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">gdx_domain</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">),</span> <span class="s2">&quot;Dimensional information read in from GDX should be consistent.&quot;</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">gdx_domain</span>
+                <span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="c1"># Stored via strict gdxSymbolSetDomain. Mark so a later retry can distinguish </span>
+                    <span class="c1"># strict-but-unresolved from truly relaxed, then try to resolve names to same-file</span>
+                    <span class="c1"># GdxSymbol refs. Symbols with lower indices are already in self.file._symbols at </span>
+                    <span class="c1"># this point; for well-formed GDX, this succeeds. GdxFile.read() also retries at the</span>
+                    <span class="c1"># end to self-heal symbols whose parents had higher indices (malformed files).</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_strict_on_disk</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">resolve_domain</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># universal set</span>
                 <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span>
@@ -811,11 +971,15 @@
             <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;Symbol </span><span class="si">{}</span><span class="s2"> cannot be cloned because it is not yet loaded.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
 
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
+        <span class="c1"># Pass _domain directly to the constructor: the domain setter copies the list, so the </span>
+        <span class="c1"># clone has its own slot list pointing at the same parent GdxSymbols. Write-time name </span>
+        <span class="c1"># lookup resolves against whatever file the clone ends up in.</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">,</span>
                            <span class="n">dims</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span>
                            <span class="n">description</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">description</span><span class="p">,</span>
                            <span class="n">variable_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">variable_type</span><span class="p">,</span>
-                           <span class="n">equation_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span><span class="p">)</span>
+                           <span class="n">equation_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span><span class="p">,</span>
+                           <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">)</span>
         <span class="n">result</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">loaded</span>
         <span class="k">return</span> <span class="n">result</span></div>
@@ -1026,25 +1190,187 @@
 
     <span class="nd">@dims</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dims</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_dims_internal</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="c1"># Assigning dims by string drops any strict (GdxSymbol-ref) domain.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_set_dims_internal</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Shared implementation for the ``dims`` setter and the ``domain`` setter.</span>
+<span class="sd">        Updates ``self._dims`` and either initializes the dataframe (no records</span>
+<span class="sd">        yet) or reflows the dataframe columns in place. Does NOT touch</span>
+<span class="sd">        ``self._domain``; callers are responsible for that. Raises</span>
+<span class="sd">        :class:`DomainError` on bad shape/type input.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">))):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span><span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot set dims to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">, because the number of &quot;</span>
-                    <span class="s2">&quot;dimensions has already been set to </span><span class="si">{self.num_dims}</span><span class="s2">.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot set dims to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">, because the number of &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;dimensions has already been set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">value</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_init_dataframe</span><span class="p">()</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s1">&#39;dims must be an int or a list. Was passed </span><span class="si">{}</span><span class="s1"> of type </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
+            <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span><span class="s1">&#39;dims must be an int or a list. Was passed </span><span class="si">{}</span><span class="s1"> of type </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)))</span>
         <span class="k">for</span> <span class="n">dim</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-                <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s1">&#39;Individual dimensions must be denoted by strings. Was passed </span><span class="si">{}</span><span class="s1"> as element of </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span><span class="s1">&#39;Individual dimensions must be denoted by strings. Was passed </span><span class="si">{}</span><span class="s1"> as element of </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">dim</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span>
         <span class="k">assert</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">==</span> <span class="mi">0</span><span class="p">))</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span>
             <span class="k">return</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_init_dataframe</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Strict (regular) domain references: one :py:class:`GdxSymbol` per dimension, or </span>
+<span class="sd">        ``None`` per slot meaning the GAMS wildcard (``&#39;*&#39;``). The whole attribute is </span>
+<span class="sd">        ``None`` when no strict refs are known.</span>
+
+<span class="sd">        Setting ``domain`` rewrites :py:attr:`dims` to the stringified version (parent name </span>
+<span class="sd">        per slot, ``&#39;*&#39;`` for ``None`` slots), reflowing DataFrame column headers in place. </span>
+<span class="sd">        Setting ``dims`` instead clears ``domain``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of (:py:class:`GdxSymbol` or None), or None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span>
+
+    <span class="nd">@domain</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                <span class="s1">&#39;domain must be a list or tuple of (GdxSymbol | None), or None. &#39;</span>
+                <span class="s1">&#39;Was passed </span><span class="si">{}</span><span class="s1"> of type </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="p">)</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                    <span class="s1">&#39;domain entries must be GdxSymbol references or None. &#39;</span>
+                    <span class="s1">&#39;Use the dims attribute for string-only domains. &#39;</span>
+                    <span class="s1">&#39;Was passed string </span><span class="si">{!r}</span><span class="s1"> as element of </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">GdxSymbol</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                    <span class="s1">&#39;domain entries must be GdxSymbol references or None. &#39;</span>
+                    <span class="s1">&#39;Was passed </span><span class="si">{}</span><span class="s1"> of type </span><span class="si">{}</span><span class="s1"> as element of </span><span class="si">{}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">value</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span> <span class="ow">and</span> <span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">num_records</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Cannot set domain to length </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">, because the &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;number of dimensions has already been set to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
+        <span class="n">stringified</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">GdxSymbol</span><span class="p">)</span> <span class="k">else</span> <span class="s1">&#39;*&#39;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_dims_internal</span><span class="p">(</span><span class="n">stringified</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domain_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Derived domain status. See :py:class:`GamsDomainType` for the codes.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        :py:class:`GamsDomainType`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">GdxSymbol</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">GamsDomainType</span><span class="o">.</span><span class="n">REGULAR</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">d</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">GamsDomainType</span><span class="o">.</span><span class="n">NONE</span>
+        <span class="k">return</span> <span class="n">GamsDomainType</span><span class="o">.</span><span class="n">RELAXED</span>
+
+<div class="viewcode-block" id="GdxSymbol.resolve_domain">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.resolve_domain">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_domain</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Attempt to populate :py:attr:`domain` with live :py:class:`GdxSymbol` references </span>
+<span class="sd">        by looking up each entry in :py:attr:`dims` against ``self.file._symbols``. Idempotent; </span>
+<span class="sd">        no-ops when ``domain`` is already set, when there&#39;s no associated file, or when the </span>
+<span class="sd">        symbol&#39;s on-disk domain wasn&#39;t strict (``REGULAR``).</span>
+
+<span class="sd">        Useful when:</span>
+
+<span class="sd">        - A GDX file was read whose strict-domain parent has a higher index than the child </span>
+<span class="sd">          (malformed; rare). The in-line resolution during read fails for that symbol; calling </span>
+<span class="sd">          this method after read picks the parent up.</span>
+<span class="sd">        - The user has manipulated ``self.file`` after reading (e.g. appended or replaced the </span>
+<span class="sd">          parent symbol) and wants the ``REGULAR`` write path re-enabled.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if ``domain`` was populated as a result of this call, False otherwise.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strict_on_disk</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">resolved</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="o">==</span> <span class="s1">&#39;*&#39;</span><span class="p">:</span>
+                <span class="n">resolved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_symbols</span><span class="p">:</span>
+                <span class="n">resolved</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_symbols</span><span class="p">[</span><span class="n">d</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;resolve_domain: symbol </span><span class="si">%r</span><span class="s2"> references strict-domain &quot;</span>
+                    <span class="s2">&quot;parent </span><span class="si">%r</span><span class="s2"> which is not in this file; leaving domain &quot;</span>
+                    <span class="s2">&quot;unresolved (RELAXED on the next write).&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="n">resolved</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
+
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_strict_domain_writeable</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name_positions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal: True iff this symbol&#39;s ``_domain`` can be written using strict</span>
+<span class="sd">        :c:func:`gdxSymbolSetDomain` at this point in the file&#39;s write sequence. Requires every</span>
+<span class="sd">        non-``None`` entry to name a parent that (a) exists in ``self.file._symbols`` and</span>
+<span class="sd">        (b) precedes this symbol in insertion order (so the parent has already been</span>
+<span class="sd">        ``gdxDataWriteDone``-ed and is in the GDX symbol table). Returns False for</span>
+<span class="sd">        self-referential 1-dim sets.</span>
+
+<span class="sd">        ``name_positions`` is an optional ``{name: insertion_position}`` map for</span>
+<span class="sd">        ``self.file._symbols``. :py:meth:`GdxFile.write` builds it once and passes it</span>
+<span class="sd">        through so eligibility checks stay O(1) per parent rather than O(N) across a</span>
+<span class="sd">        whole-file write. When omitted (standalone calls) it is built on demand.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="n">name_positions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">name_positions</span> <span class="o">=</span> <span class="p">{</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_symbols</span><span class="o">.</span><span class="n">keys</span><span class="p">())}</span>
+        <span class="n">my_pos</span> <span class="o">=</span> <span class="n">name_positions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">my_pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="bp">self</span><span class="p">:</span>
+                <span class="c1"># Self-referential set: parent isn&#39;t yet in the GDX symbol</span>
+                <span class="c1"># table when its own write starts.</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="n">parent_pos</span> <span class="o">=</span> <span class="n">name_positions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parent_pos</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># Parent not in this file.</span>
+                <span class="k">return</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="n">parent_pos</span> <span class="o">&gt;=</span> <span class="n">my_pos</span><span class="p">:</span>
+                <span class="c1"># Parent hasn&#39;t been written yet in this pass.</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">num_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1116,7 +1442,9 @@
                     <span class="k">if</span> <span class="n">num_dims</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">num_dims</span>
                     <span class="k">break</span>
-            <span class="k">if</span> <span class="n">replace_dims</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">replace_dims</span> <span class="ow">and</span> <span class="n">dim_cols</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span><span class="p">:</span>
+                <span class="c1"># Going through the dims setter clears any strict (GdxSymbol-ref)</span>
+                <span class="c1"># domain. Only do that when the names are actually changing.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">dim_cols</span>
             <span class="c1"># all done establishing dimensions</span>
             <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">==</span> <span class="n">num_dims</span>
@@ -1265,7 +1593,7 @@
 
 <div class="viewcode-block" id="GdxSymbol.write">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.write">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span> 
+    <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">name_positions</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Writes this :py:class:`GdxSymbol` to its :py:attr:`file`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1300,9 +1628,20 @@
                                           <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">value</span><span class="p">,</span>
                                           <span class="n">userinfo</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Could not start writing data for symbol </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)))</span>
-        <span class="c1"># set domain information</span>
+        <span class="c1"># set domain information: prefer strict gdxSymbolSetDomain when every</span>
+        <span class="c1"># entry of self._domain either is None (&#39;*&#39;) or refers to a parent</span>
+        <span class="c1"># already written to this file; otherwise fall back to relaxed</span>
+        <span class="c1"># gdxSymbolSetDomainX. Decision is per-symbol because GDX itself only</span>
+        <span class="c1"># supports per-symbol strict/relaxed.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_dims</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+            <span class="n">domain</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_strict_domain_writeable</span><span class="p">(</span><span class="n">name_positions</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s1">&#39;*&#39;</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">domain</span><span class="p">]</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxSymbolSetDomain</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">names</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span>
+                        <span class="s2">&quot;Could not set strict domain information for </span><span class="si">{}</span><span class="s2">. &quot;</span>
+                        <span class="s2">&quot;Domains are </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span> <span class="nb">repr</span><span class="p">(</span><span class="n">names</span><span class="p">)))</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxSymbolSetDomainX</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">H</span><span class="p">,</span><span class="s2">&quot;Could not set domain information for </span><span class="si">{}</span><span class="s2">. Domains are </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">),</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span><span class="p">)))</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1336,11 +1675,11 @@
 
 <div class="viewcode-block" id="append_set">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.append_set">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">append_set</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">set_name</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">append_set</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">set_name</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convenience function that appends set_name to gdx_file as a </span>
-<span class="sd">    :class:`GamsDataType.Set &lt;GamsDataType&gt;` :class:`GdxSymbol` using data in </span>
+<span class="sd">    Convenience function that appends set_name to gdx_file as a</span>
+<span class="sd">    :class:`GamsDataType.Set &lt;GamsDataType&gt;` :class:`GdxSymbol` using data in</span>
 <span class="sd">    df.</span>
 
 <span class="sd">    Parameters</span>
@@ -1350,18 +1689,28 @@
 <span class="sd">    set_name : str</span>
 <span class="sd">        name of the :class:`GdxSymbol` to be added</span>
 <span class="sd">    df : pandas.DataFrame</span>
-<span class="sd">        dataframe or data that can be used to construct a dataframe containing </span>
-<span class="sd">        the set data. assumes that all columns define dimensions (there is no </span>
+<span class="sd">        dataframe or data that can be used to construct a dataframe containing</span>
+<span class="sd">        the set data. assumes that all columns define dimensions (there is no</span>
 <span class="sd">        &#39;Value&#39; column)</span>
 <span class="sd">    cols : None or list of str</span>
-<span class="sd">        if not None, these are the columns in df to be used for the set </span>
+<span class="sd">        if not None, these are the columns in df to be used for the set</span>
 <span class="sd">        definition</span>
 <span class="sd">    dim_names : None or list of str</span>
 <span class="sd">        if provided, the columns of a copy of df (or of df[cols]) will be renamed</span>
-<span class="sd">        to these names, because the dimension names are taken from the final </span>
+<span class="sd">        to these names, because the dimension names are taken from the final</span>
 <span class="sd">        dataframe, these will also be the dimension names</span>
 <span class="sd">    description : None or str</span>
 <span class="sd">        passed directly to :class:`GdxSymbol`</span>
+<span class="sd">    domain : None or list/tuple of (:class:`GdxSymbol` or None)</span>
+<span class="sd">        strict (regular) domain references, one per dimension. ``None`` slots</span>
+<span class="sd">        mean the wildcard (``&#39;*&#39;``). When supplied, the new symbol is</span>
+<span class="sd">        flagged for strict :c:func:`gdxSymbolSetDomain` writes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`GdxSymbol`</span>
+<span class="sd">        The freshly appended symbol — useful for ``child = append_set(...,</span>
+<span class="sd">        domain=[parent])`` chains.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># ensure df is DataFrame and not Series</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Defining set </span><span class="si">{</span><span class="n">set_name</span><span class="si">!r}</span><span class="s2"> based on:</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1375,23 +1724,23 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">dim_names</span>
     <span class="c1"># define the symbol</span>
-    <span class="n">gdx_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="n">set_name</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> 
-        <span class="n">dims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="p">))</span>
+    <span class="n">gdx_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="n">set_name</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">),</span> <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">))</span>
     <span class="c1"># define the data for the symbol</span>
     <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">tmp</span>
     <span class="c1"># debug description of what happened</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added set </span><span class="si">{</span><span class="n">set_name</span><span class="si">!r}</span><span class="s2"> to </span><span class="si">{</span><span class="n">gdx_file</span><span class="si">!r}</span><span class="s2"> using processed data:</span><span class="se">\n</span><span class="si">{</span><span class="n">tmp</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span></div>
+    <span class="k">return</span> <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
 
 <div class="viewcode-block" id="append_parameter">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.append_parameter">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">append_parameter</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> 
-        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">append_parameter</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">cols</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dim_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Convenience function that appends param_name to gdx_file as a </span>
-<span class="sd">    :class:`GamsDataType.Parameter &lt;GamsDataType&gt;` :class:`GdxSymbol` using </span>
+<span class="sd">    Convenience function that appends param_name to gdx_file as a</span>
+<span class="sd">    :class:`GamsDataType.Parameter &lt;GamsDataType&gt;` :class:`GdxSymbol` using</span>
 <span class="sd">    data in df.</span>
 
 <span class="sd">    Parameters</span>
@@ -1401,18 +1750,28 @@
 <span class="sd">    param_name : str</span>
 <span class="sd">        name of the :class:`GdxSymbol` to be added</span>
 <span class="sd">    df : pandas.DataFrame</span>
-<span class="sd">        dataframe or data that can be used to construct a dataframe containing </span>
-<span class="sd">        the parameter data. assumes that the last selected column is the &#39;Value&#39; </span>
+<span class="sd">        dataframe or data that can be used to construct a dataframe containing</span>
+<span class="sd">        the parameter data. assumes that the last selected column is the &#39;Value&#39;</span>
 <span class="sd">        column</span>
 <span class="sd">    cols : None or list of str</span>
 <span class="sd">        if not None, these are the columns in df to be used for the parameter</span>
 <span class="sd">        definition (dimension columns followed by value column)</span>
 <span class="sd">    dim_names : None or list of str</span>
 <span class="sd">        if provided, the columns of a copy of df (or of df[cols]) will be renamed</span>
-<span class="sd">        to these names + [&#39;Value&#39;]. because the dimension names are taken from </span>
+<span class="sd">        to these names + [&#39;Value&#39;]. because the dimension names are taken from</span>
 <span class="sd">        the final dataframe, these will also be the dimension names</span>
 <span class="sd">    description : None or str</span>
 <span class="sd">        passed directly to :class:`GdxSymbol`</span>
+<span class="sd">    domain : None or list/tuple of (:class:`GdxSymbol` or None)</span>
+<span class="sd">        strict (regular) domain references, one per dimension. ``None`` slots</span>
+<span class="sd">        mean the wildcard (``&#39;*&#39;``). When supplied, the new symbol is</span>
+<span class="sd">        flagged for strict :c:func:`gdxSymbolSetDomain` writes.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`GdxSymbol`</span>
+<span class="sd">        The freshly appended symbol — useful for chaining further</span>
+<span class="sd">        ``domain=[returned_param]`` references.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># pre-process the data</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Defining parameter </span><span class="si">{</span><span class="n">param_name</span><span class="si">!r}</span><span class="s2"> based on:</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1426,12 +1785,12 @@
             <span class="n">tmp</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">dim_names</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span>
     <span class="c1"># define the symbol</span>
     <span class="n">gdx_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="n">param_name</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Parameter</span><span class="p">,</span>
-        <span class="n">dims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="p">))</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">columns</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="p">,</span> <span class="n">domain</span><span class="o">=</span><span class="n">domain</span><span class="p">))</span>
     <span class="c1"># define the data for the symbol</span>
     <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">tmp</span>
     <span class="c1"># debug descripton of what happened</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added parameter </span><span class="si">{</span><span class="n">param_name</span><span class="si">!r}</span><span class="s2"> to </span><span class="si">{</span><span class="n">gdx_file</span><span class="si">!r}</span><span class="s2"> using processed data:</span><span class="se">\n</span><span class="si">{</span><span class="n">tmp</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span></div>
+    <span class="k">return</span> <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 </pre></div>
 

@@ -47,7 +47,10 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
@@ -67,6 +70,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
@@ -77,10 +81,12 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType"><code class="docutils literal notranslate"><span class="pre">GamsDomainType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
@@ -95,6 +101,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 </ul>
 </li>
@@ -160,7 +167,14 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">numbers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Number</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Error</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.gdx</span><span class="w"> </span><span class="kn">import</span> <span class="n">GdxFile</span><span class="p">,</span> <span class="n">GdxSymbol</span><span class="p">,</span> <span class="n">GAMS_VALUE_COLS_MAP</span><span class="p">,</span> <span class="n">GamsDataType</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.gdx</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">GdxFile</span><span class="p">,</span>
+    <span class="n">GdxSymbol</span><span class="p">,</span>
+    <span class="n">GAMS_VALUE_COLS_MAP</span><span class="p">,</span>
+    <span class="n">GamsDataType</span><span class="p">,</span>
+    <span class="n">DomainError</span><span class="p">,</span>
+    <span class="n">_stable_topological_sort</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
@@ -169,9 +183,11 @@
 <div class="viewcode-block" id="Translator">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.Translator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Translator</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dataframes</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dataframes</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">domains</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span> <span class="o">=</span> <span class="n">dataframes</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span><span class="o">=</span><span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__domains</span> <span class="o">=</span> <span class="n">domains</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span><span class="o">=</span><span class="n">gams_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -180,6 +196,18 @@
     <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="fm">__del__</span><span class="p">()</span>
+
+<div class="viewcode-block" id="Translator.release">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.Translator.release">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Relinquish ownership of the built :class:`GdxFile`. After this call</span>
+<span class="sd">        the Translator&#39;s cleanup (:meth:`__del__` / :meth:`__exit__`) will</span>
+<span class="sd">        not free the GdxFile&#39;s GDX handle, so a GdxFile handed to a caller</span>
+<span class="sd">        stays valid. The Translator should not be reused afterward.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -197,6 +225,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">domains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domains</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span>
 
@@ -207,9 +239,18 @@
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gdx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">domains</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__domains</span>
+            <span class="n">gdx_file</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span><span class="p">)</span>
+            <span class="n">dataframes</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__topo_sort_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">domains</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">domains</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="n">gdx_file</span>
+            <span class="k">for</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dataframes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">__add_symbol_to_gdx</span><span class="p">(</span><span class="n">symbol_name</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">domains</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__wire_domains</span><span class="p">(</span><span class="n">domains</span><span class="p">,</span> <span class="n">gdx_file</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span>
 
 <div class="viewcode-block" id="Translator.save_gdx">
@@ -227,6 +268,68 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="n">symbol_name</span><span class="p">,</span><span class="n">data_type</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="n">num_dims</span><span class="p">))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="p">[</span><span class="n">symbol_name</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">df</span>
         <span class="k">return</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__topo_sort_dataframes</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">domains</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Validate ``domains`` against ``dataframes`` and return a dict with the same items</span>
+<span class="sd">        as ``dataframes`` reordered so every parent precedes its children. Stable: items</span>
+<span class="sd">        with no mutual dependency keep their original relative order.</span>
+
+<span class="sd">        Raises :class:`DomainError` for any structural problem: unknown child or parent</span>
+<span class="sd">        name, wrong type for ``parents``, malformed entry (non-str non-None), or a cycle.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataframes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="n">parents_of</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">child_name</span><span class="p">,</span> <span class="n">parents</span> <span class="ow">in</span> <span class="n">domains</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">child_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataframes</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;to_gdx: domains key </span><span class="si">{</span><span class="n">child_name</span><span class="si">!r}</span><span class="s2"> is not in dataframes&quot;</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parents</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;to_gdx: domains[</span><span class="si">{</span><span class="n">child_name</span><span class="si">!r}</span><span class="s2">] must be a list or tuple, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">parents</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="n">ps</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parents</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">p</span> <span class="o">==</span> <span class="n">child_name</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;to_gdx: domains[</span><span class="si">{</span><span class="n">child_name</span><span class="si">!r}</span><span class="s2">] entries must be &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;str or None; got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">p</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="k">if</span> <span class="n">p</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataframes</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;to_gdx: domains[</span><span class="si">{</span><span class="n">child_name</span><span class="si">!r}</span><span class="s2">] references unknown parent </span><span class="si">{</span><span class="n">p</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+                <span class="n">ps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="n">parents_of</span><span class="p">[</span><span class="n">child_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ps</span>
+
+        <span class="n">ordered</span><span class="p">,</span> <span class="n">cycle</span> <span class="o">=</span> <span class="n">_stable_topological_sort</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">parents_of</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cycle</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;to_gdx: cyclic domain references among </span><span class="si">{</span><span class="nb">sorted</span><span class="p">(</span><span class="n">cycle</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ordered</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">dataframes</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">dataframes</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ordered</span><span class="p">}</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">__wire_domains</span><span class="p">(</span><span class="n">domains</span><span class="p">,</span> <span class="n">gdx_file</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolve each ``domains`` entry against the materialized symbols and assign</span>
+<span class="sd">        ``GdxSymbol.domain`` so subsequent writes take the strict</span>
+<span class="sd">        :c:func:`gdxSymbolSetDomain` path. Length-vs-``num_dims`` is checked here</span>
+<span class="sd">        because it needs the constructed symbol.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">child_name</span><span class="p">,</span> <span class="n">parents</span> <span class="ow">in</span> <span class="n">domains</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">child</span> <span class="o">=</span> <span class="n">gdx_file</span><span class="p">[</span><span class="n">child_name</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parents</span><span class="p">)</span> <span class="o">!=</span> <span class="n">child</span><span class="o">.</span><span class="n">num_dims</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;to_gdx: domains[</span><span class="si">{</span><span class="n">child_name</span><span class="si">!r}</span><span class="s2">] has length &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parents</span><span class="p">)</span><span class="si">}</span><span class="s2"> but symbol has </span><span class="si">{</span><span class="n">child</span><span class="o">.</span><span class="n">num_dims</span><span class="si">}</span><span class="s2"> dims&quot;</span>
+                <span class="p">)</span>
+            <span class="n">child</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="kc">None</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">gdx_file</span><span class="p">[</span><span class="n">p</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parents</span>
+            <span class="p">]</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">__infer_data_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">symbol_name</span><span class="p">,</span><span class="n">df</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -267,29 +370,41 @@
 
 <div class="viewcode-block" id="to_gdx">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.to_gdx">[docs]</a>
-<span class="k">def</span><span class="w"> </span><span class="nf">to_gdx</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">to_gdx</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span><span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">domains</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Creates a :py:class:`gdxpds.gdx.GdxFile` from dataframes and optionally writes it to path</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    dataframes : dict of str to pd.DataFrame</span>
-<span class="sd">        symbol name to pd.DataFrame dict to be compiled into a single gdx file. Each DataFrame </span>
+<span class="sd">        symbol name to pd.DataFrame dict to be compiled into a single gdx file. Each DataFrame</span>
 <span class="sd">        is assumed to represent a single set or parameter. The last column must be the parameter&#39;s</span>
-<span class="sd">        value, or the set&#39;s listing of True/False, and must be labeled as (case insensitive) </span>
+<span class="sd">        value, or the set&#39;s listing of True/False, and must be labeled as (case insensitive)</span>
 <span class="sd">        &#39;value&#39;.</span>
 <span class="sd">    path : None or pathlib.Path or str</span>
 <span class="sd">        If provided, the gdx file will be written to this path</span>
 <span class="sd">    gams_dir : None or pathlib.Path or str</span>
+<span class="sd">    domains : None or dict of str to (list or tuple) of (str or None)</span>
+<span class="sd">        Optional subset/domain relationships, string-based. Each entry maps a child symbol&#39;s name</span>
+<span class="sd">        to a list or tuple of its parent Set names, one per dimension, with ``None`` slots</span>
+<span class="sd">        mapping to the GAMS wildcard (``&#39;*&#39;``). When provided, the resulting :class:`Translator`</span>
+<span class="sd">        (1) topologically sorts ``dataframes`` so each parent precedes its children and (2)</span>
+<span class="sd">        wires up strict :c:func:`gdxSymbolSetDomain` writes for each listed child. Any invalid</span>
+<span class="sd">        input (unknown parent name, wrong type, wrong length, cyclic references) raises</span>
+<span class="sd">        :class:`DomainError`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    :py:class:`gdxpds.gdx.GdxFile`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">translator</span> <span class="o">=</span> <span class="n">Translator</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>
+    <span class="n">translator</span> <span class="o">=</span> <span class="n">Translator</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">domains</span><span class="o">=</span><span class="n">domains</span><span class="p">)</span>
+    <span class="n">gdx</span> <span class="o">=</span> <span class="n">translator</span><span class="o">.</span><span class="n">gdx</span>
     <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">translator</span><span class="o">.</span><span class="n">save_gdx</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">translator</span><span class="o">.</span><span class="n">gdx</span></div>
+        <span class="n">gdx</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="c1"># Hand the GdxFile to the caller: the transient translator must not free</span>
+    <span class="c1"># its GDX handle when it is garbage-collected at function exit.</span>
+    <span class="n">translator</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">gdx</span></div>
 
 
 </pre></div>
