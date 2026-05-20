@@ -1,0 +1,10 @@
+gdxpds.cli.gdx\_to\_csv
+=======================
+
+.. automodule:: gdxpds.cli.gdx_to_csv
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+
