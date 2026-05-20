@@ -37,7 +37,7 @@ Additional functions include:
 
 - {py:func}`gdxpds.list_symbols`
 - {py:func}`gdxpds.get_data_types`
-- {py:func}`gdxpds.to_dataframe` — pass `old_interface=False` to get a plain DataFrame. The default (`old_interface=True`) returns a `{'symbol_name': df}` dict and is **deprecated**: the `old_interface` argument will be removed in gdxpds 2.0.0, after which `to_dataframe` always returns a plain DataFrame.
+- {py:func}`gdxpds.to_dataframe` — returns the named symbol's data as a plain DataFrame.
 - {py:func}`gdxpds.get_subset_relationships` — read the subset (domain) relationships out of a GDX file, returned as `{symbol_name: [parent_name_or_None_for_wildcard, ...]}`.
 
 To create a GDX with strict subset relationships from the direct-conversion API, pass a `domains=` mapping to {py:func}`gdxpds.to_gdx`:

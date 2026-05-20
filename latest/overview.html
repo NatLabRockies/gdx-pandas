@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview &mdash; gdx-pandas 1.6.0 documentation</title>
+  <title>Overview &mdash; gdx-pandas 2.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=72d88caf"></script>
+      <script src="_static/documentation_options.js?v=51b770b3"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -196,7 +196,7 @@
 <ul class="simple">
 <li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.list_symbols" title="gdxpds.list_symbols"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.list_symbols()</span></code></a></p></li>
 <li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_data_types" title="gdxpds.get_data_types"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.get_data_types()</span></code></a></p></li>
-<li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframe" title="gdxpds.to_dataframe"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_dataframe()</span></code></a> — pass <code class="docutils literal notranslate"><span class="pre">old_interface=False</span></code> to get a plain DataFrame. The default (<code class="docutils literal notranslate"><span class="pre">old_interface=True</span></code>) returns a <code class="docutils literal notranslate"><span class="pre">{'symbol_name':</span> <span class="pre">df}</span></code> dict and is <strong>deprecated</strong>: the <code class="docutils literal notranslate"><span class="pre">old_interface</span></code> argument will be removed in gdxpds 2.0.0, after which <code class="docutils literal notranslate"><span class="pre">to_dataframe</span></code> always returns a plain DataFrame.</p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframe" title="gdxpds.to_dataframe"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_dataframe()</span></code></a> — returns the named symbol’s data as a plain DataFrame.</p></li>
 <li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_subset_relationships" title="gdxpds.get_subset_relationships"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.get_subset_relationships()</span></code></a> — read the subset (domain) relationships out of a GDX file, returned as <code class="docutils literal notranslate"><span class="pre">{symbol_name:</span> <span class="pre">[parent_name_or_None_for_wildcard,</span> <span class="pre">...]}</span></code>.</p></li>
 </ul>
 <p>To create a GDX with strict subset relationships from the direct-conversion API, pass a <code class="docutils literal notranslate"><span class="pre">domains=</span></code> mapping to <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_gdx" title="gdxpds.to_gdx"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_gdx()</span></code></a>:</p>

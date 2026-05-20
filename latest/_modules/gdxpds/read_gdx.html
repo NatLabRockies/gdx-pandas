@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.read_gdx &mdash; gdx-pandas 1.6.0 documentation</title>
+  <title>gdxpds.read_gdx &mdash; gdx-pandas 2.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=72d88caf"></script>
+      <script src="../../_static/documentation_options.js?v=51b770b3"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -167,7 +167,6 @@
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">warnings</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
@@ -386,9 +385,8 @@
     <span class="n">gdx_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">symbol_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">old_interface</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="n">load_set_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]</span> <span class="o">|</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interface for getting the data for a single symbol</span>
 
@@ -400,35 +398,18 @@
 <span class="sd">        Name of the symbol whose data are to be read</span>
 <span class="sd">    gams_dir : None or pathlib.Path or str</span>
 <span class="sd">        optional path to GAMS directory</span>
-<span class="sd">    old_interface : bool</span>
-<span class="sd">        Whether to use the old interface and return a dict, or the new interface,</span>
-<span class="sd">        and simply return a pd.DataFrame</span>
 <span class="sd">    load_set_text : bool</span>
 <span class="sd">        If True (default is False) and symbol_name is a Set, loads the GDX Text</span>
 <span class="sd">        field into the dataframe rather than a `c_bool`.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    dict of str to pd.DataFrame OR pd.DataFrame</span>
-<span class="sd">        If old_interface (the default), returns a dict with a single entry,</span>
-<span class="sd">        where the key is symbol_name and the value is the corresponding</span>
-<span class="sd">        pd.DataFrame. Otherwise (if not old_interface), returns just the</span>
-<span class="sd">        pd.DataFrame.</span>
+<span class="sd">    pd.DataFrame</span>
+<span class="sd">        The data for symbol_name as a pandas DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span>
         <span class="n">symbol_name</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span>
-    <span class="p">)</span>
-    <span class="k">if</span> <span class="n">old_interface</span><span class="p">:</span>
-        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-            <span class="s2">&quot;to_dataframe() returning a {symbol_name: DataFrame} dict &quot;</span>
-            <span class="s2">&quot;(old_interface=True) is deprecated; the old_interface argument will &quot;</span>
-            <span class="s2">&quot;be removed in gdxpds 2.0.0, after which to_dataframe() always returns &quot;</span>
-            <span class="s2">&quot;a plain DataFrame. Pass old_interface=False to get that behavior now.&quot;</span><span class="p">,</span>
-            <span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">symbol_name</span><span class="p">:</span> <span class="n">df</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">df</span></div>
+    <span class="p">)</span></div>
 
 </pre></div>
 
