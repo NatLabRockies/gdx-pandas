@@ -180,10 +180,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="fm">__del__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -199,7 +196,7 @@
 
     <span class="nd">@gdx_file</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gdx_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="fm">__del__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span><span class="n">lazy_load</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="o">=</span> <span class="kc">None</span>

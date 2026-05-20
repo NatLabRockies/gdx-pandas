@@ -175,10 +175,13 @@
 <dl class="py method">
 <dt class="sig sig-object py" id="gdxpds.write_gdx.Translator.release">
 <span class="sig-name descname"><span class="pre">release</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/write_gdx.html#Translator.release"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.write_gdx.Translator.release" title="Link to this definition"></a></dt>
-<dd><p>Relinquish ownership of the built <code class="xref py py-class docutils literal notranslate"><span class="pre">GdxFile</span></code>. After this call
-the Translator’s cleanup (<code class="xref py py-meth docutils literal notranslate"><span class="pre">__del__()</span></code> / <code class="xref py py-meth docutils literal notranslate"><span class="pre">__exit__()</span></code>) will
-not free the GdxFile’s GDX handle, so a GdxFile handed to a caller
-stays valid. The Translator should not be reused afterward.</p>
+<dd><p>Relinquish ownership of the built <code class="xref py py-class docutils literal notranslate"><span class="pre">GdxFile</span></code> by dropping this
+Translator’s reference to it. A GdxFile handed to a caller then stays
+valid: the caller’s reference keeps it alive, and its GDX handle is
+freed exactly once via the GdxFile’s own <code class="docutils literal notranslate"><span class="pre">weakref.finalize</span></code> (or an
+explicit <code class="xref py py-meth docutils literal notranslate"><span class="pre">GdxFile.cleanup()</span></code>) once the caller is done. Neither this
+Translator’s <code class="xref py py-meth docutils literal notranslate"><span class="pre">__exit__()</span></code> nor its garbage collection will free that
+handle. The Translator should not be reused afterward.</p>
 </dd></dl>
 
 <dl class="py property">

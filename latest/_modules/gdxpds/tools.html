@@ -237,6 +237,58 @@
     <span class="p">)</span>
 
 
+<span class="k">class</span><span class="w"> </span><span class="nc">_GdxHandle</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Own the new -&gt; create -&gt; (use) -&gt; free -&gt; delete lifecycle of one SWIG gdx handle.</span>
+
+<span class="sd">    The SWIG gdx handle has two separable resources: the wrapper struct from</span>
+<span class="sd">    ``new_gdxHandle_tp()`` (a plain ``calloc``) and the gdx object that</span>
+<span class="sd">    ``gdxCreateD`` builds inside it. They tear down differently:</span>
+
+<span class="sd">    - success: ``gdxFree`` (frees the object) then ``delete_gdxHandle_tp`` (frees the wrapper);</span>
+<span class="sd">    - failure: ``delete_gdxHandle_tp`` ONLY -- on a failed ``gdxCreateD`` the library never</span>
+<span class="sd">      loaded, so ``XFree`` is unbound and ``gdxFree`` would segfault.</span>
+
+<span class="sd">    ``close()`` is idempotent (run-once: a second ``gdxFree`` is a double free). There is no</span>
+<span class="sd">    ``__del__`` on purpose -- native cleanup never runs from a destructor (which would fire at</span>
+<span class="sd">    interpreter teardown after module state is partially gone). Short-lived handles use ``with``;</span>
+<span class="sd">    a long-lived owner (e.g. ``GdxFile``) keeps the instance and drives :meth:`close` from a</span>
+<span class="sd">    ``weakref.finalize`` callback -- safe because ``close`` is a bound method that does not</span>
+<span class="sd">    reference the owner and uses gdxcc callables bound at construction (not module globals).</span>
+
+<span class="sd">    ``gdxcc`` is passed in because :mod:`gdxpds.tools` does not import a binding at module level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdxcc</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="c1"># Bind the callables now so close() does not look them up through module</span>
+        <span class="c1"># globals during interpreter shutdown.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_free</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">delete_gdxHandle_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">new_gdxHandle_tp</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rc</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxCreateD</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SSSIZE</span><span class="p">)</span>
+            <span class="n">_check_gdx_create_rc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">gdxcc</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>  <span class="c1"># raises on failure</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_created</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>   <span class="c1"># _created is False -&gt; delete-only, never gdxFree</span>
+            <span class="k">raise</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">H</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_created</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_free</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
 <div class="viewcode-block" id="GamsDirFinder">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.tools.html#gdxpds.GamsDirFinder">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GamsDirFinder</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -429,7 +481,18 @@
         
     <span class="nd">@gams_dir</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="o">=</span> <span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">gams_dir</span></div>
+        <span class="n">finder</span> <span class="o">=</span> <span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="o">=</span> <span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir_source</span> <span class="o">=</span> <span class="n">finder</span><span class="o">.</span><span class="n">source</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir_source</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Label for the discovery branch that produced :attr:`gams_dir`.</span>
+
+<span class="sd">        Mirrors :attr:`GamsDirFinder.source`; lets GAMS-load errors name where</span>
+<span class="sd">        the directory came from, consistently with the other handle-create sites.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir_source</span></div>
 
 
 
@@ -483,10 +546,8 @@
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="kn">import</span><span class="w"> </span><span class="nn">gdxcc</span>
         <span class="n">_bindings_source</span> <span class="o">=</span> <span class="s2">&quot;gdxcc&quot;</span>
-    <span class="n">H</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">new_gdxHandle_tp</span><span class="p">()</span>
-    <span class="n">rc</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxCreateD</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SSSIZE</span><span class="p">)</span>
-    <span class="n">_check_gdx_create_rc</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">gdxcc</span><span class="p">,</span> <span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">finder</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
-    <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFree</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">_GdxHandle</span><span class="p">(</span><span class="n">gdxcc</span><span class="p">,</span> <span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">finder</span><span class="o">.</span><span class="n">source</span><span class="p">):</span>
+        <span class="k">pass</span>
     <span class="c1"># Deferred to break the tools &lt;-&gt; special import cycle.</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_specials</span>
     <span class="n">load_specials</span><span class="p">(</span><span class="n">finder</span><span class="p">)</span>

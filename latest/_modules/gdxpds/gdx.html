@@ -173,7 +173,7 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">print_function</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">builtins</span><span class="w"> </span><span class="kn">import</span> <span class="nb">super</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">atexit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span><span class="p">,</span> <span class="n">OrderedDict</span>
 
 <span class="k">try</span><span class="p">:</span>
@@ -195,7 +195,7 @@
     <span class="n">HAVE_GDX2PY</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span> <span class="k">pass</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Error</span><span class="p">,</span> <span class="n">NeedsGamsDir</span><span class="p">,</span> <span class="n">load_gdxcc</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Error</span><span class="p">,</span> <span class="n">NeedsGamsDir</span><span class="p">,</span> <span class="n">load_gdxcc</span><span class="p">,</span> <span class="n">_GdxHandle</span>
 
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">gams.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdx</span> <span class="k">as</span> <span class="n">gdxcc</span>
@@ -344,7 +344,8 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a GdxFile object by connecting to GAMS and creating a pointer.</span>
 
-<span class="sd">        Throws a GdxError if either of those operations fail.</span>
+<span class="sd">        Raises a :class:`gdxpds.tools.GamsLoadError` if GAMS cannot be located or</span>
+<span class="sd">        loaded, or if the GDX object cannot be created.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -361,28 +362,38 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_producer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="c1"># Set before anything that can raise, so cleanup() is safe if create fails.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_H</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">NeedsGamsDir</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_gdx_object</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_gdx_object</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="o">.</span><span class="n">H</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span><span class="s1">&#39;*&#39;</span><span class="p">,</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="bp">self</span>
 
-        <span class="n">atexit</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFree</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">)</span>
+        <span class="c1"># Free the gdx object + wrapper exactly once, at the first of: cleanup(),</span>
+        <span class="c1"># garbage collection, or interpreter exit. The callback is the handle&#39;s own</span>
+        <span class="c1"># close() -- a bound method of self._handle, not self -- so it never keeps</span>
+        <span class="c1"># this GdxFile alive (which would defeat GC-time finalization) and stays</span>
+        <span class="c1"># valid at interpreter shutdown (close() uses callables bound when the</span>
+        <span class="c1"># handle was created, not module-global lookups).</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_handle</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
         <span class="k">return</span>
 
 <div class="viewcode-block" id="GdxFile.cleanup">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.cleanup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span><span class="p">()</span>      <span class="c1"># runs handle.close() at most once</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_H</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span>
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
 
 <div class="viewcode-block" id="GdxFile.clone">
@@ -741,11 +752,10 @@
         <span class="c1"># Idempotent: first call binds the library + populates SPECIAL_VALUES;</span>
         <span class="c1"># subsequent calls validate self.gams_dir and warn on mismatch.</span>
         <span class="n">load_gdxcc</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">)</span>
-        <span class="n">H</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">new_gdxHandle_tp</span><span class="p">()</span>
-        <span class="n">rc</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxCreateD</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SSSIZE</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">rc</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">GdxError</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">rc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-        <span class="k">return</span> <span class="n">H</span></div>
+        <span class="c1"># _GdxHandle validates the create (raising GamsLoadError on failure, and</span>
+        <span class="c1"># deleting the wrapper without an unsafe gdxFree). This GdxFile keeps the</span>
+        <span class="c1"># handle; its weakref.finalize calls handle.close() to free+delete.</span>
+        <span class="k">return</span> <span class="n">_GdxHandle</span><span class="p">(</span><span class="n">gdxcc</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir_source</span><span class="p">)</span></div>
 
 
 

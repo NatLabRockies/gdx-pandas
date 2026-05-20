@@ -191,20 +191,19 @@
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="fm">__del__</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Translator.release">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.Translator.release">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">release</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Relinquish ownership of the built :class:`GdxFile`. After this call</span>
-<span class="sd">        the Translator&#39;s cleanup (:meth:`__del__` / :meth:`__exit__`) will</span>
-<span class="sd">        not free the GdxFile&#39;s GDX handle, so a GdxFile handed to a caller</span>
-<span class="sd">        stays valid. The Translator should not be reused afterward.</span>
+<span class="sd">        Relinquish ownership of the built :class:`GdxFile` by dropping this</span>
+<span class="sd">        Translator&#39;s reference to it. A GdxFile handed to a caller then stays</span>
+<span class="sd">        valid: the caller&#39;s reference keeps it alive, and its GDX handle is</span>
+<span class="sd">        freed exactly once via the GdxFile&#39;s own ``weakref.finalize`` (or an</span>
+<span class="sd">        explicit :meth:`GdxFile.cleanup`) once the caller is done. Neither this</span>
+<span class="sd">        Translator&#39;s :meth:`__exit__` nor its garbage collection will free that</span>
+<span class="sd">        handle. The Translator should not be reused afterward.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="kc">None</span></div>
 

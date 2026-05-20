@@ -403,28 +403,24 @@
     <span class="k">global</span> <span class="n">GDX_TO_NP_SVS</span>
     <span class="k">global</span> <span class="n">NP_TO_GDX_SVS</span>
 
-    <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">_require_gams_installation</span><span class="p">,</span> <span class="n">_check_gdx_create_rc</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">_require_gams_installation</span><span class="p">,</span> <span class="n">_GdxHandle</span>
     <span class="n">_require_gams_installation</span><span class="p">(</span><span class="n">gams_dir_finder</span><span class="p">)</span>
 
-    <span class="n">H</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">new_gdxHandle_tp</span><span class="p">()</span>
-    <span class="n">rc</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxCreateD</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">gams_dir_finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SSSIZE</span><span class="p">)</span>
-    <span class="n">_check_gdx_create_rc</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">gdxcc</span><span class="p">,</span> <span class="n">gams_dir_finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gams_dir_finder</span><span class="o">.</span><span class="n">source</span><span class="p">)</span>
-    <span class="c1"># get special values</span>
-    <span class="n">special_values</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">doubleArray</span><span class="p">(</span><span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SVIDX_MAX</span><span class="p">)</span>
-    <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxGetSpecialValues</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">special_values</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">_GdxHandle</span><span class="p">(</span><span class="n">gdxcc</span><span class="p">,</span> <span class="n">gams_dir_finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gams_dir_finder</span><span class="o">.</span><span class="n">source</span><span class="p">)</span> <span class="k">as</span> <span class="n">h</span><span class="p">:</span>
+        <span class="c1"># get special values</span>
+        <span class="n">special_values</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">doubleArray</span><span class="p">(</span><span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SVIDX_MAX</span><span class="p">)</span>
+        <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxGetSpecialValues</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">special_values</span><span class="p">)</span>
 
-    <span class="n">SPECIAL_VALUES</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">GDX_TO_NP_SVS</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">NP_TO_GDX_SVS</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SVIDX_MAX</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">):</span>
-            <span class="k">break</span>
-        <span class="n">SPECIAL_VALUES</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">special_values</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="n">gdx_val</span> <span class="o">=</span> <span class="n">special_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">GDX_TO_NP_SVS</span><span class="p">[</span><span class="n">gdx_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">NP_TO_GDX_SVS</span><span class="p">[</span><span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">gdx_val</span>
-
-    <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFree</span><span class="p">(</span><span class="n">H</span><span class="p">)</span></div>
+        <span class="n">SPECIAL_VALUES</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">GDX_TO_NP_SVS</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">NP_TO_GDX_SVS</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SVIDX_MAX</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">):</span>
+                <span class="k">break</span>
+            <span class="n">SPECIAL_VALUES</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">special_values</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">gdx_val</span> <span class="o">=</span> <span class="n">special_values</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">GDX_TO_NP_SVS</span><span class="p">[</span><span class="n">gdx_val</span><span class="p">]</span> <span class="o">=</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">NP_TO_GDX_SVS</span><span class="p">[</span><span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">gdx_val</span></div>
 
 
 
