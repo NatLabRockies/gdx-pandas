@@ -90,6 +90,10 @@ def test_symbol_types_read(data_dir):
         assert list(t.dataframe.columns) == ["*", "Value"]
         assert t.dataframe["*"].tolist() == ["a", "b", "c", "d", "e"]
         assert all(isinstance(v, c_bool) for v in t.dataframe["Value"])
+        # ...and every value reads False: gdxpds-written Sets store 0.0, so the
+        # boolean is the truthiness of that stored value, not "is a member".
+        # Pin it so the alternative backend can't silently change it.
+        assert all(not bool(v) for v in t.dataframe["Value"])
 
         # Strict subset of t.
         sub_t = f["sub_t"]
@@ -154,6 +158,9 @@ def test_set_element_text(data_dir):
     default = to_dataframe(gdx_file, "st")
     assert default["*"].tolist() == ["a", "b", "c"]
     assert all(isinstance(v, c_bool) for v in default["Value"])
+    # ...and they read True here: the raw-written text-node indices are non-zero,
+    # in contrast to the all-False plain-membership Set above.
+    assert all(bool(v) for v in default["Value"])
 
     # load_set_text=True: the explanatory text replaces the boolean Value.
     with_text = to_dataframe(gdx_file, "st", load_set_text=True)
