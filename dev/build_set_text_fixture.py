@@ -1,4 +1,4 @@
-"""Generate tests/set_text_fixture.gdx.
+"""Generate tests/data/set_text_fixture.gdx.
 
 A 1D Set whose elements carry GAMS explanatory *text*, used by the
 load_set_text=True read test in tests/test_read.py. gdxpds has no API for
@@ -24,7 +24,7 @@ except ImportError:
     import gdxcc
 
 OUT_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "tests", "set_text_fixture.gdx")
+    os.path.join(os.path.dirname(__file__), "..", "tests", "data", "set_text_fixture.gdx")
 )
 
 # (element, explanatory text)

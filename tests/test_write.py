@@ -489,12 +489,12 @@ def test_write_known_value_columns(run_dir):
         assert e_by_key.loc["b"].tolist() == [16.0, 17.0, 18.0, 19.0, 20.0]
 
 
-def test_symbol_types_round_trip(base_dir, run_dir):
+def test_symbol_types_round_trip(data_dir, run_dir):
     """Read the committed reference fixture, write it back out through the
     backend, re-read, and assert every symbol round-trips identically. This is
     the read+write parity check the future gams.transfer backend must also pass.
     See dev/build_symbol_types_fixture.py."""
-    src = os.path.join(base_dir, "symbol_types_fixture.gdx")
+    src = os.path.join(data_dir, "symbol_types_fixture.gdx")
     outdir = os.path.join(run_dir, "symbol_types_round_trip")
     if not os.path.exists(outdir):
         os.mkdir(outdir)

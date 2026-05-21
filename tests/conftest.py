@@ -27,6 +27,11 @@ def base_dir():
 
 
 @pytest.fixture(scope="session")
+def data_dir(base_dir):
+    return os.path.join(base_dir, "data")
+
+
+@pytest.fixture(scope="session")
 def run_dir(base_dir):
     return os.path.join(base_dir, "output")
 
@@ -45,7 +50,7 @@ def manage_rundir(request, clean_up, run_dir):
 
 
 @pytest.fixture
-def roundtrip_one_gdx(base_dir, run_dir):
+def roundtrip_one_gdx(data_dir, run_dir):
     """Factory: returns a callable(filename, dirname) -> roundtripped_gdx_path.
 
     CLI scripts are invoked by entry-point name. pip places `csv_to_gdx` and
@@ -54,7 +59,7 @@ def roundtrip_one_gdx(base_dir, run_dir):
     """
 
     def _roundtrip(filename, dirname):
-        gdx_file = os.path.join(base_dir, filename)
+        gdx_file = os.path.join(data_dir, filename)
         with gdxpds.gdx.GdxFile() as gdx:
             gdx.read(gdx_file)
             num_records = {}
