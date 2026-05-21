@@ -165,3 +165,20 @@ def test_set_element_text(data_dir):
     # load_set_text=True: the explanatory text replaces the boolean Value.
     with_text = to_dataframe(gdx_file, "st", load_set_text=True)
     assert with_text["Value"].tolist() == ["alpha", "beta", "gamma"]
+
+
+def test_set_element_text_to_dataframes(data_dir):
+    """to_dataframes pipes load_set_text through the eager bulk-load path
+    (load_all -> load_file -> load_symbols), the plural counterpart of
+    test_set_element_text. See dev/build_set_text_fixture.py."""
+    gdx_file = os.path.join(data_dir, "set_text_fixture.gdx")
+
+    # Default: membership booleans on the eager path.
+    default = to_dataframes(gdx_file)["st"]
+    assert all(isinstance(v, c_bool) for v in default["Value"])
+    assert all(bool(v) for v in default["Value"])
+
+    # load_set_text=True: element text replaces the boolean Value, via the plural
+    # eager path (not the single-symbol lazy path exercised above).
+    with_text = to_dataframes(gdx_file, load_set_text=True)["st"]
+    assert with_text["Value"].tolist() == ["alpha", "beta", "gamma"]

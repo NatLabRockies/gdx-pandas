@@ -46,13 +46,7 @@ class Translator:
 
     @property
     def dataframes(self):
-        if self.__dataframes is None:
-            self.__dataframes = OrderedDict()
-            for symbol in self.gdx:
-                if not symbol.loaded:
-                    symbol.load()
-                self.__dataframes[symbol.name] = symbol.dataframe.copy()
-        return self.__dataframes
+        return self._get_dataframes()
 
     @property
     def symbols(self):
@@ -71,12 +65,14 @@ class Translator:
         return self.gdx[symbol_name].dataframe.copy()
 
     def _get_dataframes(self, load_set_text=False):
+        # One eager bulk load (set text is just a parameter), then collect a copy
+        # of each symbol's dataframe in file order. Backends optimize load_all:
+        # gdxcc loops per symbol; gams.transfer does a single bulk read.
         if self.__dataframes is None:
-            self.__dataframes = OrderedDict()
-            for symbol in self.__gdx:
-                if not symbol.loaded:
-                    symbol.load(load_set_text=load_set_text)
-                self.__dataframes[symbol.name] = symbol.dataframe.copy()
+            self.__gdx.load_all(load_set_text=load_set_text)
+            self.__dataframes = OrderedDict(
+                (symbol.name, symbol.dataframe.copy()) for symbol in self.__gdx
+            )
         return self.__dataframes
 
 
@@ -104,11 +100,9 @@ def to_dataframes(
         Returns a dict of Pandas DataFrames, one item for each symbol in the GDX
         file, keyed with the symbol name.
     """
-    if load_set_text:
-        return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True)._get_dataframes(
-            load_set_text=load_set_text
-        )
-    return Translator(gdx_file, gams_dir=gams_dir).dataframes
+    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True)._get_dataframes(
+        load_set_text=load_set_text
+    )
 
 
 def list_symbols(

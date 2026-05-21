@@ -305,8 +305,17 @@ class GdxFile(MutableSequence, NeedsGamsDir):
 
         # read all symbols if not lazy_load
         if not self.lazy_load:
-            self._backend_impl.load_file(self)
+            self.load_all()
         return
+
+    def load_all(self, *, load_set_text: bool = False) -> None:
+        """
+        Eagerly load every symbol's records into its :py:attr:`GdxSymbol.dataframe`.
+
+        Already-loaded symbols are skipped. Pass ``load_set_text=True`` to surface
+        GAMS element text for Sets instead of the membership ``c_bool``.
+        """
+        self._backend_impl.load_file(self, load_set_text=load_set_text)
 
     def reorder_for_strict_domains(self):
         """
