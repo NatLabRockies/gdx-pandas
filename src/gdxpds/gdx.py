@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 
 import gdxpds.special as special
+from gdxpds._backend import DEFAULT_BACKEND, make_backend
 
 # Re-exported from gdxpds.special for backward compatibility.
 from gdxpds.special import (
@@ -180,6 +181,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         self._H = None
         self._handle = None
         self._finalizer = None
+        self._backend_impl = None
 
         NeedsGamsDir.__init__(self, gams_dir=gams_dir)
         self._handle = self._create_gdx_object()
@@ -194,6 +196,11 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         # valid at interpreter shutdown (close() uses callables bound when the
         # handle was created, not module-global lookups).
         self._finalizer = weakref.finalize(self, self._handle.close)
+
+        # I/O engine. The handle is still owned by this GdxFile for now; the
+        # gdxcc backend reads it off ``self.H`` at call time (Phase 0 will move
+        # handle ownership into the backend in a later step).
+        self._backend_impl = make_backend(DEFAULT_BACKEND, self.gams_dir, self.gams_dir_source)
         return
 
     def cleanup(self) -> None:
@@ -1397,36 +1404,10 @@ class GdxSymbol:
             return
         if not self.file:
             raise Error(f"Cannot load {repr(self)} because there is no file pointer")
-        if not self.index:
-            raise Error(f"Cannot load {repr(self)} because there is no symbol index")
-
-        _ret, records = gdxcc.gdxDataReadStrStart(self.file.H, self.index)
-
-        def reader():
-            handle = self.file.H
-            for i in range(records):
-                yield gdxcc.gdxDataReadStr(handle)
-
-        vc = self.value_cols  # do this for speed in the next line
-        if load_set_text and (self.data_type == GamsDataType.Set):
-            data = [
-                elements
-                + [
-                    gdxcc.gdxGetElemText(self.file.H, int(values[col_ind]))[1]
-                    for _col_name, col_ind in vc
-                ]
-                for _ret, elements, values, _afdim in reader()
-            ]
-            self._fixup_set_vals = False
-        else:
-            data = [
-                elements + [values[col_ind] for col_name, col_ind in vc]
-                for ret, elements, values, afdim in reader()
-            ]
-        self.dataframe = data
-        if self.data_type not in (GamsDataType.Set, GamsDataType.Alias):
-            self.dataframe = special.convert_gdx_to_np_svs(self.dataframe, self.num_dims)
-        self._loaded = True
+        # The backend reads the records and populates this symbol's dataframe.
+        # The "no symbol index" guard now lives in the gdxcc backend, which is
+        # the path that needs it.
+        self.file._backend_impl.load_symbol(self, load_set_text=load_set_text)
         return
 
     def unload(self) -> None:
