@@ -149,7 +149,9 @@ def resolve_backend(explicit: str | Backend | None) -> Backend:
         if not _probe_gams_transfer():
             raise BackendError(
                 "Backend 'gams_transfer' requested but gams.transfer is not "
-                "importable; install a gamsapi matching your GAMS version."
+                "usable here (not installed, or its gamsapi build cannot load "
+                "the active GAMS libraries). Install a gamsapi matching your "
+                "GAMS version."
             )
     return backend
 

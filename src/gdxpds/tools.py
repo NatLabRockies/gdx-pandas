@@ -341,18 +341,23 @@ _have_gams_transfer = None
 
 
 def _probe_gams_transfer() -> bool:
-    """Return True if ``gams.transfer`` (the gamsapi fast-path engine) imports.
+    """Return True if the ``gams.transfer`` fast path is *usable* here.
 
-    Cached after the first call. Kept lazy (not run at import) so ``import
-    gdxpds`` does not pay the gams.transfer import cost on systems that never
-    touch the fast path. Any import failure (missing or broken) reads as "not
+    Importable is necessary but not sufficient: a gamsapi whose build does not
+    match the active GAMS install imports fine but then fails to load its shared
+    libraries (e.g. ``gmdcclib``) when a Container is constructed. So this
+    actually constructs a Container against the resolved GAMS directory to
+    confirm the engine works. Cached after the first call; kept lazy so
+    ``import gdxpds`` pays nothing on systems that never touch the fast path.
+    Any failure (not installed, version-skewed, GAMS not found) reads as "not
     available".
     """
     global _have_gams_transfer
     if _have_gams_transfer is None:
         try:
-            import gams.transfer  # noqa: F401
+            import gams.transfer as gt
 
+            gt.Container(system_directory=GamsDirFinder().gams_dir)
             _have_gams_transfer = True
         except Exception:
             _have_gams_transfer = False
@@ -483,6 +488,9 @@ def info(gams_dir: str | os.PathLike[str] | None = None) -> str:
     lines.append(f"  selected:    {selected}")
     bound = _loaded_gams_dir or "(not yet bound)"
     lines.append(f"  bound dir:   {bound}")
+    # Importable (above) is not the same as usable: a version-skewed gamsapi
+    # imports but cannot load the GAMS libraries. This reports actual usability.
+    lines.append(f"  gams.transfer usable: {'yes' if _probe_gams_transfer() else 'no'}")
 
     try:
         from gdxpds._backend import resolve_backend
