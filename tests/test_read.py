@@ -1,10 +1,14 @@
 import logging
 import os
+from ctypes import c_bool
 
+import numpy as np
+import pandas as pd
 import pytest
 
 import gdxpds.gdx
-from gdxpds import get_data_types, list_symbols, to_dataframes
+import gdxpds.special
+from gdxpds import get_data_types, list_symbols, to_dataframe, to_dataframes
 
 logger = logging.getLogger(__name__)
 
@@ -69,3 +73,81 @@ def test_unload(base_dir):
         assert f["startupfuel"].loaded
         assert not f["startupfuel"].dataframe.empty
         assert "CC" in f["startupfuel"].dataframe["*"].tolist()
+
+
+def test_symbol_types_read(base_dir):
+    """Read symbol_types_fixture.gdx and pin the per-type column shapes and
+    values. This is the read-side reference the future gams.transfer backend
+    must reproduce. See dev/build_symbol_types_fixture.py for the contents."""
+    gdx_file = os.path.join(base_dir, "symbol_types_fixture.gdx")
+    with gdxpds.gdx.GdxFile(lazy_load=False) as f:
+        f.read(gdx_file)
+
+        # Set t: a single boolean Value column; membership is conveyed by row
+        # presence. gdxpds-written Sets store value 0.0 (see _fixup_set_value),
+        # so the boolean reads False even though each element is a member.
+        t = f["t"]
+        assert t.data_type == gdxpds.gdx.GamsDataType.Set
+        assert list(t.dataframe.columns) == ["*", "Value"]
+        assert t.dataframe["*"].tolist() == ["a", "b", "c"]
+        assert all(isinstance(v, c_bool) for v in t.dataframe["Value"])
+
+        # Strict subset of t.
+        sub_t = f["sub_t"]
+        assert sub_t.data_type == gdxpds.gdx.GamsDataType.Set
+        assert sub_t.dataframe["t"].tolist() == ["a", "c"]
+
+        # Parameter p: single Value column carrying the special values. UNDEF/NA
+        # are indistinguishable from NaN in pandas, so the NaN-family is checked
+        # loosely and +Inf / -Inf / EPS exactly.
+        p = f["p"]
+        assert p.data_type == gdxpds.gdx.GamsDataType.Parameter
+        assert list(p.dataframe.columns) == ["t", "Value"]
+        pv = dict(zip(p.dataframe["t"], p.dataframe["Value"]))
+        assert pv["a"] == 1.5
+        assert np.isnan(pv["b"])
+        assert pv["c"] == np.inf
+        assert pv["d"] == -np.inf
+        assert gdxpds.special.is_np_eps(pv["e"])
+
+        # Variable v (Free): the five value columns with known values.
+        v = f["v"]
+        assert v.data_type == gdxpds.gdx.GamsDataType.Variable
+        assert v.variable_type == gdxpds.gdx.GamsVariableType.Free
+        assert list(v.dataframe.columns) == ["t", "Level", "Marginal", "Lower", "Upper", "Scale"]
+        v_by_key = v.dataframe.set_index("t")
+        assert v_by_key.loc["a"].tolist() == [1.0, 2.0, 3.0, 4.0, 5.0]
+        assert v_by_key.loc["b"].tolist() == [6.0, 7.0, 8.0, 9.0, 10.0]
+
+        # Equation e (Equality): the five value columns with known values.
+        e = f["e"]
+        assert e.data_type == gdxpds.gdx.GamsDataType.Equation
+        assert e.equation_type == gdxpds.gdx.GamsEquationType.Equality
+        e_by_key = e.dataframe.set_index("t")
+        assert e_by_key.loc["a"].tolist() == [11.0, 12.0, 13.0, 14.0, 15.0]
+        assert e_by_key.loc["b"].tolist() == [16.0, 17.0, 18.0, 19.0, 20.0]
+
+
+def test_to_dataframe_single_symbol(base_dir):
+    """to_dataframe returns a plain DataFrame for a single symbol (as of v2.0.0,
+    with the old_interface dict wrapper removed)."""
+    gdx_file = os.path.join(base_dir, "symbol_types_fixture.gdx")
+    df = to_dataframe(gdx_file, "p")
+    assert isinstance(df, pd.DataFrame)
+    assert list(df.columns) == ["t", "Value"]
+    assert df.loc[df["t"] == "a", "Value"].iloc[0] == 1.5
+
+
+def test_set_element_text(base_dir):
+    """load_set_text=True surfaces GAMS element text in place of the membership
+    boolean. See dev/build_set_text_fixture.py."""
+    gdx_file = os.path.join(base_dir, "set_text_fixture.gdx")
+
+    # Default: membership booleans (the raw-written values are non-zero, so True).
+    default = to_dataframe(gdx_file, "st")
+    assert default["*"].tolist() == ["a", "b", "c"]
+    assert all(isinstance(v, c_bool) for v in default["Value"])
+
+    # load_set_text=True: the explanatory text replaces the boolean Value.
+    with_text = to_dataframe(gdx_file, "st", load_set_text=True)
+    assert with_text["Value"].tolist() == ["alpha", "beta", "gamma"]

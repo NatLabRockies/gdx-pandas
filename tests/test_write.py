@@ -4,11 +4,13 @@ import logging
 import os
 from ctypes import c_bool
 
+import numpy as np
 import pandas as pd
 import pytest
 
 import gdxpds
 import gdxpds.gdx
+import gdxpds.special
 from gdxpds.tools import Error
 
 logger = logging.getLogger(__name__)
@@ -416,3 +418,121 @@ def test_to_gdx_returned_handle_survives_translator_gc(run_dir):
         check.read(out2)
         assert {s.name for s in check} == {"a"}
         assert check["a"].num_records == 2
+
+
+def test_write_known_value_columns(run_dir):
+    """Build a Parameter (with specials), a Variable, and an Equation from
+    scratch with known, non-default values in every value column; write, read
+    back, and assert the exact values and types survive. (Existing tests only
+    wrote default value-column values.)"""
+    eps = np.finfo(float).eps
+    outdir = os.path.join(run_dir, "known_value_columns")
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    out = os.path.join(outdir, "known_values.gdx")
+
+    with gdxpds.gdx.GdxFile() as gdx:
+        gdx.append(gdxpds.gdx.GdxSymbol("p", gdxpds.gdx.GamsDataType.Parameter, dims=["t"]))
+        gdx[-1].dataframe = pd.DataFrame(
+            [["a", 1.5], ["b", np.nan], ["c", np.inf], ["d", -np.inf], ["e", eps]],
+            columns=["t", "Value"],
+        )
+        gdx.append(
+            gdxpds.gdx.GdxSymbol(
+                "v",
+                gdxpds.gdx.GamsDataType.Variable,
+                dims=["t"],
+                variable_type=gdxpds.gdx.GamsVariableType.Free,
+            )
+        )
+        v_df = pd.DataFrame({"t": ["a", "b"]})
+        for i, col in enumerate(gdx[-1].value_col_names):
+            v_df[col] = [float(i + 1), float(i + 6)]
+        gdx[-1].dataframe = v_df
+        gdx.append(
+            gdxpds.gdx.GdxSymbol(
+                "e",
+                gdxpds.gdx.GamsDataType.Equation,
+                dims=["t"],
+                equation_type=gdxpds.gdx.GamsEquationType.Equality,
+            )
+        )
+        e_df = pd.DataFrame({"t": ["a", "b"]})
+        for i, col in enumerate(gdx[-1].value_col_names):
+            e_df[col] = [float(i + 11), float(i + 16)]
+        gdx[-1].dataframe = e_df
+        gdx.write(out)
+
+    with gdxpds.gdx.GdxFile(lazy_load=False) as gdx:
+        gdx.read(out)
+
+        p = gdx["p"]
+        pv = dict(zip(p.dataframe["t"], p.dataframe["Value"]))
+        assert pv["a"] == 1.5
+        assert np.isnan(pv["b"])
+        assert pv["c"] == np.inf
+        assert pv["d"] == -np.inf
+        assert gdxpds.special.is_np_eps(pv["e"])
+
+        v = gdx["v"]
+        assert v.data_type == gdxpds.gdx.GamsDataType.Variable
+        assert v.variable_type == gdxpds.gdx.GamsVariableType.Free
+        v_by_key = v.dataframe.set_index("t")
+        assert v_by_key.loc["a"].tolist() == [1.0, 2.0, 3.0, 4.0, 5.0]
+        assert v_by_key.loc["b"].tolist() == [6.0, 7.0, 8.0, 9.0, 10.0]
+
+        e = gdx["e"]
+        assert e.data_type == gdxpds.gdx.GamsDataType.Equation
+        assert e.equation_type == gdxpds.gdx.GamsEquationType.Equality
+        e_by_key = e.dataframe.set_index("t")
+        assert e_by_key.loc["a"].tolist() == [11.0, 12.0, 13.0, 14.0, 15.0]
+        assert e_by_key.loc["b"].tolist() == [16.0, 17.0, 18.0, 19.0, 20.0]
+
+
+def test_symbol_types_round_trip(base_dir, run_dir):
+    """Read the committed reference fixture, write it back out through the
+    backend, re-read, and assert every symbol round-trips identically. This is
+    the read+write parity check the future gams.transfer backend must also pass.
+    See dev/build_symbol_types_fixture.py."""
+    src = os.path.join(base_dir, "symbol_types_fixture.gdx")
+    outdir = os.path.join(run_dir, "symbol_types_round_trip")
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
+    rt = os.path.join(outdir, "round_trip.gdx")
+
+    names = ["t", "sub_t", "p", "v", "e"]
+    orig = {}
+    with gdxpds.gdx.GdxFile(lazy_load=False) as f:
+        f.read(src)
+        for name in names:
+            sym = f[name]
+            orig[name] = (
+                sym.data_type,
+                sym.variable_type,
+                sym.equation_type,
+                sym.dataframe.reset_index(drop=True),
+            )
+        with f.clone() as g:
+            g.write(rt)
+
+    def cell_equal(x, y):
+        if isinstance(x, c_bool) or isinstance(y, c_bool):
+            return bool(x) == bool(y)
+        if isinstance(x, float) or isinstance(y, float):
+            return gdxpds.special.pd_val_equal(x, y)
+        return x == y
+
+    with gdxpds.gdx.GdxFile(lazy_load=False) as g:
+        g.read(rt)
+        for name in names:
+            dt, vt, et, odf = orig[name]
+            sym = g[name]
+            assert sym.data_type == dt
+            assert sym.variable_type == vt
+            assert sym.equation_type == et
+            rdf = sym.dataframe.reset_index(drop=True)
+            assert list(rdf.columns) == list(odf.columns)
+            assert len(rdf) == len(odf)
+            for col in odf.columns:
+                for x, y in zip(odf[col], rdf[col]):
+                    assert cell_equal(x, y), f"{name}.{col}: {x!r} != {y!r}"
