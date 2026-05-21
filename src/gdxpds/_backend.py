@@ -17,6 +17,7 @@ ABC in later steps.
 from __future__ import annotations
 
 import abc
+import os
 from collections.abc import Sequence
 from enum import StrEnum
 from typing import TYPE_CHECKING
@@ -50,6 +51,15 @@ class GdxBackend(abc.ABC):
     :meth:`load_file` (all symbols) and :meth:`load_symbol` (one symbol)
     conveniences are defined in terms of it.
     """
+
+    @abc.abstractmethod
+    def open_read(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
+        """Open ``filename`` for reading and populate ``gdx_file``'s metadata.
+
+        Sets ``gdx_file``'s ``_filename``/``_version``/``_producer``, builds its
+        ``universal_set`` and the ``GdxSymbol`` collection (with extended
+        per-symbol metadata and resolved domains), but does **not** load records.
+        """
 
     @abc.abstractmethod
     def load_symbols(

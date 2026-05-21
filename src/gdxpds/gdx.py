@@ -301,49 +301,13 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         if not self.empty:
             raise Error("GdxFile.read can only be used if the GdxFile is .empty")
 
-        # open the file
-        rc = gdxcc.gdxOpenRead(self.H, str(filename))
-        if not rc[0]:
-            raise GdxError(self.H, f"Could not open {filename!r}")
-        self._filename = filename
-
-        # read in meta-data ...
-        # ... for the file
-        ret, self._version, self._producer = gdxcc.gdxFileVersion(self.H)
-        if ret != 1:
-            raise GdxError(self.H, "Could not get file version")
-        ret, symbol_count, element_count = gdxcc.gdxSystemInfo(self.H)
-        logger.debug(
-            f"Opening '{filename}' with {symbol_count} symbols and "
-            f"{element_count} elements with lazy_load = {self.lazy_load}."
-        )
-        # ... for the symbols
-        ret, name, dims, data_type = gdxcc.gdxSymbolInfo(self.H, 0)
-        if ret != 1:
-            raise GdxError(self.H, "Could not get symbol info for the universal set")
-        self.universal_set = GdxSymbol(name, data_type, dims=dims, file=self, index=0)
-        for i in range(symbol_count):
-            index = i + 1
-            ret, name, dims, data_type = gdxcc.gdxSymbolInfo(self.H, index)
-            if ret != 1:
-                raise GdxError(self.H, f"Could not get symbol info for symbol {index}")
-            try:
-                sym = GdxSymbol(name, data_type, dims=dims, file=self, index=index)
-                self.append(sym)
-            except Exception as e:
-                logger.error(f"Unable to initialize GdxSymbol {name!r}, because {e}. SKIPPING.")
-
-        # Self-heal strict-domain refs whose parent appeared at a higher
-        # GDX index than the child (malformed but readable). No-op for
-        # well-formed files — each symbol's in-line attempt already
-        # succeeded.
-        for symbol in self:
-            symbol.resolve_domain()
+        # The backend reads file + symbol metadata and builds the GdxSymbol
+        # collection (records are not loaded here).
+        self._backend_impl.open_read(self, filename)
 
         # read all symbols if not lazy_load
         if not self.lazy_load:
-            for symbol in self:
-                symbol.load()
+            self._backend_impl.load_file(self)
         return
 
     def reorder_for_strict_domains(self):
@@ -720,6 +684,10 @@ class GdxSymbol:
         self._dims = None
         self._domain = None
         self._strict_on_disk = False
+        # Record count per GAMS; meaningful only before load (afterwards
+        # num_records uses the dataframe). The backend's open_read overwrites
+        # this for symbols read from a file.
+        self._num_records = 0
         self.dims = dims
         if domain is not None:
             self.domain = domain
@@ -730,44 +698,13 @@ class GdxSymbol:
         # adding this flag to implement ability to load set text instead of boolean values
         self._fixup_set_vals = True
 
-        if self.file is not None:
-            # reading from file
-            # get additional meta-data
-            ret, records, userinfo, description = gdxcc.gdxSymbolInfoX(self.file.H, self.index)
-            if ret != 1:
-                raise GdxError(
-                    self.file.H, f"Unable to get extended symbol information for {self.name}"
-                )
-            self._num_records = records
-            if self.data_type == GamsDataType.Variable:
-                self.variable_type = GamsVariableType(userinfo)
-            elif self.data_type == GamsDataType.Equation:
-                self.equation_type = GamsEquationType(userinfo)
-            self.description = description
-            if self.index > 0:
-                ret, gdx_domain = gdxcc.gdxSymbolGetDomainX(self.file.H, self.index)
-                if ret == 0:
-                    raise GdxError(self.file.H, f"Unable to get domain information for {self.name}")
-                assert len(gdx_domain) == len(self.dims), (
-                    "Dimensional information read in from GDX should be consistent."
-                )
-                self.dims = gdx_domain
-                if ret == 3:
-                    # Stored via strict gdxSymbolSetDomain. Mark so a later retry can distinguish
-                    # strict-but-unresolved from truly relaxed, then try to resolve names to same-file
-                    # GdxSymbol refs. Symbols with lower indices are already in self.file._symbols at
-                    # this point; for well-formed GDX, this succeeds. GdxFile.read() also retries at the
-                    # end to self-heal symbols whose parents had higher indices (malformed files).
-                    self._strict_on_disk = True
-                    self.resolve_domain()
-            else:
-                # universal set
-                assert self.index == 0
-                self._loaded = True
-            return
-
-        # writing new symbol
-        self._loaded = True
+        # A symbol constructed without a file is being built for writing and is
+        # ready to use immediately. A symbol constructed with a file is being
+        # read: the backend's open_read populates its extended metadata (record
+        # count, variable/equation subtype, description, domain) and it stays
+        # unloaded until its records are pulled.
+        if self.file is None:
+            self._loaded = True
         return
 
     def clone(self) -> GdxSymbol:
