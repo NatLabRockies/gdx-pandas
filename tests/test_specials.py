@@ -89,9 +89,9 @@ def test_roundtrip_just_special_values(run_dir, roundtrip_one_gdx):
         check_special_values(h)
 
 
-def test_roundtrip_special_values(base_dir, roundtrip_one_gdx):
+def test_roundtrip_special_values(data_dir, roundtrip_one_gdx):
     filename = "OptimalCSPConfig_Out.gdx"
-    original_gdx = os.path.join(base_dir, filename)
+    original_gdx = os.path.join(data_dir, filename)
     roundtripped_gdx = roundtrip_one_gdx(filename, "roundtrip_special_values")
     data = []
     for gdx_file in [original_gdx, roundtripped_gdx]:

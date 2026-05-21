@@ -1,4 +1,4 @@
-"""Generate tests/strict_domain_fixture.gdx.
+"""Generate tests/data/strict_domain_fixture.gdx.
 
 A minimal GDX with a parent Set and a strict-domain subset. Used by
 tests/test_domain.py::test_read_external_strict_fixture to validate that
@@ -26,6 +26,7 @@ OUT_PATH = os.path.abspath(
         os.path.dirname(__file__),
         "..",
         "tests",
+        "data",
         "strict_domain_fixture.gdx",
     )
 )

@@ -333,11 +333,11 @@ def test_setting_dims_clears_domain():
 # ---------------------------------------------------------------------------
 # 15. Read strict GDX from a known-good fixture (skipped if not present)
 # ---------------------------------------------------------------------------
-def test_read_external_strict_fixture(base_dir):
-    fixture = os.path.join(base_dir, "strict_domain_fixture.gdx")
+def test_read_external_strict_fixture(data_dir):
+    fixture = os.path.join(data_dir, "strict_domain_fixture.gdx")
     if not os.path.exists(fixture):
         pytest.skip(
-            "tests/strict_domain_fixture.gdx not present; "
+            "tests/data/strict_domain_fixture.gdx not present; "
             "run dev/build_strict_domain_fixture.py to generate it."
         )
     with GdxFile(lazy_load=False) as gdx:

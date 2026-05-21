@@ -11,11 +11,11 @@ def test_gdx_roundtrip(roundtrip_one_gdx):
         roundtrip_one_gdx(filename, "gdx_roundtrip")
 
 
-def test_csv_roundtrip(base_dir, run_dir):
+def test_csv_roundtrip(data_dir, run_dir):
     # load csvs into pandas and make map of filenames to number of rows
     csvs = [
-        os.path.join(base_dir, "installed_capacity.csv"),
-        os.path.join(base_dir, "annual_generation.csv"),
+        os.path.join(data_dir, "installed_capacity.csv"),
+        os.path.join(data_dir, "annual_generation.csv"),
     ]
     n = len(csvs)
     num_records = {}
