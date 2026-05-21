@@ -42,7 +42,7 @@ Each PR branches off `main`, in order:
 | `eh/ruff-typing-tooling` | **v1.6.0** | typing + tooling; finish with the `to_dataframe` deprecation warning, version bump, CHANGES entry |
 | e.g. `eh/breaking-cleanup` | **v2.0.0** | remove `.py` CLI shims, gdx2py, and `to_dataframe(old_interface=...)` |
 | `eh/test-gaps` | _(no tag)_ | test-gap groundwork; the correctness oracle for the speedup — **landed** (PR #109) |
-| `eh/gams-transfer` | **v2.1.0** | extract gdxcc backend (Phase 0), then read + write fast path behind a backend switch (spike done) |
+| `eh/gams-transfer` | **v2.1.0** | Phase 0 (gdxcc extracted) + Step 1 (backend switch) + Phase A (read fast path) **done**; Phase B (write) remaining |
 | e.g. `eh/gams-transfer-default` | **v3.0.0** | flip default to gams.transfer + add set-text-write (breaking, coordinated) |
 
 Ordering: the test-gap PR lands before the speedup PR — those tests are the
@@ -122,6 +122,25 @@ back): read 776.6 s → 9.0 s (~86x), write 1002.0 s → 11.5 s (~87x). The "pro
 only if the speedup is material" gate is decisively met — which is why this release
 now also covers writes, not just reads.
 
+**Status (branch `eh/gams-transfer`, landed locally in order).** Phase 0 (gdxcc
+extracted behind a `GdxBackend` ABC; set-text reads unified), Step 1 (`Backend`
+enum + `backend=` kwarg + `GDXPDS_BACKEND` env var + `HAVE_GAMS_TRANSFER` +
+`to_dataframes(symbols=...)` subset + `BackendError`/`SymbolNotFoundError`), and
+**Phase A** (the gams.transfer read backend, parity-tested vs gdxcc over all
+fixtures incl. set text, special values, subset, and aliases). Two read-side
+decisions firmed up during Phase A:
+
+- *Aliases read as Sets* (both backends). Legacy gdxpds read an alias as a
+  degenerate float column — an untested/unused path; it now reads like the set it
+  aliases (`c_bool` membership), so it shares the Set membership-boolean wart and
+  is fixed together with it in v3.0.0.
+- *`HAVE_GAMS_TRANSFER` means usable, not merely importable.* The probe constructs
+  a Container, so a version-skewed gamsapi (imports but can't load the GAMS shared
+  libraries) reads as unavailable and transfer-gated tests skip cleanly rather
+  than crashing. `info()` reports `gams.transfer usable: yes/no`.
+
+**Remaining:** Phase B (the write path) + the v2.1.0 version bump / CHANGES entry.
+
 **Why this is riskier than gdx2py was.** gdx2py was a clean drop-in (returned a
 plain list). gams.transfer is not:
 
@@ -197,8 +216,8 @@ together under one major bump (one migration note, not two).
   item calls for.
 
 Candidate third payload for the same release: fixing the membership-boolean wart
-(`Value` reliably `True` for members) — also breaking, also touches read + write +
-`load_set_text`. See "Known warts" below.
+for **Sets and Aliases** (`Value` reliably `True` for members) — also breaking,
+also touches read + write + `load_set_text`. See "Known warts" below.
 
 ## Known warts / deferred cleanups
 
@@ -214,10 +233,12 @@ v3.0.0; future entries may be unscheduled.)
   written value at `0.0` because `isinstance(c_bool(True), Number)` is False. The
   current behavior is now pinned by tests in
   [../tests/test_read.py](../tests/test_read.py) so the gams.transfer backend
-  can't drift. Fixing it (membership reliably `True`) is a deliberate behavior
-  change touching the read path, the write path, and `load_set_text` — coordinate
-  with the gams.transfer work and treat it as breaking. **Slated for v3.0.0** as a
-  candidate payload alongside the default-flip and set-text-write.
+  can't drift. **Aliases now read as Sets (v2.1.0), so they share this wart** —
+  the fix must cover Set and Alias together. Fixing it (membership reliably
+  `True`) is a deliberate behavior change touching the read path, the write path,
+  and `load_set_text` — coordinate with the gams.transfer work and treat it as
+  breaking. **Slated for v3.0.0** as a candidate payload alongside the
+  default-flip and set-text-write.
 
 - **`GdxFile.H` is a gdxcc-specific escape hatch on an engine-agnostic
   interface.** After the Phase 0 extraction it delegates to
