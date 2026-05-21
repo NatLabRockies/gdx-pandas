@@ -218,3 +218,13 @@ v3.0.0; future entries may be unscheduled.)
   change touching the read path, the write path, and `load_set_text` — coordinate
   with the gams.transfer work and treat it as breaking. **Slated for v3.0.0** as a
   candidate payload alongside the default-flip and set-text-write.
+
+- **`GdxFile.H` is a gdxcc-specific escape hatch on an engine-agnostic
+  interface.** After the Phase 0 extraction it delegates to
+  `self._backend_impl.handle` — the gdxcc GDX pointer, or `None` for backends
+  without one (and after `cleanup`). It stays public and working in v2.1.0 (it's
+  used as a raw-`gdxcc` escape hatch, e.g. in
+  [../tests/test_specials.py](../tests/test_specials.py)). **Candidate for
+  deprecation/removal in v3.0.0**, when the default flips to gams.transfer and
+  `None` becomes the common return; power users would move to
+  `gdx_file._backend_impl.handle` or a documented accessor.
