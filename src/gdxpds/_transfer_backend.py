@@ -207,19 +207,14 @@ class TransferBackend(GdxBackend):
             symbol._loaded = True
             return
 
-        if symbol.data_type == GamsDataType.Alias:
-            # Aliases delegate .records to their parent Set; translating them to
-            # the gdxpds shape needs a fixture to validate against (Phase A.4).
-            raise NotImplementedError(
-                "Alias read via the gams_transfer backend is not yet implemented."
-            )
-
         num_dims = symbol.num_dims
         # Domain columns, decategorized to plain strings (gdxcc yields object/str,
         # gams.transfer yields ordered categoricals).
         dim_data = records.iloc[:, :num_dims].astype(str).reset_index(drop=True)
 
-        if symbol.data_type == GamsDataType.Set:
+        # An Alias reads like the Set it aliases: gams.transfer delegates its
+        # .records to the parent set, so the Set membership/text path applies.
+        if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
             text = records.iloc[:, num_dims].astype(str).reset_index(drop=True)
             if load_set_text:
                 value_data = text.to_frame()

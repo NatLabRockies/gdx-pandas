@@ -893,7 +893,7 @@ class GdxSymbol:
                 f"this GdxSymbol, which is a {self.data_type}"
             )
         value_col = GamsValueType(value_col_name)
-        if self.data_type == GamsDataType.Set:
+        if self.data_type in (GamsDataType.Set, GamsDataType.Alias):
             assert value_col == GamsValueType.Level
             return c_bool(True)
         if (self.data_type == GamsDataType.Variable) and (
@@ -1256,13 +1256,13 @@ class GdxSymbol:
             )
             raise
 
-        if self.data_type == GamsDataType.Set:
+        if self.data_type in (GamsDataType.Set, GamsDataType.Alias):
             self._fixup_set_value()
         return
 
     def _init_dataframe(self):
         self._dataframe = pd.DataFrame([], columns=self.dims + self.value_col_names)
-        if self.data_type == GamsDataType.Set:
+        if self.data_type in (GamsDataType.Set, GamsDataType.Alias):
             colname = self._dataframe.columns[-1]
             replace_df_column(self._dataframe, colname, self._dataframe[colname].astype(c_bool))
         return
@@ -1285,7 +1285,7 @@ class GdxSymbol:
         fills in any missing values, so users no longer need to actually specify
         self.dataframe['Value'] = True.
         """
-        assert self.data_type == GamsDataType.Set
+        assert self.data_type in (GamsDataType.Set, GamsDataType.Alias)
 
         colname = self._dataframe.columns[-1]
         assert colname == self.value_col_names[0], (

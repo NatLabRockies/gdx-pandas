@@ -177,7 +177,10 @@ class GdxccBackend(GdxBackend):
                 yield gdxcc.gdxDataReadStr(H)
 
         vc = symbol.value_cols  # local for speed in the comprehensions below
-        if load_set_text and (symbol.data_type == GamsDataType.Set):
+        # Aliases read like the Set they alias (membership/text), so they take
+        # the same set-text path and the same _fixup; only Variables/Equations/
+        # Parameters get the special-value conversion below.
+        if load_set_text and (symbol.data_type in (GamsDataType.Set, GamsDataType.Alias)):
             data = [
                 elements
                 + [gdxcc.gdxGetElemText(H, int(values[col_ind]))[1] for _col_name, col_ind in vc]

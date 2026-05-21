@@ -182,3 +182,20 @@ def test_set_element_text_to_dataframes(data_dir):
     # eager path (not the single-symbol lazy path exercised above).
     with_text = to_dataframes(gdx_file, load_set_text=True)["st"]
     assert with_text["Value"].tolist() == ["alpha", "beta", "gamma"]
+
+
+def test_alias_reads_like_its_set(data_dir):
+    """An Alias reads like the Set it aliases -- membership c_bool values, not a
+    degenerate float column -- while keeping its Alias data type. The cross-
+    backend equality of this read is covered by test_backend_parity. See
+    dev/build_alias_fixture.py."""
+    gdx_file = os.path.join(data_dir, "alias_fixture.gdx")
+    assert get_data_types(gdx_file)["at"] == gdxpds.gdx.GamsDataType.Alias
+
+    t = to_dataframe(gdx_file, "t")
+    at = to_dataframe(gdx_file, "at")
+    assert list(at.columns) == list(t.columns)
+    assert all(isinstance(v, c_bool) for v in at["Value"])
+    # The alias surfaces the same elements and membership values as its set.
+    assert at["*"].tolist() == t["*"].tolist()
+    assert [bool(v) for v in at["Value"]] == [bool(v) for v in t["Value"]]
