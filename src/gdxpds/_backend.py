@@ -20,12 +20,20 @@ import abc
 import os
 from collections.abc import Sequence
 from enum import StrEnum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, assert_never
 
 from gdxpds.tools import Error
 
 if TYPE_CHECKING:
     from gdxpds.gdx import GdxFile, GdxSymbol
+
+
+class BackendError(Error):
+    """Raised for an invalid or unavailable backend selection.
+
+    Subclass of :class:`~gdxpds.tools.Error`, so ``except Error`` still catches
+    it.
+    """
 
 
 class Backend(StrEnum):
@@ -119,6 +127,33 @@ class GdxBackend(abc.ABC):
         """Release any native resources (run-once, idempotent)."""
 
 
+def resolve_backend(explicit: str | Backend | None) -> Backend:
+    """Resolve which backend to use.
+
+    Order: ``explicit`` value → ``GDXPDS_BACKEND`` env var → :data:`DEFAULT_BACKEND`.
+    Strings are normalized to :class:`Backend` members. An unrecognized value
+    raises :class:`~gdxpds.tools.Error`; requesting ``GAMS_TRANSFER`` when
+    gams.transfer is not importable also raises (no silent fallback).
+    """
+    raw = explicit if explicit is not None else os.environ.get("GDXPDS_BACKEND")
+    if raw is None or raw == "":
+        return DEFAULT_BACKEND
+    try:
+        backend = Backend(raw)
+    except ValueError:
+        valid = ", ".join(repr(b.value) for b in Backend)
+        raise BackendError(f"Unknown backend {raw!r}. Valid backends: {valid}.")
+    if backend is Backend.GAMS_TRANSFER:
+        from gdxpds.tools import _probe_gams_transfer
+
+        if not _probe_gams_transfer():
+            raise BackendError(
+                "Backend 'gams_transfer' requested but gams.transfer is not "
+                "importable; install a gamsapi matching your GAMS version."
+            )
+    return backend
+
+
 def make_backend(
     kind: Backend = DEFAULT_BACKEND,
     gams_dir: str | None = None,
@@ -133,4 +168,11 @@ def make_backend(
         from gdxpds._gdxcc_backend import GdxccBackend
 
         return GdxccBackend(gams_dir, gams_dir_source)
-    raise Error(f"Backend {kind!r} is not available.")
+    if kind == Backend.GAMS_TRANSFER:
+        raise BackendError(
+            "The gams_transfer backend is not yet implemented (planned for "
+            "v2.1.0 Phase A); use the default gdxcc backend."
+        )
+    # Exhaustive over Backend; guards against a future member added without a
+    # branch here. User-facing validation of bad values lives in resolve_backend.
+    assert_never(kind)

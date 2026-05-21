@@ -336,6 +336,36 @@ class NeedsGamsDir:
 _bindings_source = None
 _loaded_gams_dir = None
 
+# Cached result of probing for the optional gams.transfer fast-path engine.
+_have_gams_transfer = None
+
+
+def _probe_gams_transfer() -> bool:
+    """Return True if ``gams.transfer`` (the gamsapi fast-path engine) imports.
+
+    Cached after the first call. Kept lazy (not run at import) so ``import
+    gdxpds`` does not pay the gams.transfer import cost on systems that never
+    touch the fast path. Any import failure (missing or broken) reads as "not
+    available".
+    """
+    global _have_gams_transfer
+    if _have_gams_transfer is None:
+        try:
+            import gams.transfer  # noqa: F401
+
+            _have_gams_transfer = True
+        except Exception:
+            _have_gams_transfer = False
+    return _have_gams_transfer
+
+
+def __getattr__(name: str):
+    # PEP 562: expose HAVE_GAMS_TRANSFER lazily, computed on first access rather
+    # than at module import.
+    if name == "HAVE_GAMS_TRANSFER":
+        return _probe_gams_transfer()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 def load_gdxcc(gams_dir: str | os.PathLike[str] | None = None) -> None:
     """Bind the GAMS library and initialize special-value conversion tables.
@@ -428,7 +458,11 @@ def info(gams_dir: str | os.PathLike[str] | None = None) -> str:
     lines.append(f"Python:        {py_version} ({sys.platform})")
 
     lines.append("Bindings:")
-    for module_path, dist_name in [("gams.core.gdx", "gamsapi"), ("gdxcc", "gdxcc")]:
+    for module_path, dist_name in [
+        ("gams.core.gdx", "gamsapi"),
+        ("gdxcc", "gdxcc"),
+        ("gams.transfer", "gamsapi"),
+    ]:
         try:
             importlib.import_module(module_path)
             try:
@@ -449,6 +483,14 @@ def info(gams_dir: str | os.PathLike[str] | None = None) -> str:
     lines.append(f"  selected:    {selected}")
     bound = _loaded_gams_dir or "(not yet bound)"
     lines.append(f"  bound dir:   {bound}")
+
+    try:
+        from gdxpds._backend import resolve_backend
+
+        default_backend = resolve_backend(None).value
+    except Exception as e:
+        default_backend = f"(unresolved: {type(e).__name__}: {e})"
+    lines.append(f"Default backend: {default_backend}")
 
     try:
         finder = GamsDirFinder(gams_dir=gams_dir)

@@ -19,7 +19,7 @@ from enum import Enum
 import numpy as np
 import pandas as pd
 
-from gdxpds._backend import DEFAULT_BACKEND, make_backend
+from gdxpds._backend import Backend, make_backend, resolve_backend
 
 # Re-exported from gdxpds.special for backward compatibility.
 from gdxpds.special import (
@@ -150,9 +150,19 @@ class DomainError(Error):
     """
 
 
+class SymbolNotFoundError(Error):
+    """Raised when a requested symbol name is not present in a :class:`GdxFile`.
+
+    Subclass of :class:`Error`, so ``except Error`` still catches it.
+    """
+
+
 class GdxFile(MutableSequence, NeedsGamsDir):
     def __init__(
-        self, gams_dir: str | os.PathLike[str] | None = None, lazy_load: bool = True
+        self,
+        gams_dir: str | os.PathLike[str] | None = None,
+        lazy_load: bool = True,
+        backend: str | Backend | None = None,
     ) -> None:
         """
         Initializes a GdxFile object by connecting to GAMS and creating a pointer.
@@ -169,6 +179,10 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             accessed later after the corresponding calls to :py:meth:`GdxSymbol.load`.
             If False, all data are automatically loaded and the full GDX file is
             available in memory after the call to :py:meth:`read`.
+        backend : None or str or :py:class:`gdxpds.Backend`
+            Which I/O engine to use. ``None`` (default) resolves via the
+            ``GDXPDS_BACKEND`` env var, falling back to the default backend
+            (``gdxcc``). Pass ``"gdxcc"`` / ``Backend.GDXCC`` to pin it.
         """
         self.lazy_load = lazy_load
         self._version = None
@@ -178,11 +192,15 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         # Set before anything that can raise, so cleanup() is safe if create fails.
         self._finalizer = None
         self._backend_impl = None
+        self._backend_kind = None
 
         NeedsGamsDir.__init__(self, gams_dir=gams_dir)
         # Build the I/O engine. For the gdxcc backend this binds the GDX library
         # and creates the handle, which the backend owns and frees in close().
-        self._backend_impl = make_backend(DEFAULT_BACKEND, self.gams_dir, self.gams_dir_source)
+        self._backend_kind = resolve_backend(backend)
+        self._backend_impl = make_backend(
+            self._backend_kind, self.gams_dir, self.gams_dir_source
+        )
 
         # Free the engine's native resources exactly once, at the first of:
         # cleanup(), garbage collection, or interpreter exit. The callback is the
@@ -217,7 +235,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         -------
         :py:class:`GdxFile`
         """
-        result = GdxFile(gams_dir=self.gams_dir, lazy_load=False)
+        result = GdxFile(gams_dir=self.gams_dir, lazy_load=False, backend=self._backend_kind)
         for symbol in self:
             result.append(symbol.clone())
             result[-1]._file = result
@@ -316,6 +334,22 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         GAMS element text for Sets instead of the membership ``c_bool``.
         """
         self._backend_impl.load_file(self, load_set_text=load_set_text)
+
+    def load_symbols(self, names: Sequence[str], *, load_set_text: bool = False) -> None:
+        """
+        Eagerly load the records of the named symbols (a subset of the file).
+
+        Resolves each name to its :py:class:`GdxSymbol` and loads via the backend
+        (gams.transfer issues a single targeted read; gdxcc loops per symbol).
+        Raises :class:`gdxpds.tools.Error` for an unknown name; already-loaded
+        symbols are skipped.
+        """
+        symbols = []
+        for name in names:
+            if name not in self:
+                raise SymbolNotFoundError(f"No symbol named {name!r} in {self.filename!r}.")
+            symbols.append(self[name])
+        self._backend_impl.load_symbols(self, symbols, load_set_text=load_set_text)
 
     def reorder_for_strict_domains(self):
         """
