@@ -169,10 +169,9 @@ def make_backend(
 
         return GdxccBackend(gams_dir, gams_dir_source)
     if kind == Backend.GAMS_TRANSFER:
-        raise BackendError(
-            "The gams_transfer backend is not yet implemented (planned for "
-            "v2.1.0 Phase A); use the default gdxcc backend."
-        )
+        from gdxpds._transfer_backend import TransferBackend
+
+        return TransferBackend(gams_dir, gams_dir_source)
     # Exhaustive over Backend; guards against a future member added without a
     # branch here. User-facing validation of bad values lives in resolve_backend.
     assert_never(kind)
