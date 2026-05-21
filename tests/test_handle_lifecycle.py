@@ -125,7 +125,7 @@ def test_gdxfile_cleanup_is_idempotent():
     assert f._finalizer.alive  # handle live, not yet freed
     f.cleanup()
     assert not f._finalizer.alive  # freed, exactly once
-    assert f._H is None
+    assert f.H is None  # handle delegated to the backend; None after close
     f.cleanup()  # second call: safe no-op
     assert not f._finalizer.alive
     del f

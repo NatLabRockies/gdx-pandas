@@ -84,6 +84,40 @@ class GdxBackend(abc.ABC):
         """Load the records of a single symbol."""
         self.load_symbols(symbol.file, [symbol], load_set_text=load_set_text)
 
+    @property
+    def handle(self) -> object | None:
+        """Native engine handle, if any.
+
+        The gdxcc backend returns its GDX pointer; backends without one (e.g.
+        gams.transfer) return ``None``. Surfaced through ``GdxFile.H``.
+        """
+        return None
+
+    @abc.abstractmethod
+    def write_file(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
+        """Write every (loaded) symbol of ``gdx_file`` out to ``filename``."""
+
+    def write_symbol(
+        self,
+        gdx_file: GdxFile,
+        symbol: GdxSymbol,
+        index: int | None = None,
+        name_positions: dict | None = None,
+    ) -> None:
+        """Write a single symbol (legacy per-symbol path).
+
+        Only engines with a per-symbol write API implement this; others raise.
+        Whole-file writes should go through :meth:`write_file`.
+        """
+        raise NotImplementedError(
+            f"{type(self).__name__} does not support per-symbol writes; "
+            "use GdxFile.write() / gdxpds.to_gdx()."
+        )
+
+    @abc.abstractmethod
+    def close(self) -> None:
+        """Release any native resources (run-once, idempotent)."""
+
 
 def make_backend(
     kind: Backend = DEFAULT_BACKEND,

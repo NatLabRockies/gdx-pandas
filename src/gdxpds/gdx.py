@@ -15,12 +15,10 @@ from collections import OrderedDict, defaultdict
 from collections.abc import MutableSequence, Sequence
 from ctypes import c_bool
 from enum import Enum
-from numbers import Number
 
 import numpy as np
 import pandas as pd
 
-import gdxpds.special as special
 from gdxpds._backend import DEFAULT_BACKEND, make_backend
 
 # Re-exported from gdxpds.special for backward compatibility.
@@ -33,7 +31,7 @@ from gdxpds.special import (
     is_np_eps,  # noqa: F401
     is_np_sv,  # noqa: F401
 )
-from gdxpds.tools import Error, NeedsGamsDir, _GdxHandle, load_gdxcc
+from gdxpds.tools import Error, NeedsGamsDir
 
 # gdxcc bindings: modern (shipped inside gamsapi) is preferred; the standalone
 # legacy PyPI package is the fallback.
@@ -178,35 +176,29 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         self._filename = None
         self._symbols = OrderedDict()
         # Set before anything that can raise, so cleanup() is safe if create fails.
-        self._H = None
-        self._handle = None
         self._finalizer = None
         self._backend_impl = None
 
         NeedsGamsDir.__init__(self, gams_dir=gams_dir)
-        self._handle = self._create_gdx_object()
-        self._H = self._handle.H
+        # Build the I/O engine. For the gdxcc backend this binds the GDX library
+        # and creates the handle, which the backend owns and frees in close().
+        self._backend_impl = make_backend(DEFAULT_BACKEND, self.gams_dir, self.gams_dir_source)
+
+        # Free the engine's native resources exactly once, at the first of:
+        # cleanup(), garbage collection, or interpreter exit. The callback is the
+        # backend's own close() -- a bound method of the backend, not self -- so
+        # it never keeps this GdxFile alive (which would defeat GC-time
+        # finalization) and stays valid at interpreter shutdown (close() uses
+        # callables bound when the handle was created, not module-global lookups).
+        self._finalizer = weakref.finalize(self, self._backend_impl.close)
+
         self.universal_set = GdxSymbol("*", GamsDataType.Set, dims=1, file=None, index=0)
         self.universal_set._file = self
-
-        # Free the gdx object + wrapper exactly once, at the first of: cleanup(),
-        # garbage collection, or interpreter exit. The callback is the handle's own
-        # close() -- a bound method of self._handle, not self -- so it never keeps
-        # this GdxFile alive (which would defeat GC-time finalization) and stays
-        # valid at interpreter shutdown (close() uses callables bound when the
-        # handle was created, not module-global lookups).
-        self._finalizer = weakref.finalize(self, self._handle.close)
-
-        # I/O engine. The handle is still owned by this GdxFile for now; the
-        # gdxcc backend reads it off ``self.H`` at call time (Phase 0 will move
-        # handle ownership into the backend in a later step).
-        self._backend_impl = make_backend(DEFAULT_BACKEND, self.gams_dir, self.gams_dir_source)
         return
 
     def cleanup(self) -> None:
         if self._finalizer is not None:
-            self._finalizer()  # runs handle.close() at most once
-        self._H = None
+            self._finalizer()  # runs backend.close() at most once
 
     def __enter__(self):
         return self
@@ -245,9 +237,15 @@ class GdxFile(MutableSequence, NeedsGamsDir):
     @property
     def H(self):
         """
-        GDX object handle
+        GDX object handle (gdxcc backend only; ``None`` for backends without one,
+        and after :py:meth:`cleanup`).
+
+        This is a gdxcc-specific escape hatch (e.g. for driving raw ``gdxcc``
+        calls). It is a candidate for deprecation/removal in v3.0.0, when the
+        default backend flips and ``None`` becomes the common return — see the
+        "Known warts" section of ``dev/ROADMAP.md``.
         """
-        return self._H
+        return self._backend_impl.handle if self._backend_impl is not None else None
 
     @property
     def filename(self):
@@ -353,35 +351,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         ----------
         filename : pathlib.Path or str
         """
-        # only write if all symbols loaded
-        for symbol in self:
-            if not symbol.loaded:
-                raise Error("All symbols must be loaded before this file can be written.")
-
-        ret = gdxcc.gdxOpenWrite(self.H, str(filename), "gdxpds")
-        if not ret:
-            raise GdxError(
-                self.H,
-                f"Could not open {filename!r} for writing. "
-                "Consider cloning this file (.clone()) before trying to write.",
-            )
-        self._filename = filename
-
-        # write the universal set
-        self.universal_set.write()
-
-        # Build the {name: position} map once so each symbol's strict-domain
-        # eligibility check is O(1) per parent rather than O(N).
-        name_positions = {name: i for i, name in enumerate(self._symbols.keys())}
-
-        for i, symbol in enumerate(self, start=1):
-            try:
-                symbol.write(index=i, name_positions=name_positions)
-            except Exception:
-                logger.error(f"Unable to write {symbol} to {filename}")
-                raise
-
-        gdxcc.gdxClose(self.H)
+        self._backend_impl.write_file(self, filename)
 
     def __repr__(self):
         return f"GdxFile(self,gams_dir={repr(self.gams_dir)},lazy_load={repr(self.lazy_load)})"
@@ -513,15 +483,6 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             [(symbol.name, symbol) for _cur_key, symbol in self._symbols.items()]
         )
         return
-
-    def _create_gdx_object(self):
-        # Idempotent: first call binds the library + populates SPECIAL_VALUES;
-        # subsequent calls validate self.gams_dir and warn on mismatch.
-        load_gdxcc(gams_dir=self.gams_dir)
-        # _GdxHandle validates the create (raising GamsLoadError on failure, and
-        # deleting the wrapper without an unsafe gdxFree). This GdxFile keeps the
-        # handle; its weakref.finalize calls handle.close() to free+delete.
-        return _GdxHandle(gdxcc, self.gams_dir, self.gams_dir_source)
 
 
 class GamsDataType(Enum):
@@ -1358,82 +1319,11 @@ class GdxSymbol:
         """
         Writes this :py:class:`GdxSymbol` to its :py:attr:`file`
         """
-        if not self.loaded:
-            raise Error(f"Cannot write unloaded symbol {self.name!r}.")
         if self.file is None:
             raise Error(f"Cannot write {self!r} because there is no file pointer")
-
-        if self.data_type == GamsDataType.Set:
-            self._fixup_set_value()
-
-        if index is not None:
-            self._index = index
-
-        if self.index == 0:
-            # universal set
-            gdxcc.gdxUELRegisterRawStart(self.file.H)
-            gdxcc.gdxUELRegisterRaw(self.file.H, self.name)
-            gdxcc.gdxUELRegisterDone(self.file.H)
-            return
-
-        # write the data
-        userinfo = 0
-        if self.variable_type is not None:
-            userinfo = self.variable_type.value
-        elif self.equation_type is not None:
-            userinfo = self.equation_type.value
-        if not gdxcc.gdxDataWriteStrStart(
-            self.file.H, self.name, self.description, self.num_dims, self.data_type.value, userinfo
-        ):
-            raise GdxError(
-                self.file.H, f"Could not start writing data for symbol {repr(self.name)}"
-            )
-        # set domain information: prefer strict gdxSymbolSetDomain when every
-        # entry of self._domain either is None ('*') or refers to a parent
-        # already written to this file; otherwise fall back to relaxed
-        # gdxSymbolSetDomainX. Decision is per-symbol because GDX itself only
-        # supports per-symbol strict/relaxed.
-        if self.num_dims > 0:
-            domain = self._domain if self._strict_domain_writeable(name_positions) else None
-            if domain is not None:
-                names = [d.name if d is not None else "*" for d in domain]
-                if not gdxcc.gdxSymbolSetDomain(self.file.H, names):
-                    raise GdxError(
-                        self.file.H,
-                        f"Could not set strict domain information for {repr(self.name)}. "
-                        f"Domains are {repr(names)}",
-                    )
-            elif self.index:
-                if not gdxcc.gdxSymbolSetDomainX(self.file.H, self.index, self.dims):
-                    raise GdxError(
-                        self.file.H,
-                        f"Could not set domain information for {repr(self.name)}. Domains are {repr(self.dims)}",
-                    )
-            else:
-                logger.info("Not writing domain information because symbol index is unknown.")
-        values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
-        # make sure index is clean -- needed for merging in convert_np_to_gdx_svs
-        self.dataframe = self.dataframe.reset_index(drop=True)
-        # convert special numeric values if appropriate
-        to_write = (
-            self.dataframe.copy()
-            if (self.data_type in (GamsDataType.Set, GamsDataType.Alias))
-            else special.convert_np_to_gdx_svs(self.dataframe, self.num_dims)
+        self.file._backend_impl.write_symbol(
+            self.file, self, index=index, name_positions=name_positions
         )
-        # write each row
-        for row in to_write.itertuples(index=False, name=None):
-            dims = [str(x) for x in row[: self.num_dims]]
-            vals = row[self.num_dims :]
-            for _col_name, col_ind in self.value_cols:
-                values[col_ind] = 0.0
-                try:
-                    if isinstance(vals[col_ind], Number):
-                        values[col_ind] = float(vals[col_ind])
-                except Exception:
-                    raise Error(f"Unable to set element {col_ind} from {vals}.")
-            gdxcc.gdxDataWriteStr(self.file.H, dims, values)
-        gdxcc.gdxDataWriteDone(self.file.H)
-        return
 
 
 # ------------------------------------------------------------------------------

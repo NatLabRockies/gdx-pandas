@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Sequence
+from numbers import Number
 from typing import TYPE_CHECKING
 
 import gdxpds.special as special
@@ -21,7 +22,7 @@ from gdxpds.gdx import (
     GdxError,
     GdxSymbol,
 )
-from gdxpds.tools import Error
+from gdxpds.tools import Error, _GdxHandle, load_gdxcc
 
 # gdxcc bindings: modern (shipped inside gamsapi) is preferred; the standalone
 # legacy PyPI package is the fallback.
@@ -49,6 +50,26 @@ class GdxccBackend(GdxBackend):
     def __init__(self, gams_dir: str | None = None, gams_dir_source: str | None = None) -> None:
         self.gams_dir = gams_dir
         self.gams_dir_source = gams_dir_source
+        # Idempotent: first call binds the library + populates SPECIAL_VALUES;
+        # subsequent calls validate gams_dir and warn on mismatch.
+        load_gdxcc(gams_dir=gams_dir)
+        # _GdxHandle validates the create (raising GamsLoadError on failure, and
+        # deleting the wrapper without an unsafe gdxFree). This backend owns the
+        # handle; GdxFile's weakref.finalize calls close() to free+delete it.
+        self._handle = _GdxHandle(gdxcc, gams_dir, gams_dir_source)
+
+    @property
+    def handle(self) -> object | None:
+        """The SWIG-bound GDX handle pointer, or None once closed."""
+        return self._handle.H if self._handle is not None else None
+
+    def close(self) -> None:
+        # Run-once: drop the reference first, then free+delete via _GdxHandle
+        # (itself idempotent). After this, handle returns None.
+        h = self._handle
+        if h is not None:
+            self._handle = None
+            h.close()
 
     def open_read(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
         H = gdx_file.H
@@ -174,3 +195,116 @@ class GdxccBackend(GdxBackend):
         if symbol.data_type not in (GamsDataType.Set, GamsDataType.Alias):
             symbol.dataframe = special.convert_gdx_to_np_svs(symbol.dataframe, symbol.num_dims)
         symbol._loaded = True
+
+    def write_file(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
+        # only write if all symbols loaded
+        for symbol in gdx_file:
+            if not symbol.loaded:
+                raise Error("All symbols must be loaded before this file can be written.")
+
+        H = gdx_file.H
+        ret = gdxcc.gdxOpenWrite(H, str(filename), "gdxpds")
+        if not ret:
+            raise GdxError(
+                H,
+                f"Could not open {filename!r} for writing. "
+                "Consider cloning this file (.clone()) before trying to write.",
+            )
+        gdx_file._filename = filename
+
+        # write the universal set
+        self.write_symbol(gdx_file, gdx_file.universal_set)
+
+        # Build the {name: position} map once so each symbol's strict-domain
+        # eligibility check is O(1) per parent rather than O(N).
+        name_positions = {name: i for i, name in enumerate(gdx_file._symbols.keys())}
+
+        for i, symbol in enumerate(gdx_file, start=1):
+            try:
+                self.write_symbol(gdx_file, symbol, index=i, name_positions=name_positions)
+            except Exception:
+                logger.error(f"Unable to write {symbol} to {filename}")
+                raise
+
+        gdxcc.gdxClose(H)
+
+    def write_symbol(
+        self,
+        gdx_file: GdxFile,
+        symbol: GdxSymbol,
+        index: int | None = None,
+        name_positions: dict | None = None,
+    ) -> None:
+        if not symbol.loaded:
+            raise Error(f"Cannot write unloaded symbol {symbol.name!r}.")
+        H = gdx_file.H
+
+        if symbol.data_type == GamsDataType.Set:
+            symbol._fixup_set_value()
+
+        if index is not None:
+            symbol._index = index
+
+        if symbol.index == 0:
+            # universal set
+            gdxcc.gdxUELRegisterRawStart(H)
+            gdxcc.gdxUELRegisterRaw(H, symbol.name)
+            gdxcc.gdxUELRegisterDone(H)
+            return
+
+        # write the data
+        userinfo = 0
+        if symbol.variable_type is not None:
+            userinfo = symbol.variable_type.value
+        elif symbol.equation_type is not None:
+            userinfo = symbol.equation_type.value
+        if not gdxcc.gdxDataWriteStrStart(
+            H, symbol.name, symbol.description, symbol.num_dims, symbol.data_type.value, userinfo
+        ):
+            raise GdxError(H, f"Could not start writing data for symbol {repr(symbol.name)}")
+        # set domain information: prefer strict gdxSymbolSetDomain when every
+        # entry of symbol._domain either is None ('*') or refers to a parent
+        # already written to this file; otherwise fall back to relaxed
+        # gdxSymbolSetDomainX. Decision is per-symbol because GDX itself only
+        # supports per-symbol strict/relaxed.
+        if symbol.num_dims > 0:
+            domain = symbol._domain if symbol._strict_domain_writeable(name_positions) else None
+            if domain is not None:
+                names = [d.name if d is not None else "*" for d in domain]
+                if not gdxcc.gdxSymbolSetDomain(H, names):
+                    raise GdxError(
+                        H,
+                        f"Could not set strict domain information for {repr(symbol.name)}. "
+                        f"Domains are {repr(names)}",
+                    )
+            elif symbol.index:
+                if not gdxcc.gdxSymbolSetDomainX(H, symbol.index, symbol.dims):
+                    raise GdxError(
+                        H,
+                        f"Could not set domain information for {repr(symbol.name)}. "
+                        f"Domains are {repr(symbol.dims)}",
+                    )
+            else:
+                logger.info("Not writing domain information because symbol index is unknown.")
+        values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
+        # make sure index is clean -- needed for merging in convert_np_to_gdx_svs
+        symbol.dataframe = symbol.dataframe.reset_index(drop=True)
+        # convert special numeric values if appropriate
+        to_write = (
+            symbol.dataframe.copy()
+            if (symbol.data_type in (GamsDataType.Set, GamsDataType.Alias))
+            else special.convert_np_to_gdx_svs(symbol.dataframe, symbol.num_dims)
+        )
+        # write each row
+        for row in to_write.itertuples(index=False, name=None):
+            dims = [str(x) for x in row[: symbol.num_dims]]
+            vals = row[symbol.num_dims :]
+            for _col_name, col_ind in symbol.value_cols:
+                values[col_ind] = 0.0
+                try:
+                    if isinstance(vals[col_ind], Number):
+                        values[col_ind] = float(vals[col_ind])
+                except Exception:
+                    raise Error(f"Unable to set element {col_ind} from {vals}.")
+            gdxcc.gdxDataWriteStr(H, dims, values)
+        gdxcc.gdxDataWriteDone(H)
