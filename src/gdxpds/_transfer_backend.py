@@ -1,10 +1,11 @@
 """gams.transfer implementation of :class:`gdxpds._backend.GdxBackend` (read).
 
-Phase A: the read fast path. ``open_read`` builds the symbol metadata from a
-``gams.transfer`` Container (records-free), and ``load_symbols`` reads records
-(bulk or targeted) and translates each symbol into the gdxpds DataFrame shape so
-the result matches the gdxcc backend. ``write_file`` is not implemented yet
-(Phase B) and inherits the ABC default that raises.
+Read (Phase A): ``open_read`` builds the symbol metadata from a ``gams.transfer``
+Container (records-free), and ``load_symbols`` reads records (bulk or targeted)
+and translates each symbol into the gdxpds DataFrame shape so the result matches
+the gdxcc backend. Write (Phase B): ``write_file`` builds a Container from the
+gdxpds symbols (the inverse translation) and writes it. Writing aliases is not
+supported (to_gdx never infers one); use ``backend='gdxcc'`` for that.
 
 ``gams.transfer`` is imported at module load, but this module is itself imported
 lazily by :func:`gdxpds._backend.make_backend`, so ``import gdxpds`` stays free
@@ -57,6 +58,27 @@ _EQU_TYPE = {
     # either, so leaving it unmapped keeps the two backends consistent.
 }
 
+# Inverse maps for the write path (gdxpds enum -> gams.transfer .type string).
+_VAR_TYPE_STR = {member: s for s, member in _VAR_TYPE.items()}
+_EQU_TYPE_STR = {member: s for s, member in _EQU_TYPE.items()}
+
+
+def _np_to_transfer_specials(records: pd.DataFrame, value_cols: list[str]) -> None:
+    """In place, map gdxpds canonical special values to gams.transfer encodings.
+
+    Inverse of :func:`_convert_transfer_specials`: machine eps -> EPS (gt's
+    ``-0.0``); NaN -> NA (gt's NA sentinel); +/-inf already match. Genuine 0.0 is
+    left alone (only eps maps to EPS).
+    """
+    eps = NUMPY_SPECIAL_VALUES[-1]
+    for col in value_cols:
+        arr = records[col].to_numpy(dtype="float64", copy=True)
+        is_eps = np.abs(arr - eps) < eps
+        is_nan = np.isnan(arr)
+        arr[is_nan] = gt.SpecialValues.NA
+        arr[is_eps] = gt.SpecialValues.EPS
+        records[col] = arr
+
 
 def _data_type_of(gt_sym) -> GamsDataType:
     # UniverseAlias / Alias before Set (an alias is not a Set, but check the
@@ -89,12 +111,9 @@ def _convert_transfer_specials(values: pd.DataFrame) -> pd.DataFrame:
     eps = NUMPY_SPECIAL_VALUES[-1]
     out = values.copy()
     for col in out.columns:
-        arr = np.asarray(out[col].to_numpy(dtype="float64"))
+        arr = out[col].to_numpy(dtype="float64", copy=True)
         is_eps = np.asarray(gt.SpecialValues.isEps(arr))
-        is_nan = np.asarray(gt.SpecialValues.isNA(arr)) | np.asarray(
-            gt.SpecialValues.isUndef(arr)
-        )
-        arr = arr.copy()
+        is_nan = np.asarray(gt.SpecialValues.isNA(arr)) | np.asarray(gt.SpecialValues.isUndef(arr))
         arr[is_nan] = np.nan
         arr[is_eps] = eps
         out[col] = arr
@@ -121,10 +140,90 @@ class TransferBackend(GdxBackend):
         self._container = None
 
     def write_file(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
-        raise NotImplementedError(
-            "Writing via the gams_transfer backend is not yet implemented "
-            "(planned for v2.1.0 Phase B); use backend='gdxcc' to write."
-        )
+        for symbol in gdx_file:
+            if not symbol.loaded:
+                raise Error("All symbols must be loaded before this file can be written.")
+
+        container = gt.Container(system_directory=self.gams_dir)
+        # {name: position} for the per-symbol strict-domain eligibility check,
+        # mirroring the gdxcc write path.
+        name_positions = {name: i for i, name in enumerate(gdx_file._symbols.keys())}
+        for symbol in gdx_file:
+            self._add_symbol(container, symbol, name_positions)
+        try:
+            container.write(str(filename))
+        except Exception as e:
+            raise Error(f"gams.transfer failed to write {filename!r}: {e}")
+        gdx_file._filename = filename
+
+    def _gt_domain(self, container, symbol: GdxSymbol, name_positions: dict):
+        """Domain spec for a gt symbol, mirroring the gdxcc strict/relaxed choice.
+
+        Strict (a same-file parent that precedes this symbol) -> the gt.Set refs
+        already in the container; otherwise the dim-name strings (relaxed / '*').
+        """
+        if symbol.num_dims == 0:
+            return []
+        if symbol._strict_domain_writeable(name_positions):
+            return [container.data[d.name] if d is not None else "*" for d in symbol._domain]
+        return list(symbol.dims)
+
+    def _add_symbol(self, container, symbol: GdxSymbol, name_positions: dict) -> None:
+        data_type = symbol.data_type
+        if data_type == GamsDataType.Alias:
+            # to_gdx never infers an Alias, and writing one needs alias_with
+            # plumbing; out of scope for v2.1.0 (use backend='gdxcc').
+            raise NotImplementedError(
+                "Writing aliases via the gams_transfer backend is not supported."
+            )
+
+        num_dims = symbol.num_dims
+        domain = self._gt_domain(container, symbol, name_positions)
+        description = symbol.description or ""
+        # Domain columns are matched positionally by gams.transfer, so give them
+        # unique throwaway names (dodging duplicate '*' labels); value columns
+        # are matched by name.
+        dim_names = [f"_d{i}" for i in range(num_dims)]
+
+        if data_type == GamsDataType.Set:
+            records = symbol.dataframe.iloc[:, :num_dims].copy()
+            records.columns = dim_names
+            records["element_text"] = ""  # v2.1.0: no set-text-write (parity with gdxcc)
+            gt.Set(container, symbol.name, domain=domain, description=description, records=records)
+            return
+
+        # Parameter / Variable / Equation. gams.transfer's value-column names are
+        # the gdxpds value_col_names lowercased (Value -> value, Level -> level,
+        # ...); value_col_names derives from GamsValueType, the same source the
+        # gdxcc backend uses, so there is no second hard-coded list to keep in sync.
+        value_cols = [name.lower() for name in symbol.value_col_names]
+        records = symbol.dataframe.copy()
+        records.columns = dim_names + value_cols
+        _np_to_transfer_specials(records, value_cols)
+        if data_type == GamsDataType.Parameter:
+            gt.Parameter(
+                container, symbol.name, domain=domain, description=description, records=records
+            )
+        elif data_type == GamsDataType.Variable:
+            vt = symbol.variable_type
+            gt.Variable(
+                container,
+                symbol.name,
+                _VAR_TYPE_STR.get(vt, "free") if vt is not None else "free",
+                domain=domain,
+                description=description,
+                records=records,
+            )
+        else:  # Equation
+            et = symbol.equation_type
+            gt.Equation(
+                container,
+                symbol.name,
+                _EQU_TYPE_STR.get(et, "eq") if et is not None else "eq",
+                domain=domain,
+                description=description,
+                records=records,
+            )
 
     def open_read(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
         # Metadata only: keeps list_symbols / get_data_types cheap. Records are
@@ -176,9 +275,7 @@ class TransferBackend(GdxBackend):
         else:
             # Targeted: read just the requested symbols' records.
             targets = [s for s in symbols if not s.loaded]
-            container = (
-                self._read_records(gdx_file, [s.name for s in targets]) if targets else None
-            )
+            container = self._read_records(gdx_file, [s.name for s in targets]) if targets else None
         for symbol in targets:
             self._translate(container, symbol, load_set_text=load_set_text)
 
