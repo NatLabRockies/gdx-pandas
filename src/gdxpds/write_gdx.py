@@ -4,6 +4,7 @@ import logging
 import os
 from collections.abc import Mapping, Sequence
 from numbers import Number
+from typing import TYPE_CHECKING
 
 import pandas as pd
 
@@ -16,6 +17,9 @@ from gdxpds.gdx import (
     _stable_topological_sort,
 )
 from gdxpds.tools import Error
+
+if TYPE_CHECKING:
+    from gdxpds._backend import Backend
 
 logger = logging.getLogger(__name__)
 
@@ -205,7 +209,7 @@ def to_gdx(
     path: str | os.PathLike[str] | None = None,
     gams_dir: str | os.PathLike[str] | None = None,
     domains: Mapping[str, Sequence[str | None]] | None = None,
-    backend: str | None = None,
+    backend: str | Backend | None = None,
 ) -> GdxFile:
     """
     Creates a :py:class:`gdxpds.gdx.GdxFile` from dataframes and optionally writes it to path

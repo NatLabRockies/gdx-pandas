@@ -198,9 +198,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         # Build the I/O engine. For the gdxcc backend this binds the GDX library
         # and creates the handle, which the backend owns and frees in close().
         self._backend_kind = resolve_backend(backend)
-        self._backend_impl = make_backend(
-            self._backend_kind, self.gams_dir, self.gams_dir_source
-        )
+        self._backend_impl = make_backend(self._backend_kind, self.gams_dir, self.gams_dir_source)
 
         # Free the engine's native resources exactly once, at the first of:
         # cleanup(), garbage collection, or interpreter exit. The callback is the

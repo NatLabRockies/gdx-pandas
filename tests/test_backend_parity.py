@@ -70,6 +70,37 @@ def test_read_parity_special_values():
         _assert_same(a, b)
 
 
+def test_read_parity_undef():
+    # gdxcc distinguishes GDX UNDEF (-> None) from GDX NA (-> np.nan), yielding an
+    # object-dtype value column when any UNDEF is present (see special.GDX_TO_NP_SVS).
+    # gdxcc's *write* path can't emit a genuine UNDEF (None collapses to 0.0), so
+    # build the fixture straight through gams.transfer to get a real UNDEF on disk,
+    # then assert both backends read it back identically (object col, None vs nan).
+    import gams.transfer as gt
+
+    from gdxpds.tools import GamsDirFinder
+
+    gdir = GamsDirFinder().gams_dir
+    with tempfile.TemporaryDirectory() as d:
+        out = os.path.join(d, "undef.gdx")
+        c = gt.Container(system_directory=gdir)
+        recs = pd.DataFrame(
+            {
+                "i": ["na", "undef", "one"],
+                "value": [gt.SpecialValues.NA, gt.SpecialValues.UNDEF, 1.0],
+            }
+        )
+        gt.Parameter(c, "p", domain=["*"], records=recs)
+        c.write(out)
+
+        a = to_dataframes(out, backend="gdxcc")
+        b = to_dataframes(out, backend="gams_transfer")
+        # Sanity: the oracle really did produce the None/nan distinction in object dtype.
+        assert a["p"]["Value"].dtype == object
+        assert a["p"]["Value"].iloc[1] is None
+        _assert_same(a, b)
+
+
 def test_read_parity_symbol_subset(data_dir):
     # The subset path (targeted read on gams.transfer) matches gdxcc.
     path = os.path.join(data_dir, "symbol_types_fixture.gdx")
@@ -121,6 +152,32 @@ def test_write_parity_special_values(tmp_path):
         "scalar": pd.DataFrame({"Value": [42.0]}),
     }
     _assert_matrix_consistent(_write_read_matrix(dfs, tmp_path))
+
+
+def test_write_parity_undef(tmp_path):
+    # A Python None in a value column is gdxpds' canonical GDX UNDEF. The gdxcc
+    # oracle's write path can't emit UNDEF -- a None isn't a Number, so it falls
+    # through to 0.0 -- and v2.1.0 holds strict parity, so the gams_transfer write
+    # must also yield 0.0 (not NA). Keep the whole write x read matrix consistent.
+    # (1.0 first so to_gdx infers a Parameter, not a Set.)
+    dfs = {
+        "p": pd.DataFrame(
+            {"i": ["one", "undef", "na"], "Value": pd.Series([1.0, None, np.nan], dtype=object)}
+        )
+    }
+    matrix = _write_read_matrix(dfs, tmp_path)
+    _assert_matrix_consistent(matrix)
+    for dfs_out in matrix.values():
+        vals = list(dfs_out["p"]["Value"])
+        assert vals[0] == 1.0
+        # The point of this test is that the write path treats UNDEF and NA
+        # *differently*: UNDEF (None) collapses to 0.0, while NA stays NaN -- and
+        # NA must not itself collapse to None (which would mean it got confused
+        # with UNDEF). The `is not None` guard makes that distinction explicit and
+        # short-circuits before np.isnan (which would raise on None); pd.isna would
+        # be too weak here, since pd.isna(None) is also True.
+        assert vals[1] == 0.0
+        assert vals[2] is not None and np.isnan(vals[2])
 
 
 def test_write_parity_mixed_boolean_set(tmp_path):

@@ -3,10 +3,14 @@ from __future__ import annotations
 import logging
 import os
 from collections import OrderedDict
+from typing import TYPE_CHECKING
 
 import pandas as pd
 
 from gdxpds.gdx import GamsDataType, GdxFile, SymbolNotFoundError
+
+if TYPE_CHECKING:
+    from gdxpds._backend import Backend
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +94,7 @@ def to_dataframes(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
     load_set_text: bool = False,
-    backend: str | None = None,
+    backend: str | Backend | None = None,
     symbols: list[str] | None = None,
 ) -> dict[str, pd.DataFrame]:
     """
@@ -128,7 +132,7 @@ def to_dataframes(
 def list_symbols(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
-    backend: str | None = None,
+    backend: str | Backend | None = None,
 ) -> list[str]:
     """
     Returns the list of symbols available in gdx_file.
@@ -153,7 +157,7 @@ def list_symbols(
 def get_data_types(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
-    backend: str | None = None,
+    backend: str | Backend | None = None,
 ) -> dict[str, GamsDataType]:
     """
     Returns a dict of the symbols' :py:class:`GamsDataTypes <GamsDataType>`.
@@ -178,7 +182,7 @@ def get_data_types(
 def get_subset_relationships(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
-    backend: str | None = None,
+    backend: str | Backend | None = None,
 ) -> dict[str, list[str | None]]:
     """
     Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name.
@@ -224,7 +228,7 @@ def to_dataframe(
     symbol_name: str,
     gams_dir: str | os.PathLike[str] | None = None,
     load_set_text: bool = False,
-    backend: str | None = None,
+    backend: str | Backend | None = None,
 ) -> pd.DataFrame:
     """
     Interface for getting the data for a single symbol

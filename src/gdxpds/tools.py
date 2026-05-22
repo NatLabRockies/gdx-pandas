@@ -340,27 +340,44 @@ _loaded_gams_dir = None
 _have_gams_transfer = None
 
 
-def _probe_gams_transfer() -> bool:
+def _probe_transfer_at(gams_dir: str | os.PathLike[str] | None) -> bool:
+    """Construct a ``gams.transfer`` Container at ``gams_dir`` and report success.
+
+    ``gams_dir`` is resolved through :class:`GamsDirFinder` (``None`` -> default
+    discovery). Any failure (not installed, version-skewed, GAMS not found) reads
+    as "not available". Uncached -- the caller decides whether to memoize.
+    """
+    try:
+        import gams.transfer as gt
+
+        gt.Container(system_directory=GamsDirFinder(gams_dir=gams_dir).gams_dir)
+        return True
+    except Exception:
+        return False
+
+
+def _probe_gams_transfer(gams_dir: str | os.PathLike[str] | None = None) -> bool:
     """Return True if the ``gams.transfer`` fast path is *usable* here.
 
     Importable is necessary but not sufficient: a gamsapi whose build does not
     match the active GAMS install imports fine but then fails to load its shared
     libraries (e.g. ``gmdcclib``) when a Container is constructed. So this
     actually constructs a Container against the resolved GAMS directory to
-    confirm the engine works. Cached after the first call; kept lazy so
-    ``import gdxpds`` pays nothing on systems that never touch the fast path.
-    Any failure (not installed, version-skewed, GAMS not found) reads as "not
-    available".
+    confirm the engine works.
+
+    With the default ``gams_dir=None`` the result is cached after the first call
+    (keyed to the default-discovered directory), so ``import gdxpds`` pays nothing
+    on systems that never touch the fast path and repeat checks are free. When an
+    explicit ``gams_dir`` is given (e.g. ``info(gams_dir=...)`` inspecting a
+    specific install) the probe runs fresh against that directory and neither
+    reads nor writes the cache, so it reports that directory and a transient
+    failure can't poison later default probes.
     """
+    if gams_dir is not None:
+        return _probe_transfer_at(gams_dir)
     global _have_gams_transfer
     if _have_gams_transfer is None:
-        try:
-            import gams.transfer as gt
-
-            gt.Container(system_directory=GamsDirFinder().gams_dir)
-            _have_gams_transfer = True
-        except Exception:
-            _have_gams_transfer = False
+        _have_gams_transfer = _probe_transfer_at(None)
     return _have_gams_transfer
 
 
@@ -489,8 +506,10 @@ def info(gams_dir: str | os.PathLike[str] | None = None) -> str:
     bound = _loaded_gams_dir or "(not yet bound)"
     lines.append(f"  bound dir:   {bound}")
     # Importable (above) is not the same as usable: a version-skewed gamsapi
-    # imports but cannot load the GAMS libraries. This reports actual usability.
-    lines.append(f"  gams.transfer usable: {'yes' if _probe_gams_transfer() else 'no'}")
+    # imports but cannot load the GAMS libraries. This reports actual usability
+    # for the directory being inspected (a fresh, uncached probe when gams_dir is
+    # given, so the report tracks the requested install rather than the default).
+    lines.append(f"  gams.transfer usable: {'yes' if _probe_gams_transfer(gams_dir) else 'no'}")
 
     try:
         from gdxpds._backend import resolve_backend

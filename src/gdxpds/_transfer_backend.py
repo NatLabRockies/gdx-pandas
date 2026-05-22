@@ -66,17 +66,33 @@ _EQU_TYPE_STR = {member: s for s, member in _EQU_TYPE.items()}
 def _np_to_transfer_specials(records: pd.DataFrame, value_cols: list[str]) -> None:
     """In place, map gdxpds canonical special values to gams.transfer encodings.
 
-    Inverse of :func:`_convert_transfer_specials`: machine eps -> EPS (gt's
-    ``-0.0``); NaN -> NA (gt's NA sentinel); +/-inf already match. Genuine 0.0 is
-    left alone (only eps maps to EPS).
+    Mostly the inverse of :func:`_convert_transfer_specials`: machine eps -> EPS
+    (gt's ``-0.0``); NaN -> NA (gt's NA sentinel); +/-inf already match. Genuine
+    0.0 is left alone (only eps maps to EPS).
+
+    The one asymmetry is GDX UNDEF (gdxpds canonical ``None``; see
+    :data:`special.NUMPY_SPECIAL_VALUES`). For strict v2.1.0 parity we mirror the
+    gdxcc write path, which *cannot* emit UNDEF: there a ``None`` isn't a
+    ``Number`` and falls through to ``0.0``. So a ``None`` (only possible in an
+    object column) maps to ``0.0`` here too -- not NA, which the plain float64
+    coercion below would otherwise produce. v3.0.0 may revisit emitting a genuine
+    UNDEF (which would read back as ``None``).
     """
     eps = NUMPY_SPECIAL_VALUES[-1]
     for col in value_cols:
-        arr = records[col].to_numpy(dtype="float64", copy=True)
+        col_data = records[col]
+        # float64 columns can't hold a Python None, so only object columns need
+        # the (per-element) None check; skip it otherwise to keep the hot path fast.
+        if col_data.dtype == object:
+            is_none = col_data.map(lambda v: v is None).to_numpy(dtype=bool)
+        else:
+            is_none = np.zeros(len(col_data), dtype=bool)
+        arr = col_data.to_numpy(dtype="float64", copy=True)
         is_eps = np.abs(arr - eps) < eps
-        is_nan = np.isnan(arr)
+        is_nan = np.isnan(arr) & ~is_none  # genuine NaN (NA), not a coerced None
         arr[is_nan] = gt.SpecialValues.NA
         arr[is_eps] = gt.SpecialValues.EPS
+        arr[is_none] = 0.0  # UNDEF -> 0.0, matching gdxcc
         records[col] = arr
 
 
@@ -104,19 +120,33 @@ def _dims_of(gt_sym) -> list[str]:
 def _convert_transfer_specials(values: pd.DataFrame) -> pd.DataFrame:
     """Map gams.transfer special-value encodings to the gdxpds canonical form.
 
-    EPS (gt's ``-0.0``) -> machine eps; NA and UNDEF (gt's special NaNs) ->
-    plain ``np.nan``; +/-inf already match. Genuine ``0.0`` is left alone (only
-    negative zero is EPS).
+    Mirrors the gdxcc backend's :func:`special.convert_gdx_to_np_svs` exactly:
+    EPS (gt's ``-0.0``) -> machine eps; NA (gt's NA sentinel) -> ``np.nan``;
+    UNDEF (gt's plain NaN) -> ``None``; +/-inf already match. Genuine ``0.0`` is
+    left alone (only negative zero is EPS).
+
+    Keeping UNDEF distinct from NA is what byte-for-byte parity with gdxcc
+    requires: gdxcc maps GDX UNDEF -> ``None`` and GDX NA -> ``np.nan`` (see
+    :data:`special.GDX_TO_NP_SVS`). A column carrying any UNDEF therefore comes
+    back as object dtype (so ``None`` survives), matching gdxcc; a column with no
+    UNDEF stays ``float64``.
     """
     eps = NUMPY_SPECIAL_VALUES[-1]
     out = values.copy()
     for col in out.columns:
         arr = out[col].to_numpy(dtype="float64", copy=True)
         is_eps = np.asarray(gt.SpecialValues.isEps(arr))
-        is_nan = np.asarray(gt.SpecialValues.isNA(arr)) | np.asarray(gt.SpecialValues.isUndef(arr))
-        arr[is_nan] = np.nan
+        is_na = np.asarray(gt.SpecialValues.isNA(arr))
+        is_undef = np.asarray(gt.SpecialValues.isUndef(arr))
+        arr[is_na | is_undef] = np.nan
         arr[is_eps] = eps
-        out[col] = arr
+        if is_undef.any():
+            # UNDEF -> None (gdxcc parity), forcing object dtype like gdxcc does.
+            obj = arr.astype(object)
+            obj[is_undef] = None
+            out[col] = obj
+        else:
+            out[col] = arr
     return out
 
 

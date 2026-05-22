@@ -240,6 +240,26 @@ v3.0.0; future entries may be unscheduled.)
   breaking. **Slated for v3.0.0** as a candidate payload alongside the
   default-flip and set-text-write.
 
+- **GDX UNDEF is not preserved on write — it collapses to `0.0`.** gdxpds'
+  canonical form maps GDX UNDEF → Python `None` and GDX NA → `np.nan` (see
+  [../src/gdxpds/special.py](../src/gdxpds/special.py),
+  `NUMPY_SPECIAL_VALUES`/`GDX_TO_NP_SVS`). Both backends *read* the distinction
+  correctly (a value column carrying any UNDEF comes back as object dtype with
+  `None`; v2.1.0 made the gams.transfer read match the gdxcc oracle here). But the
+  gdxcc *write* path cannot emit UNDEF: a `None` isn't a `Number`, so
+  `write_symbol` ([../src/gdxpds/_gdxcc_backend.py](../src/gdxpds/_gdxcc_backend.py))
+  falls through to `0.0`. So a read→write round-trip turns UNDEF into `0.0` (NA, by
+  contrast, round-trips). For strict v2.1.0 parity the gams.transfer write path
+  mirrors this — `_np_to_transfer_specials`
+  ([../src/gdxpds/_transfer_backend.py](../src/gdxpds/_transfer_backend.py)) maps
+  `None` → `0.0` rather than to a genuine `gt.SpecialValues.UNDEF` — pinned by
+  `test_write_parity_undef`
+  ([../tests/test_backend_parity.py](../tests/test_backend_parity.py)). **Candidate
+  fix for v3.0.0** (unscheduled): gams.transfer *can* write a real UNDEF (which
+  reads back as `None`), so the default-flip release could let the transfer write
+  preserve UNDEF. It's a behavior change that would diverge from the gdxcc oracle,
+  so it belongs with the coordinated breaking release, not v2.1.0.
+
 - **`GdxFile.H` is a gdxcc-specific escape hatch on an engine-agnostic
   interface.** After the Phase 0 extraction it delegates to
   `self._backend_impl.handle` — the gdxcc GDX pointer, or `None` for backends

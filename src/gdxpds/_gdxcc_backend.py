@@ -111,9 +111,7 @@ class GdxccBackend(GdxBackend):
         for symbol in gdx_file:
             symbol.resolve_domain()
 
-    def _make_symbol(
-        self, gdx_file: GdxFile, name: str, data_type, dims, index: int
-    ) -> GdxSymbol:
+    def _make_symbol(self, gdx_file: GdxFile, name: str, data_type, dims, index: int) -> GdxSymbol:
         """Construct a GdxSymbol and populate its extended gdxcc metadata.
 
         Mirrors the metadata read that used to live in ``GdxSymbol.__init__``;
