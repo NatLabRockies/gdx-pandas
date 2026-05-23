@@ -2,6 +2,9 @@ import os
 import subprocess
 
 import pandas as pd
+import pytest
+
+import gdxpds
 
 
 def test_gdx_roundtrip(roundtrip_one_gdx):
@@ -50,3 +53,26 @@ def test_csv_roundtrip(data_dir, run_dir):
                 cnt += 1
         break
     assert cnt == n
+
+
+@pytest.mark.parametrize("backend", ["gdxcc", "gams_transfer"])
+def test_cli_backend_flag(data_dir, run_dir, backend):
+    # The --backend flag is accepted by both CLIs and routed to to_gdx /
+    # to_dataframes (an unplumbed flag would make check=True fail).
+    if backend == "gams_transfer" and not gdxpds.HAVE_GAMS_TRANSFER:
+        pytest.skip("gams.transfer not available")
+    csvs = [
+        os.path.join(data_dir, "installed_capacity.csv"),
+        os.path.join(data_dir, "annual_generation.csv"),
+    ]
+    out_dir = os.path.join(run_dir, f"cli_backend_{backend}")
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+    gdx_file = os.path.join(out_dir, "intermediate.gdx")
+    subprocess.run(
+        ["csv_to_gdx", "-i", csvs[0], csvs[1], "-o", gdx_file, "--backend", backend], check=True
+    )
+    subprocess.run(["gdx_to_csv", "-i", gdx_file, "-o", out_dir, "--backend", backend], check=True)
+    for csv in csvs:
+        name = os.path.splitext(os.path.basename(csv))[0]
+        assert os.path.isfile(os.path.join(out_dir, name + ".csv"))

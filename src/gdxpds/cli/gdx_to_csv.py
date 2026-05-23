@@ -7,13 +7,13 @@ import gdxpds
 logger = logging.getLogger(__name__)
 
 
-def convert_gdx_to_csv(in_gdx, out_dir, gams_dir=None):
+def convert_gdx_to_csv(in_gdx, out_dir, gams_dir=None, backend=None):
     # check inputs
     if not os.path.exists(os.path.dirname(out_dir)):
         raise RuntimeError(f"Parent directory of output directory '{out_dir}' does not exist.")
 
     # convert to pandas.DataFrames
-    dataframes = gdxpds.to_dataframes(in_gdx, gams_dir)
+    dataframes = gdxpds.to_dataframes(in_gdx, gams_dir, backend=backend)
 
     # write to files
     if not os.path.exists(out_dir):
@@ -50,10 +50,18 @@ def main(argv=None):
                         directory.""",
         default=None,
     )
+    parser.add_argument(
+        "-b",
+        "--backend",
+        choices=[b.value for b in gdxpds.Backend],
+        default=None,
+        help="""I/O engine to use. Defaults to the GDXPDS_BACKEND environment
+                        variable, then 'gdxcc'.""",
+    )
 
     args = parser.parse_args(argv)
 
-    convert_gdx_to_csv(args.in_gdx, os.path.realpath(args.out_dir), args.gams_dir)
+    convert_gdx_to_csv(args.in_gdx, os.path.realpath(args.out_dir), args.gams_dir, args.backend)
 
 
 if __name__ == "__main__":

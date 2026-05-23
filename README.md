@@ -23,6 +23,8 @@ gdx-pandas is a python package to translate between gdx (GAMS data) and pandas.
     pip install gamsapi[transfer]==xx.y.z
     ```
 
+    Installing `gamsapi` this way also enables the optional, much-faster `gams.transfer` I/O engine for large files (see [Configure](#configure) below).
+
     **Legacy.** Use the standalone `gdxcc` package from PyPI by installing `gdxpds` with the `legacy` extra (see below). `gdxcc` is older and is not version-matched to your GAMS install, but the SWIG-bound C ABI is stable enough that it generally works.
 
 ### Get the Latest Package
@@ -37,6 +39,17 @@ pip install gdxpds[legacy]
 
 Versions are listed at [pypi](https://pypi.python.org/pypi/gdxpds/) and 
 https://github.com/NatLabRockies/gdx-pandas/releases.
+
+### Configure
+
+gdxpds needs to know **where GAMS is**, and optionally **which I/O engine** to use. Set either once via an environment variable, or per call with the `gams_dir=` / `backend=` keywords (also `--gams_dir` / `--backend` on the CLIs):
+
+```bash
+export GAMS_DIR=/path/to/gams        # otherwise auto-discovered
+export GDXPDS_BACKEND=gams_transfer  # default: gdxcc; gams_transfer is much faster on large files (needs gamsapi)
+```
+
+See *Configuration* in the [documentation](https://NatLabRockies.github.io/gdx-pandas) for the full keyword / environment-variable / CLI matrix and the speed trade-offs.
 
 ## Verify installation
 

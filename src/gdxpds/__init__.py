@@ -1,6 +1,7 @@
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
-from gdxpds.gdx import GdxError
+from gdxpds._backend import Backend, BackendError
+from gdxpds.gdx import GdxError, SymbolNotFoundError
 from gdxpds.read_gdx import (
     get_data_types,
     get_subset_relationships,
@@ -25,6 +26,10 @@ __all__ = [
     "GamsLoadError",
     "GdxError",
     "GamsDirFinder",
+    "Backend",
+    "BackendError",
+    "SymbolNotFoundError",
+    "HAVE_GAMS_TRANSFER",
     "to_dataframes",
     "to_dataframe",
     "list_symbols",
@@ -32,3 +37,13 @@ __all__ = [
     "get_subset_relationships",
     "to_gdx",
 ]
+
+
+def __getattr__(name: str):
+    # Expose HAVE_GAMS_TRANSFER lazily so ``import gdxpds`` does not pay the
+    # gams.transfer import cost; the probe runs on first access.
+    if name == "HAVE_GAMS_TRANSFER":
+        from gdxpds.tools import _probe_gams_transfer
+
+        return _probe_gams_transfer()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

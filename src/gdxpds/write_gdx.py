@@ -4,6 +4,7 @@ import logging
 import os
 from collections.abc import Mapping, Sequence
 from numbers import Number
+from typing import TYPE_CHECKING
 
 import pandas as pd
 
@@ -17,14 +18,18 @@ from gdxpds.gdx import (
 )
 from gdxpds.tools import Error
 
+if TYPE_CHECKING:
+    from gdxpds._backend import Backend
+
 logger = logging.getLogger(__name__)
 
 
 class Translator:
-    def __init__(self, dataframes, gams_dir=None, domains=None):
+    def __init__(self, dataframes, gams_dir=None, domains=None, backend=None):
         self.dataframes = dataframes
         self.__domains = domains
         self.__gams_dir = gams_dir
+        self.__backend = backend
         self.__gdx = None
 
     def __exit__(self, *args):
@@ -77,7 +82,7 @@ class Translator:
     def gdx(self):
         if self.__gdx is None:
             domains = self.__domains
-            gdx_file = GdxFile(gams_dir=self.__gams_dir)
+            gdx_file = GdxFile(gams_dir=self.__gams_dir, backend=self.__backend)
             dataframes = (
                 self.__topo_sort_dataframes(self.dataframes, domains)
                 if domains is not None
@@ -204,6 +209,7 @@ def to_gdx(
     path: str | os.PathLike[str] | None = None,
     gams_dir: str | os.PathLike[str] | None = None,
     domains: Mapping[str, Sequence[str | None]] | None = None,
+    backend: str | Backend | None = None,
 ) -> GdxFile:
     """
     Creates a :py:class:`gdxpds.gdx.GdxFile` from dataframes and optionally writes it to path
@@ -227,11 +233,15 @@ def to_gdx(
         input (unknown parent name, wrong type, wrong length, cyclic references) raises
         :class:`DomainError`.
 
+    backend : None or str or :py:class:`gdxpds.Backend`
+        Which I/O engine to use for the write (default resolves via
+        ``GDXPDS_BACKEND``, falling back to ``gdxcc``).
+
     Returns
     -------
     :py:class:`gdxpds.gdx.GdxFile`
     """
-    translator = Translator(dataframes, gams_dir=gams_dir, domains=domains)
+    translator = Translator(dataframes, gams_dir=gams_dir, domains=domains, backend=backend)
     gdx = translator.gdx
     if path is not None:
         gdx.write(path)

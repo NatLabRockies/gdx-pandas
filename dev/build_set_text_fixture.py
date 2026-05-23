@@ -33,8 +33,9 @@ ELEMENTS = [("a", "alpha"), ("b", "beta"), ("c", "gamma")]
 
 def main():
     # Creating a GdxFile binds the GAMS library, after which the raw gdxcc calls
-    # below operate on its handle (f.H).
-    with gdxpds.gdx.GdxFile() as f:
+    # below operate on its handle (f.H). Pin the gdxcc backend: f.H is None under
+    # the gams.transfer backend, so GDXPDS_BACKEND must not redirect us.
+    with gdxpds.gdx.GdxFile(backend="gdxcc") as f:
         if not gdxcc.gdxOpenWrite(f.H, OUT_PATH, "gdxpds"):
             raise gdxpds.gdx.GdxError(f.H, f"Could not open {OUT_PATH!r} for writing")
         f.universal_set.write()

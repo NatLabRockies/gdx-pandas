@@ -15,12 +15,11 @@ from collections import OrderedDict, defaultdict
 from collections.abc import MutableSequence, Sequence
 from ctypes import c_bool
 from enum import Enum
-from numbers import Number
 
 import numpy as np
 import pandas as pd
 
-import gdxpds.special as special
+from gdxpds._backend import Backend, make_backend, resolve_backend
 
 # Re-exported from gdxpds.special for backward compatibility.
 from gdxpds.special import (
@@ -32,7 +31,7 @@ from gdxpds.special import (
     is_np_eps,  # noqa: F401
     is_np_sv,  # noqa: F401
 )
-from gdxpds.tools import Error, NeedsGamsDir, _GdxHandle, load_gdxcc
+from gdxpds.tools import Error, NeedsGamsDir
 
 # gdxcc bindings: modern (shipped inside gamsapi) is preferred; the standalone
 # legacy PyPI package is the fallback.
@@ -151,9 +150,19 @@ class DomainError(Error):
     """
 
 
+class SymbolNotFoundError(Error):
+    """Raised when a requested symbol name is not present in a :class:`GdxFile`.
+
+    Subclass of :class:`Error`, so ``except Error`` still catches it.
+    """
+
+
 class GdxFile(MutableSequence, NeedsGamsDir):
     def __init__(
-        self, gams_dir: str | os.PathLike[str] | None = None, lazy_load: bool = True
+        self,
+        gams_dir: str | os.PathLike[str] | None = None,
+        lazy_load: bool = True,
+        backend: str | Backend | None = None,
     ) -> None:
         """
         Initializes a GdxFile object by connecting to GAMS and creating a pointer.
@@ -170,6 +179,10 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             accessed later after the corresponding calls to :py:meth:`GdxSymbol.load`.
             If False, all data are automatically loaded and the full GDX file is
             available in memory after the call to :py:meth:`read`.
+        backend : None or str or :py:class:`gdxpds.Backend`
+            Which I/O engine to use. ``None`` (default) resolves via the
+            ``GDXPDS_BACKEND`` env var, falling back to the default backend
+            (``gdxcc``). Pass ``"gdxcc"`` / ``Backend.GDXCC`` to pin it.
         """
         self.lazy_load = lazy_load
         self._version = None
@@ -177,29 +190,31 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         self._filename = None
         self._symbols = OrderedDict()
         # Set before anything that can raise, so cleanup() is safe if create fails.
-        self._H = None
-        self._handle = None
         self._finalizer = None
+        self._backend_impl = None
+        self._backend_kind = None
 
         NeedsGamsDir.__init__(self, gams_dir=gams_dir)
-        self._handle = self._create_gdx_object()
-        self._H = self._handle.H
+        # Build the I/O engine. For the gdxcc backend this binds the GDX library
+        # and creates the handle, which the backend owns and frees in close().
+        self._backend_kind = resolve_backend(backend)
+        self._backend_impl = make_backend(self._backend_kind, self.gams_dir, self.gams_dir_source)
+
+        # Free the engine's native resources exactly once, at the first of:
+        # cleanup(), garbage collection, or interpreter exit. The callback is the
+        # backend's own close() -- a bound method of the backend, not self -- so
+        # it never keeps this GdxFile alive (which would defeat GC-time
+        # finalization) and stays valid at interpreter shutdown (close() uses
+        # callables bound when the handle was created, not module-global lookups).
+        self._finalizer = weakref.finalize(self, self._backend_impl.close)
+
         self.universal_set = GdxSymbol("*", GamsDataType.Set, dims=1, file=None, index=0)
         self.universal_set._file = self
-
-        # Free the gdx object + wrapper exactly once, at the first of: cleanup(),
-        # garbage collection, or interpreter exit. The callback is the handle's own
-        # close() -- a bound method of self._handle, not self -- so it never keeps
-        # this GdxFile alive (which would defeat GC-time finalization) and stays
-        # valid at interpreter shutdown (close() uses callables bound when the
-        # handle was created, not module-global lookups).
-        self._finalizer = weakref.finalize(self, self._handle.close)
         return
 
     def cleanup(self) -> None:
         if self._finalizer is not None:
-            self._finalizer()  # runs handle.close() at most once
-        self._H = None
+            self._finalizer()  # runs backend.close() at most once
 
     def __enter__(self):
         return self
@@ -218,7 +233,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         -------
         :py:class:`GdxFile`
         """
-        result = GdxFile(gams_dir=self.gams_dir, lazy_load=False)
+        result = GdxFile(gams_dir=self.gams_dir, lazy_load=False, backend=self._backend_kind)
         for symbol in self:
             result.append(symbol.clone())
             result[-1]._file = result
@@ -238,9 +253,15 @@ class GdxFile(MutableSequence, NeedsGamsDir):
     @property
     def H(self):
         """
-        GDX object handle
+        GDX object handle (gdxcc backend only; ``None`` for backends without one,
+        and after :py:meth:`cleanup`).
+
+        This is a gdxcc-specific escape hatch (e.g. for driving raw ``gdxcc``
+        calls). It is a candidate for deprecation/removal in v3.0.0, when the
+        default backend flips and ``None`` becomes the common return — see the
+        "Known warts" section of ``dev/ROADMAP.md``.
         """
-        return self._H
+        return self._backend_impl.handle if self._backend_impl is not None else None
 
     @property
     def filename(self):
@@ -294,50 +315,39 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         if not self.empty:
             raise Error("GdxFile.read can only be used if the GdxFile is .empty")
 
-        # open the file
-        rc = gdxcc.gdxOpenRead(self.H, str(filename))
-        if not rc[0]:
-            raise GdxError(self.H, f"Could not open {filename!r}")
-        self._filename = filename
-
-        # read in meta-data ...
-        # ... for the file
-        ret, self._version, self._producer = gdxcc.gdxFileVersion(self.H)
-        if ret != 1:
-            raise GdxError(self.H, "Could not get file version")
-        ret, symbol_count, element_count = gdxcc.gdxSystemInfo(self.H)
-        logger.debug(
-            f"Opening '{filename}' with {symbol_count} symbols and "
-            f"{element_count} elements with lazy_load = {self.lazy_load}."
-        )
-        # ... for the symbols
-        ret, name, dims, data_type = gdxcc.gdxSymbolInfo(self.H, 0)
-        if ret != 1:
-            raise GdxError(self.H, "Could not get symbol info for the universal set")
-        self.universal_set = GdxSymbol(name, data_type, dims=dims, file=self, index=0)
-        for i in range(symbol_count):
-            index = i + 1
-            ret, name, dims, data_type = gdxcc.gdxSymbolInfo(self.H, index)
-            if ret != 1:
-                raise GdxError(self.H, f"Could not get symbol info for symbol {index}")
-            try:
-                sym = GdxSymbol(name, data_type, dims=dims, file=self, index=index)
-                self.append(sym)
-            except Exception as e:
-                logger.error(f"Unable to initialize GdxSymbol {name!r}, because {e}. SKIPPING.")
-
-        # Self-heal strict-domain refs whose parent appeared at a higher
-        # GDX index than the child (malformed but readable). No-op for
-        # well-formed files — each symbol's in-line attempt already
-        # succeeded.
-        for symbol in self:
-            symbol.resolve_domain()
+        # The backend reads file + symbol metadata and builds the GdxSymbol
+        # collection (records are not loaded here).
+        self._backend_impl.open_read(self, filename)
 
         # read all symbols if not lazy_load
         if not self.lazy_load:
-            for symbol in self:
-                symbol.load()
+            self.load_all()
         return
+
+    def load_all(self, *, load_set_text: bool = False) -> None:
+        """
+        Eagerly load every symbol's records into its :py:attr:`GdxSymbol.dataframe`.
+
+        Already-loaded symbols are skipped. Pass ``load_set_text=True`` to surface
+        GAMS element text for Sets instead of the membership ``c_bool``.
+        """
+        self._backend_impl.load_file(self, load_set_text=load_set_text)
+
+    def load_symbols(self, names: Sequence[str], *, load_set_text: bool = False) -> None:
+        """
+        Eagerly load the records of the named symbols (a subset of the file).
+
+        Resolves each name to its :py:class:`GdxSymbol` and loads via the backend
+        (gams.transfer issues a single targeted read; gdxcc loops per symbol).
+        Raises :class:`SymbolNotFoundError` for an unknown name; already-loaded
+        symbols are skipped.
+        """
+        symbols = []
+        for name in names:
+            if name not in self:
+                raise SymbolNotFoundError(f"No symbol named {name!r} in {self.filename!r}.")
+            symbols.append(self[name])
+        self._backend_impl.load_symbols(self, symbols, load_set_text=load_set_text)
 
     def reorder_for_strict_domains(self):
         """
@@ -382,35 +392,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         ----------
         filename : pathlib.Path or str
         """
-        # only write if all symbols loaded
-        for symbol in self:
-            if not symbol.loaded:
-                raise Error("All symbols must be loaded before this file can be written.")
-
-        ret = gdxcc.gdxOpenWrite(self.H, str(filename), "gdxpds")
-        if not ret:
-            raise GdxError(
-                self.H,
-                f"Could not open {filename!r} for writing. "
-                "Consider cloning this file (.clone()) before trying to write.",
-            )
-        self._filename = filename
-
-        # write the universal set
-        self.universal_set.write()
-
-        # Build the {name: position} map once so each symbol's strict-domain
-        # eligibility check is O(1) per parent rather than O(N).
-        name_positions = {name: i for i, name in enumerate(self._symbols.keys())}
-
-        for i, symbol in enumerate(self, start=1):
-            try:
-                symbol.write(index=i, name_positions=name_positions)
-            except Exception:
-                logger.error(f"Unable to write {symbol} to {filename}")
-                raise
-
-        gdxcc.gdxClose(self.H)
+        self._backend_impl.write_file(self, filename)
 
     def __repr__(self):
         return f"GdxFile(self,gams_dir={repr(self.gams_dir)},lazy_load={repr(self.lazy_load)})"
@@ -542,15 +524,6 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             [(symbol.name, symbol) for _cur_key, symbol in self._symbols.items()]
         )
         return
-
-    def _create_gdx_object(self):
-        # Idempotent: first call binds the library + populates SPECIAL_VALUES;
-        # subsequent calls validate self.gams_dir and warn on mismatch.
-        load_gdxcc(gams_dir=self.gams_dir)
-        # _GdxHandle validates the create (raising GamsLoadError on failure, and
-        # deleting the wrapper without an unsafe gdxFree). This GdxFile keeps the
-        # handle; its weakref.finalize calls handle.close() to free+delete.
-        return _GdxHandle(gdxcc, self.gams_dir, self.gams_dir_source)
 
 
 class GamsDataType(Enum):
@@ -713,6 +686,10 @@ class GdxSymbol:
         self._dims = None
         self._domain = None
         self._strict_on_disk = False
+        # Record count per GAMS; meaningful only before load (afterwards
+        # num_records uses the dataframe). The backend's open_read overwrites
+        # this for symbols read from a file.
+        self._num_records = 0
         self.dims = dims
         if domain is not None:
             self.domain = domain
@@ -723,44 +700,13 @@ class GdxSymbol:
         # adding this flag to implement ability to load set text instead of boolean values
         self._fixup_set_vals = True
 
-        if self.file is not None:
-            # reading from file
-            # get additional meta-data
-            ret, records, userinfo, description = gdxcc.gdxSymbolInfoX(self.file.H, self.index)
-            if ret != 1:
-                raise GdxError(
-                    self.file.H, f"Unable to get extended symbol information for {self.name}"
-                )
-            self._num_records = records
-            if self.data_type == GamsDataType.Variable:
-                self.variable_type = GamsVariableType(userinfo)
-            elif self.data_type == GamsDataType.Equation:
-                self.equation_type = GamsEquationType(userinfo)
-            self.description = description
-            if self.index > 0:
-                ret, gdx_domain = gdxcc.gdxSymbolGetDomainX(self.file.H, self.index)
-                if ret == 0:
-                    raise GdxError(self.file.H, f"Unable to get domain information for {self.name}")
-                assert len(gdx_domain) == len(self.dims), (
-                    "Dimensional information read in from GDX should be consistent."
-                )
-                self.dims = gdx_domain
-                if ret == 3:
-                    # Stored via strict gdxSymbolSetDomain. Mark so a later retry can distinguish
-                    # strict-but-unresolved from truly relaxed, then try to resolve names to same-file
-                    # GdxSymbol refs. Symbols with lower indices are already in self.file._symbols at
-                    # this point; for well-formed GDX, this succeeds. GdxFile.read() also retries at the
-                    # end to self-heal symbols whose parents had higher indices (malformed files).
-                    self._strict_on_disk = True
-                    self.resolve_domain()
-            else:
-                # universal set
-                assert self.index == 0
-                self._loaded = True
-            return
-
-        # writing new symbol
-        self._loaded = True
+        # A symbol constructed without a file is being built for writing and is
+        # ready to use immediately. A symbol constructed with a file is being
+        # read: the backend's open_read populates its extended metadata (record
+        # count, variable/equation subtype, description, domain) and it stays
+        # unloaded until its records are pulled.
+        if self.file is None:
+            self._loaded = True
         return
 
     def clone(self) -> GdxSymbol:
@@ -945,7 +891,7 @@ class GdxSymbol:
                 f"this GdxSymbol, which is a {self.data_type}"
             )
         value_col = GamsValueType(value_col_name)
-        if self.data_type == GamsDataType.Set:
+        if self.data_type in (GamsDataType.Set, GamsDataType.Alias):
             assert value_col == GamsValueType.Level
             return c_bool(True)
         if (self.data_type == GamsDataType.Variable) and (
@@ -1308,13 +1254,13 @@ class GdxSymbol:
             )
             raise
 
-        if self.data_type == GamsDataType.Set:
+        if self.data_type in (GamsDataType.Set, GamsDataType.Alias):
             self._fixup_set_value()
         return
 
     def _init_dataframe(self):
         self._dataframe = pd.DataFrame([], columns=self.dims + self.value_col_names)
-        if self.data_type == GamsDataType.Set:
+        if self.data_type in (GamsDataType.Set, GamsDataType.Alias):
             colname = self._dataframe.columns[-1]
             replace_df_column(self._dataframe, colname, self._dataframe[colname].astype(c_bool))
         return
@@ -1337,7 +1283,7 @@ class GdxSymbol:
         fills in any missing values, so users no longer need to actually specify
         self.dataframe['Value'] = True.
         """
-        assert self.data_type == GamsDataType.Set
+        assert self.data_type in (GamsDataType.Set, GamsDataType.Alias)
 
         colname = self._dataframe.columns[-1]
         assert colname == self.value_col_names[0], (
@@ -1397,36 +1343,10 @@ class GdxSymbol:
             return
         if not self.file:
             raise Error(f"Cannot load {repr(self)} because there is no file pointer")
-        if not self.index:
-            raise Error(f"Cannot load {repr(self)} because there is no symbol index")
-
-        _ret, records = gdxcc.gdxDataReadStrStart(self.file.H, self.index)
-
-        def reader():
-            handle = self.file.H
-            for i in range(records):
-                yield gdxcc.gdxDataReadStr(handle)
-
-        vc = self.value_cols  # do this for speed in the next line
-        if load_set_text and (self.data_type == GamsDataType.Set):
-            data = [
-                elements
-                + [
-                    gdxcc.gdxGetElemText(self.file.H, int(values[col_ind]))[1]
-                    for _col_name, col_ind in vc
-                ]
-                for _ret, elements, values, _afdim in reader()
-            ]
-            self._fixup_set_vals = False
-        else:
-            data = [
-                elements + [values[col_ind] for col_name, col_ind in vc]
-                for ret, elements, values, afdim in reader()
-            ]
-        self.dataframe = data
-        if self.data_type not in (GamsDataType.Set, GamsDataType.Alias):
-            self.dataframe = special.convert_gdx_to_np_svs(self.dataframe, self.num_dims)
-        self._loaded = True
+        # The backend reads the records and populates this symbol's dataframe.
+        # The "no symbol index" guard now lives in the gdxcc backend, which is
+        # the path that needs it.
+        self.file._backend_impl.load_symbol(self, load_set_text=load_set_text)
         return
 
     def unload(self) -> None:
@@ -1440,82 +1360,11 @@ class GdxSymbol:
         """
         Writes this :py:class:`GdxSymbol` to its :py:attr:`file`
         """
-        if not self.loaded:
-            raise Error(f"Cannot write unloaded symbol {self.name!r}.")
         if self.file is None:
             raise Error(f"Cannot write {self!r} because there is no file pointer")
-
-        if self.data_type == GamsDataType.Set:
-            self._fixup_set_value()
-
-        if index is not None:
-            self._index = index
-
-        if self.index == 0:
-            # universal set
-            gdxcc.gdxUELRegisterRawStart(self.file.H)
-            gdxcc.gdxUELRegisterRaw(self.file.H, self.name)
-            gdxcc.gdxUELRegisterDone(self.file.H)
-            return
-
-        # write the data
-        userinfo = 0
-        if self.variable_type is not None:
-            userinfo = self.variable_type.value
-        elif self.equation_type is not None:
-            userinfo = self.equation_type.value
-        if not gdxcc.gdxDataWriteStrStart(
-            self.file.H, self.name, self.description, self.num_dims, self.data_type.value, userinfo
-        ):
-            raise GdxError(
-                self.file.H, f"Could not start writing data for symbol {repr(self.name)}"
-            )
-        # set domain information: prefer strict gdxSymbolSetDomain when every
-        # entry of self._domain either is None ('*') or refers to a parent
-        # already written to this file; otherwise fall back to relaxed
-        # gdxSymbolSetDomainX. Decision is per-symbol because GDX itself only
-        # supports per-symbol strict/relaxed.
-        if self.num_dims > 0:
-            domain = self._domain if self._strict_domain_writeable(name_positions) else None
-            if domain is not None:
-                names = [d.name if d is not None else "*" for d in domain]
-                if not gdxcc.gdxSymbolSetDomain(self.file.H, names):
-                    raise GdxError(
-                        self.file.H,
-                        f"Could not set strict domain information for {repr(self.name)}. "
-                        f"Domains are {repr(names)}",
-                    )
-            elif self.index:
-                if not gdxcc.gdxSymbolSetDomainX(self.file.H, self.index, self.dims):
-                    raise GdxError(
-                        self.file.H,
-                        f"Could not set domain information for {repr(self.name)}. Domains are {repr(self.dims)}",
-                    )
-            else:
-                logger.info("Not writing domain information because symbol index is unknown.")
-        values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
-        # make sure index is clean -- needed for merging in convert_np_to_gdx_svs
-        self.dataframe = self.dataframe.reset_index(drop=True)
-        # convert special numeric values if appropriate
-        to_write = (
-            self.dataframe.copy()
-            if (self.data_type in (GamsDataType.Set, GamsDataType.Alias))
-            else special.convert_np_to_gdx_svs(self.dataframe, self.num_dims)
+        self.file._backend_impl.write_symbol(
+            self.file, self, index=index, name_positions=name_positions
         )
-        # write each row
-        for row in to_write.itertuples(index=False, name=None):
-            dims = [str(x) for x in row[: self.num_dims]]
-            vals = row[self.num_dims :]
-            for _col_name, col_ind in self.value_cols:
-                values[col_ind] = 0.0
-                try:
-                    if isinstance(vals[col_ind], Number):
-                        values[col_ind] = float(vals[col_ind])
-                except Exception:
-                    raise Error(f"Unable to set element {col_ind} from {vals}.")
-            gdxcc.gdxDataWriteStr(self.file.H, dims, values)
-        gdxcc.gdxDataWriteDone(self.file.H)
-        return
 
 
 # ------------------------------------------------------------------------------

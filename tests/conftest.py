@@ -21,6 +21,70 @@ def clean_up(request):
     return not request.config.getoption("--no-clean-up")
 
 
+# Rows appended by tests/test_backend_timing.py; rendered once after the run by
+# pytest_terminal_summary below. Each row: dict(fixture, size_kb, op, gdxcc,
+# gams_transfer, ratio) where ratio = gdxcc / gams_transfer (>1 = transfer faster).
+_BACKEND_TIMINGS = []
+
+
+@pytest.fixture(scope="session")
+def backend_timings():
+    return _BACKEND_TIMINGS
+
+
+def _crossover_note(rows, op):
+    """Describe the gdxcc<->gams_transfer winner across sizes for one op.
+
+    Rows are sorted by size; returns "clear winner" text if one backend wins at
+    every size, else the size band where gams_transfer overtakes gdxcc.
+    """
+    op_rows = sorted((r for r in rows if r["op"] == op), key=lambda r: r["size_kb"])
+    if not op_rows:
+        return ""
+    wins = [r["ratio"] >= 1.0 for r in op_rows]  # True = transfer faster
+    if all(wins):
+        return f"{op}: gams_transfer faster at every size tested."
+    if not any(wins):
+        return f"{op}: gdxcc faster at every size tested (transfer overhead never amortized)."
+    first = next(i for i, w in enumerate(wins) if w)
+    # A clean single crossover is all-gdxcc-faster (False) up to `first`, then
+    # all-transfer-faster (True) at and above it. Anything else -- transfer
+    # already winning at the smallest size (first == 0), or wins that flip back
+    # and forth (noise / non-monotonic timings) -- has no single switchover band
+    # to report, so describe it as mixed rather than invent a bogus band.
+    if first == 0 or not all(wins[first:]):
+        return f"{op}: mixed results across sizes; no single switchover band (see table above)."
+    below = op_rows[first - 1]
+    above = op_rows[first]
+    return (
+        f"{op}: switchover between {below['size_kb']:.1f} KB ({below['fixture']}, gdxcc faster) "
+        f"and {above['size_kb']:.1f} KB ({above['fixture']}, transfer faster)."
+    )
+
+
+def pytest_terminal_summary(terminalreporter, exitstatus, config):
+    rows = _BACKEND_TIMINGS
+    if not rows:
+        return
+    tr = terminalreporter
+    tr.write_sep("=", "backend timing (gdxcc vs gams_transfer)")
+    tr.write_line(
+        "min seconds over repeated runs; ratio = gdxcc / gams_transfer (>1 = transfer faster)"
+    )
+    header = f"{'fixture':32s} {'size_KB':>9s} {'op':>5s} {'gdxcc':>9s} {'xfer':>9s} {'ratio':>7s}"
+    tr.write_line(header)
+    tr.write_line("-" * len(header))
+    for r in sorted(rows, key=lambda r: (r["size_kb"], r["op"])):
+        tr.write_line(
+            f"{r['fixture'][:32]:32s} {r['size_kb']:9.1f} {r['op']:>5s} "
+            f"{r['gdxcc']:9.4f} {r['gams_transfer']:9.4f} {r['ratio']:7.2f}"
+        )
+    for op in ("read", "write"):
+        note = _crossover_note(rows, op)
+        if note:
+            tr.write_line(note)
+
+
 @pytest.fixture(scope="session")
 def base_dir():
     return os.path.dirname(__file__)

@@ -1,8 +1,8 @@
 # Overview
 
-There are two main ways to use gdxpds. The first use case is the one that was initially supported: direct conversion between GDX files on disk and pandas DataFrames or a csv version thereof. Starting with the Version 1.0.0 rewrite, there is now a second style of use which involves interfacing with GDX files and symbols via the {py:class}`gdxpds.gdx.GdxFile` and {py:class}`gdxpds.gdx.GdxSymbol` classes.
+There are two main ways to use gdxpds. The first use case is the one that was initially supported: direct conversion between GDX files on disk and pandas DataFrames or a csv version thereof. Starting with the Version 1.0.0 rewrite, there is now a second style of use which involves interfacing with GDX files and symbols via the {py:class}`gdxpds.gdx.GdxFile` and {py:class}`gdxpds.gdx.GdxSymbol` classes. Either way, [Configuration](#configuration) — where to find GAMS and which I/O engine to use — works the same.
 
-[Direct Conversion](#direct-conversion) | [Backend Classes](#backend-classes)
+[Direct Conversion](#direct-conversion) | [Backend Classes](#backend-classes) | [Configuration](#configuration)
 
 ## Direct Conversion
 
@@ -217,3 +217,60 @@ or simply build in dependency order from the start.
 **Mutation rules.** Setting `domain` after a symbol has records updates the strict refs and renames the DataFrame column headers to match the parent names. Setting `dims` clears any strict refs (the two attributes are coupled and last write wins). Removing a parent (`del gdx['a']`) or replacing it with a same-name symbol is fine — strict resolution happens by name at write time.
 
 If you prefer the simpler API that works with dicts of DataFrames, see [the `domains=` kwarg on `to_gdx` and `gdxpds.get_subset_relationships()`](#direct-conversion) for the string-based equivalent.
+
+## Configuration
+
+Two runtime choices control how gdxpds talks to GAMS, and both are set the same three ways — a keyword argument, an environment variable, or (for the command-line utilities) a flag. In each case the explicit keyword wins, then the environment variable, then a fallback:
+
+| Setting | Keyword | Environment variable | CLI flag | Fallback |
+|---|---|---|---|---|
+| GAMS install location | `gams_dir=` | `GAMS_DIR`, then `GAMSDIR` | `-g` / `--gams_dir` | auto-discovery: `where`/`which gams`, then the newest install under `C:\GAMS` |
+| I/O engine | `backend=` | `GDXPDS_BACKEND` | `-b` / `--backend` | `gdxcc` |
+
+The keyword arguments are accepted by every read/write entry point — {py:func}`gdxpds.to_dataframes`, {py:func}`gdxpds.to_dataframe`, {py:func}`gdxpds.list_symbols`, {py:func}`gdxpds.get_data_types`, {py:func}`gdxpds.get_subset_relationships`, {py:func}`gdxpds.to_gdx`, and {py:class}`gdxpds.gdx.GdxFile`. Either choice may be omitted to use its fallback.
+
+Direct conversion example:
+
+```python
+import gdxpds
+
+dataframes = gdxpds.to_dataframes('data.gdx', gams_dir=r'C:\GAMS\48', backend='gams_transfer')
+gdxpds.to_gdx(dataframes, 'out.gdx', gams_dir=r'C:\GAMS\48', backend=gdxpds.Backend.GAMS_TRANSFER)
+```
+
+Backend classes example:
+
+```python
+import gdxpds.gdx
+
+with gdxpds.gdx.GdxFile(gams_dir=r'C:\GAMS\48', backend='gams_transfer') as f:
+    f.read('data.gdx')
+```
+
+The same two choices are flags on the `gdx_to_csv` / `csv_to_gdx` utilities:
+
+```bash
+gdx_to_csv -i data.gdx -o out_dir --gams_dir /opt/gams/48 --backend gams_transfer
+csv_to_gdx -i data.txt -o out.gdx --gams_dir /opt/gams/48 --backend gams_transfer
+```
+
+Or set either one once — for a whole process or shell session — through its environment variable instead of passing it at every call site (PowerShell shown; use `export` on POSIX):
+
+```powershell
+$Env:GAMS_DIR = 'C:\GAMS\48'
+$Env:GDXPDS_BACKEND = 'gams_transfer'
+gdx_to_csv -i data.gdx -o out_dir
+```
+
+### GAMS install location (`gams_dir`)
+
+gdxpds always needs to locate your GAMS installation, because the GDX shared library lives there (not in the Python package) — so `gams_dir` is required even when the Python bindings are pip-installed. If you do not set it explicitly, gdxpds auto-discovers it as described in the table above; calling `gdxpds info` on the command line reports which directory was chosen and via which route.
+
+### I/O engine (`backend`)
+
+gdxpds can move data between GDX files and DataFrames through either of two engines, named by string or {py:class}`gdxpds.Backend` value. (This "backend" is a different concept from the [Backend Classes](#backend-classes) above — the `GdxFile` / `GdxSymbol` objects; here it means the underlying read/write *engine*.)
+
+- **`"gdxcc"`** (the legacy engine and current default) uses SWIG-bound `gdxcc` calls and works with either GAMS Python binding.
+- **`"gams_transfer"`** uses GAMS's `gams.transfer` library (shipped inside `gamsapi`). It is **much faster on large files** — roughly 2× faster to read and 4× faster to write a ~2 MB GDX, widening to an order of magnitude or more on hundreds-of-MB files — but its fixed per-file overhead makes it *slower* than `gdxcc` on very small files.
+
+`gams.transfer` is only usable when a compatible `gamsapi` is installed (see [Install](index.md#install)); check `gdxpds.HAVE_GAMS_TRANSFER` at runtime. Requesting it when it is unavailable raises {py:class}`gdxpds.BackendError` rather than silently falling back. Both engines produce identical DataFrames and GDX files.
