@@ -32,7 +32,10 @@ ELEMENTS = ["a", "b", "c"]
 
 
 def main():
-    with gdxpds.gdx.GdxFile() as f:
+    # Pin the gdxcc backend: this script drives raw gdxcc calls through f.H,
+    # which is None under the gams.transfer backend (so GDXPDS_BACKEND must not
+    # be allowed to redirect us).
+    with gdxpds.gdx.GdxFile(backend="gdxcc") as f:
         if not gdxcc.gdxOpenWrite(f.H, OUT_PATH, "gdxpds"):
             raise gdxpds.gdx.GdxError(f.H, f"Could not open {OUT_PATH!r} for writing")
         f.universal_set.write()

@@ -1,11 +1,11 @@
-"""gams.transfer implementation of :class:`gdxpds._backend.GdxBackend` (read).
+"""gams.transfer implementation of :class:`gdxpds._backend.GdxBackend` (read + write).
 
-Read (Phase A): ``open_read`` builds the symbol metadata from a ``gams.transfer``
-Container (records-free), and ``load_symbols`` reads records (bulk or targeted)
-and translates each symbol into the gdxpds DataFrame shape so the result matches
-the gdxcc backend. Write (Phase B): ``write_file`` builds a Container from the
-gdxpds symbols (the inverse translation) and writes it. Writing aliases is not
-supported (to_gdx never infers one); use ``backend='gdxcc'`` for that.
+Read: ``open_read`` builds the symbol metadata from a ``gams.transfer`` Container
+(records-free), and ``load_symbols`` reads records (bulk or targeted) and
+translates each symbol into the gdxpds DataFrame shape so the result matches the
+gdxcc backend. Write: ``write_file`` builds a Container from the gdxpds symbols
+(the inverse translation) and writes it. Writing aliases is not supported
+(to_gdx never infers one); use ``backend='gdxcc'`` for that.
 
 ``gams.transfer`` is imported at module load, but this module is itself imported
 lazily by :func:`gdxpds._backend.make_backend`, so ``import gdxpds`` stays free
@@ -151,7 +151,7 @@ def _convert_transfer_specials(values: pd.DataFrame) -> pd.DataFrame:
 
 
 class TransferBackend(GdxBackend):
-    """Reads GDX via ``gams.transfer`` and translates to the gdxpds shape.
+    """Reads and writes GDX via ``gams.transfer``, translating to/from the gdxpds shape.
 
     Holds no native handle (``handle`` stays ``None``); state is the cached
     Container, dropped in :meth:`close`.

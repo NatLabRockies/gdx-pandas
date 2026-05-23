@@ -1,17 +1,16 @@
 """Backend selection and the ``GdxBackend`` interface.
 
-gdxpds can move data between GDX files and pandas DataFrames through more than
-one engine. This module owns the engine-agnostic pieces:
+gdxpds moves data between GDX files and pandas DataFrames through a selectable
+I/O engine. This module owns the engine-agnostic pieces:
 
-- the public :class:`Backend` enum and the :data:`DEFAULT_BACKEND` constant,
-- the :class:`GdxBackend` ABC that each engine implements, and
-- :func:`make_backend`, which constructs the concrete backend.
+- :class:`Backend`, the engine enum, with :data:`DEFAULT_BACKEND`;
+- :func:`resolve_backend` (explicit arg / ``GDXPDS_BACKEND`` env var / default)
+  and :func:`make_backend`, which builds the chosen engine; and
+- :class:`GdxBackend`, the ABC each engine implements; see its docstring for the
+  read / write / handle / teardown contract.
 
-The ABC is being built up incrementally (Phase 0 of the gams.transfer work).
-Today it covers the read-record primitive :meth:`GdxBackend.load_symbols`
-(with :meth:`~GdxBackend.load_file` / :meth:`~GdxBackend.load_symbol` as
-conveniences). Metadata reading, writing, and handle teardown move behind this
-ABC in later steps.
+The concrete engines live in :mod:`gdxpds._gdxcc_backend` (the legacy and default
+engine) and :mod:`gdxpds._transfer_backend`.
 """
 
 from __future__ import annotations
@@ -55,18 +54,22 @@ DEFAULT_BACKEND = Backend.GDXCC
 class GdxBackend(abc.ABC):
     """Interface implemented by each GDX I/O engine.
 
-    The single abstract read primitive is :meth:`load_symbols`; the
-    :meth:`load_file` (all symbols) and :meth:`load_symbol` (one symbol)
-    conveniences are defined in terms of it.
+    Abstract methods: :meth:`open_read` (metadata), :meth:`load_symbols`
+    (records), :meth:`write_file`, and :meth:`close`. The :meth:`load_file` (all
+    symbols) and :meth:`load_symbol` (one symbol) conveniences are defined in
+    terms of :meth:`load_symbols`; :meth:`write_symbol` and :attr:`handle` have
+    default implementations that engines override only if applicable.
     """
 
     @abc.abstractmethod
     def open_read(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
         """Open ``filename`` for reading and populate ``gdx_file``'s metadata.
 
-        Sets ``gdx_file``'s ``_filename``/``_version``/``_producer``, builds its
-        ``universal_set`` and the ``GdxSymbol`` collection (with extended
-        per-symbol metadata and resolved domains), but does **not** load records.
+        Sets ``gdx_file``'s ``_filename`` and, where the engine exposes them, its
+        ``_version``/``_producer`` (the gams.transfer backend leaves those
+        ``None``); builds its ``universal_set`` and the ``GdxSymbol`` collection
+        (with extended per-symbol metadata and resolved domains), but does
+        **not** load records.
         """
 
     @abc.abstractmethod
@@ -112,7 +115,7 @@ class GdxBackend(abc.ABC):
         index: int | None = None,
         name_positions: dict | None = None,
     ) -> None:
-        """Write a single symbol (legacy per-symbol path).
+        """Write a single symbol (single-symbol path).
 
         Only engines with a per-symbol write API implement this; others raise.
         Whole-file writes should go through :meth:`write_file`.
@@ -132,8 +135,8 @@ def resolve_backend(explicit: str | Backend | None) -> Backend:
 
     Order: ``explicit`` value → ``GDXPDS_BACKEND`` env var → :data:`DEFAULT_BACKEND`.
     Strings are normalized to :class:`Backend` members. An unrecognized value
-    raises :class:`~gdxpds.tools.Error`; requesting ``GAMS_TRANSFER`` when
-    gams.transfer is not importable also raises (no silent fallback).
+    raises :class:`BackendError`; requesting ``GAMS_TRANSFER`` when gams.transfer
+    is not importable also raises (no silent fallback).
     """
     raw = explicit if explicit is not None else os.environ.get("GDXPDS_BACKEND")
     if raw is None or raw == "":

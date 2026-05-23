@@ -1,9 +1,11 @@
 """gdxcc implementation of :class:`gdxpds._backend.GdxBackend`.
 
-Holds the gdxcc-specific I/O logic extracted from :mod:`gdxpds.gdx`, so that
-``gdx.py`` is left as a backend-agnostic interface + data model. Built up
-incrementally (Phase 0 of the gams.transfer work); currently implements the
-record-read primitive :meth:`GdxccBackend.load_symbols`.
+Holds the gdxcc-specific I/O logic, implementing the backend of the
+:mod:`gdxpds.gdx` interface + data model as mediated by :mod:`gdxpds._backend`.
+Implements the full backend contract: metadata read
+(:meth:`GdxccBackend.open_read`), record read (:meth:`GdxccBackend.load_symbols`),
+write (:meth:`GdxccBackend.write_file` and the per-symbol
+:meth:`GdxccBackend.write_symbol`), plus ownership and teardown of the GDX handle.
 """
 
 from __future__ import annotations
@@ -42,9 +44,10 @@ logger = logging.getLogger(__name__)
 class GdxccBackend(GdxBackend):
     """Reads/writes GDX via the SWIG-bound ``gdxcc`` calls.
 
-    The GDX handle is currently still owned by the :class:`~gdxpds.gdx.GdxFile`
-    (the backend reads it off ``gdx_file.H`` at call time); handle ownership
-    moves here in a later Phase 0 step.
+    Owns the GDX handle: a :class:`~gdxpds.tools._GdxHandle` created in
+    :meth:`__init__` and freed in :meth:`close`.
+    :attr:`gdxpds.gdx.GdxFile.H` delegates to this backend's :attr:`handle`, and
+    :class:`~gdxpds.gdx.GdxFile` schedules :meth:`close` via ``weakref.finalize``.
     """
 
     def __init__(self, gams_dir: str | None = None, gams_dir_source: str | None = None) -> None:
@@ -112,11 +115,7 @@ class GdxccBackend(GdxBackend):
             symbol.resolve_domain()
 
     def _make_symbol(self, gdx_file: GdxFile, name: str, data_type, dims, index: int) -> GdxSymbol:
-        """Construct a GdxSymbol and populate its extended gdxcc metadata.
-
-        Mirrors the metadata read that used to live in ``GdxSymbol.__init__``;
-        keeping it here leaves the constructor backend-agnostic.
-        """
+        """Construct a GdxSymbol and populate its extended gdxcc metadata."""
         H = gdx_file.H
         symbol = GdxSymbol(name, data_type, dims=dims, file=gdx_file, index=index)
         ret, records, userinfo, description = gdxcc.gdxSymbolInfoX(H, index)

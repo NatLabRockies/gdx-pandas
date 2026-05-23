@@ -238,7 +238,8 @@ def to_dataframe(
     gdx_file : pathlib.Path or str
         Path to the GDX file to read
     symbol_name : str
-        Name of the symbol whose data are to be read
+        Name of the symbol whose data are to be read. An unknown name raises
+        :class:`~gdxpds.gdx.SymbolNotFoundError`.
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
     load_set_text : bool

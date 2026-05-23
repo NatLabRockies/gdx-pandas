@@ -47,6 +47,13 @@ def _crossover_note(rows, op):
     if not any(wins):
         return f"{op}: gdxcc faster at every size tested (transfer overhead never amortized)."
     first = next(i for i, w in enumerate(wins) if w)
+    # A clean single crossover is all-gdxcc-faster (False) up to `first`, then
+    # all-transfer-faster (True) at and above it. Anything else -- transfer
+    # already winning at the smallest size (first == 0), or wins that flip back
+    # and forth (noise / non-monotonic timings) -- has no single switchover band
+    # to report, so describe it as mixed rather than invent a bogus band.
+    if first == 0 or not all(wins[first:]):
+        return f"{op}: mixed results across sizes; no single switchover band (see table above)."
     below = op_rows[first - 1]
     above = op_rows[first]
     return (

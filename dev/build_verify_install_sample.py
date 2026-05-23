@@ -37,7 +37,9 @@ OUT_PATH = os.path.abspath(
 def main():
     eps = np.finfo(float).eps
 
-    with gdxpds.gdx.GdxFile() as gdx:
+    # Pin the gdxcc oracle so the committed sample is written deterministically
+    # regardless of any ambient GDXPDS_BACKEND.
+    with gdxpds.gdx.GdxFile(backend="gdxcc") as gdx:
         # Root Set with a wildcard domain: domain_type == NONE on read.
         gdx.append(gdxpds.gdx.GdxSymbol("t", gdxpds.gdx.GamsDataType.Set, dims=["*"]))
         gdx[-1].dataframe = pd.DataFrame(

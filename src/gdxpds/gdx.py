@@ -339,7 +339,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
 
         Resolves each name to its :py:class:`GdxSymbol` and loads via the backend
         (gams.transfer issues a single targeted read; gdxcc loops per symbol).
-        Raises :class:`gdxpds.tools.Error` for an unknown name; already-loaded
+        Raises :class:`SymbolNotFoundError` for an unknown name; already-loaded
         symbols are skipped.
         """
         symbols = []
