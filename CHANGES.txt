@@ -1,3 +1,14 @@
+v2.1.0, 05/23/26 -- gams.transfer I/O engine for reading and writing GDX, opt-in
+                    and non-breaking; select it with the backend= keyword, the GDXPDS_BACKEND
+                    environment variable, or the --backend CLI flag. gdxcc stays the default,
+                    and the two engines produce identical DataFrames and GDX files
+                    gams.transfer is much faster on large files (order-of-magnitude on
+                    hundreds-of-MB GDX) but slower on very small ones; it is usable only with
+                    a compatible gamsapi installed (check gdxpds.HAVE_GAMS_TRANSFER)
+                    gdxpds info reports the resolved backend and gams.transfer usability
+                    to_dataframes() gains a symbols= argument to read only the named symbols
+                    new SymbolNotFoundError, raised for an unknown symbol name (subclass of
+                    gdxpds.tools.Error, like BackendError)
 v2.0.0, 05/20/26 -- BREAKING: to_dataframe() now always returns a plain DataFrame;
                     the old_interface argument is removed. Migrate by dropping any
                     old_interface=False from calls (old_interface=True previously

@@ -1,4 +1,4 @@
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 
 from gdxpds._backend import Backend, BackendError
 from gdxpds.gdx import GdxError, SymbolNotFoundError

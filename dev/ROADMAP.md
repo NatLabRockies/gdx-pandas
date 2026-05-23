@@ -42,8 +42,8 @@ Each PR branches off `main`, in order:
 | `eh/ruff-typing-tooling` | **v1.6.0** | typing + tooling; finish with the `to_dataframe` deprecation warning, version bump, CHANGES entry |
 | e.g. `eh/breaking-cleanup` | **v2.0.0** | remove `.py` CLI shims, gdx2py, and `to_dataframe(old_interface=...)` |
 | `eh/test-gaps` | _(no tag)_ | test-gap groundwork; the correctness oracle for the speedup — **landed** (PR #109) |
-| `eh/gams-transfer` | **v2.1.0** | Phase 0 (gdxcc extracted) + Step 1 (backend switch) + Phase A (read fast path) **done**; Phase B (write) remaining |
-| e.g. `eh/gams-transfer-default` | **v3.0.0** | flip default to gams.transfer + add set-text-write (breaking, coordinated) |
+| `eh/gams-transfer` | **v2.1.0** | Phase 0 (gdxcc extracted) + Step 1 (backend switch) + Phase A (read) + Phase B (write) **done**; version bumped + CHANGES written — ready to merge and tag |
+| e.g. `eh/gams-transfer-default` | **v3.0.0** | flip default to gams.transfer + add set-text-write (breaking, coordinated) + full status for Alias |
 
 Ordering: the test-gap PR lands before the speedup PR — those tests are the
 correctness oracle for the backend swap. The breaking-cleanup PR is independent
@@ -122,13 +122,14 @@ back): read 776.6 s → 9.0 s (~86x), write 1002.0 s → 11.5 s (~87x). The "pro
 only if the speedup is material" gate is decisively met — which is why this release
 now also covers writes, not just reads.
 
-**Status (branch `eh/gams-transfer`, landed locally in order).** Phase 0 (gdxcc
+**Status (branch `eh/gams-transfer`, complete).** Phase 0 (gdxcc
 extracted behind a `GdxBackend` ABC; set-text reads unified), Step 1 (`Backend`
 enum + `backend=` kwarg + `GDXPDS_BACKEND` env var + `HAVE_GAMS_TRANSFER` +
-`to_dataframes(symbols=...)` subset + `BackendError`/`SymbolNotFoundError`), and
+`to_dataframes(symbols=...)` subset + `BackendError`/`SymbolNotFoundError`),
 **Phase A** (the gams.transfer read backend, parity-tested vs gdxcc over all
-fixtures incl. set text, special values, subset, and aliases). Two read-side
-decisions firmed up during Phase A:
+fixtures incl. set text, special values, subset, and aliases), and **Phase B**
+(the gams.transfer write backend, parity-tested over the full write × read
+backend matrix). Two read-side decisions firmed up during Phase A:
 
 - *Aliases read as Sets* (both backends). Legacy gdxpds read an alias as a
   degenerate float column — an untested/unused path; it now reads like the set it
@@ -139,7 +140,9 @@ decisions firmed up during Phase A:
   libraries) reads as unavailable and transfer-gated tests skip cleanly rather
   than crashing. `info()` reports `gams.transfer usable: yes/no`.
 
-**Remaining:** Phase B (the write path) + the v2.1.0 version bump / CHANGES entry.
+**Done:** all phases, plus the v2.1.0 version bump (`__version__` = 2.1.0) and the
+CHANGES.txt entry (05/23/26). Ready to merge to `main` and publish the `v2.1.0`
+Release; the local GAMS-matrix test run is the remaining gate.
 
 **Why this is riskier than gdx2py was.** gdx2py was a clean drop-in (returned a
 plain list). gams.transfer is not:
