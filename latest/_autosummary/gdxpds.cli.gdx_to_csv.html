@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.cli.gdx_to_csv &mdash; gdx-pandas 2.0.0 documentation</title>
+  <title>gdxpds.cli.gdx_to_csv &mdash; gdx-pandas 2.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=20623aea"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -54,6 +54,11 @@
 <li class="toctree-l3"><a class="reference internal" href="../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
@@ -69,6 +74,13 @@
 <li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
@@ -85,6 +97,7 @@
 <li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
@@ -172,7 +185,7 @@
 <span id="gdxpds-cli-gdx-to-csv"></span><h1>gdxpds.cli.gdx_to_csv<a class="headerlink" href="#module-gdxpds.cli.gdx_to_csv" title="Link to this heading"></a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="gdxpds.cli.gdx_to_csv.convert_gdx_to_csv">
-<span class="sig-prename descclassname"><span class="pre">gdxpds.cli.gdx_to_csv.</span></span><span class="sig-name descname"><span class="pre">convert_gdx_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_gdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/cli/gdx_to_csv.html#convert_gdx_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.cli.gdx_to_csv.convert_gdx_to_csv" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">gdxpds.cli.gdx_to_csv.</span></span><span class="sig-name descname"><span class="pre">convert_gdx_to_csv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">in_gdx</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">out_dir</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/cli/gdx_to_csv.html#convert_gdx_to_csv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.cli.gdx_to_csv.convert_gdx_to_csv" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">

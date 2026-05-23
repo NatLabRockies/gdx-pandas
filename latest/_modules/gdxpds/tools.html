@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.tools &mdash; gdx-pandas 2.0.0 documentation</title>
+  <title>gdxpds.tools &mdash; gdx-pandas 2.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../../_static/documentation_options.js?v=20623aea"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -51,6 +51,11 @@
 <li class="toctree-l3"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
@@ -66,6 +71,13 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
@@ -82,6 +94,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
@@ -513,6 +526,58 @@
 <span class="n">_bindings_source</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="n">_loaded_gams_dir</span> <span class="o">=</span> <span class="kc">None</span>
 
+<span class="c1"># Cached result of probing for the optional gams.transfer fast-path engine.</span>
+<span class="n">_have_gams_transfer</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_probe_transfer_at</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a ``gams.transfer`` Container at ``gams_dir`` and report success.</span>
+
+<span class="sd">    ``gams_dir`` is resolved through :class:`GamsDirFinder` (``None`` -&gt; default</span>
+<span class="sd">    discovery). Any failure (not installed, version-skewed, GAMS not found) reads</span>
+<span class="sd">    as &quot;not available&quot;. Uncached -- the caller decides whether to memoize.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">gams.transfer</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span>
+
+        <span class="n">gt</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span><span class="n">system_directory</span><span class="o">=</span><span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_probe_gams_transfer</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if the ``gams.transfer`` fast path is *usable* here.</span>
+
+<span class="sd">    Importable is necessary but not sufficient: a gamsapi whose build does not</span>
+<span class="sd">    match the active GAMS install imports fine but then fails to load its shared</span>
+<span class="sd">    libraries (e.g. ``gmdcclib``) when a Container is constructed. So this</span>
+<span class="sd">    actually constructs a Container against the resolved GAMS directory to</span>
+<span class="sd">    confirm the engine works.</span>
+
+<span class="sd">    With the default ``gams_dir=None`` the result is cached after the first call</span>
+<span class="sd">    (keyed to the default-discovered directory), so ``import gdxpds`` pays nothing</span>
+<span class="sd">    on systems that never touch the fast path and repeat checks are free. When an</span>
+<span class="sd">    explicit ``gams_dir`` is given (e.g. ``info(gams_dir=...)`` inspecting a</span>
+<span class="sd">    specific install) the probe runs fresh against that directory and neither</span>
+<span class="sd">    reads nor writes the cache, so it reports that directory and a transient</span>
+<span class="sd">    failure can&#39;t poison later default probes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">gams_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_probe_transfer_at</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">)</span>
+    <span class="k">global</span> <span class="n">_have_gams_transfer</span>
+    <span class="k">if</span> <span class="n">_have_gams_transfer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_have_gams_transfer</span> <span class="o">=</span> <span class="n">_probe_transfer_at</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_have_gams_transfer</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="c1"># PEP 562: expose HAVE_GAMS_TRANSFER lazily, computed on first access rather</span>
+    <span class="c1"># than at module import.</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;HAVE_GAMS_TRANSFER&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_probe_gams_transfer</span><span class="p">()</span>
+    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="load_gdxcc">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.tools.html#gdxpds.load_gdxcc">[docs]</a>
@@ -610,7 +675,11 @@
     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python:        </span><span class="si">{</span><span class="n">py_version</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Bindings:&quot;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">module_path</span><span class="p">,</span> <span class="n">dist_name</span> <span class="ow">in</span> <span class="p">[(</span><span class="s2">&quot;gams.core.gdx&quot;</span><span class="p">,</span> <span class="s2">&quot;gamsapi&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;gdxcc&quot;</span><span class="p">,</span> <span class="s2">&quot;gdxcc&quot;</span><span class="p">)]:</span>
+    <span class="k">for</span> <span class="n">module_path</span><span class="p">,</span> <span class="n">dist_name</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;gams.core.gdx&quot;</span><span class="p">,</span> <span class="s2">&quot;gamsapi&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;gdxcc&quot;</span><span class="p">,</span> <span class="s2">&quot;gdxcc&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;gams.transfer&quot;</span><span class="p">,</span> <span class="s2">&quot;gamsapi&quot;</span><span class="p">),</span>
+    <span class="p">]:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
@@ -631,6 +700,19 @@
     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  selected:    </span><span class="si">{</span><span class="n">selected</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">bound</span> <span class="o">=</span> <span class="n">_loaded_gams_dir</span> <span class="ow">or</span> <span class="s2">&quot;(not yet bound)&quot;</span>
     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  bound dir:   </span><span class="si">{</span><span class="n">bound</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Importable (above) is not the same as usable: a version-skewed gamsapi</span>
+    <span class="c1"># imports but cannot load the GAMS libraries. This reports actual usability</span>
+    <span class="c1"># for the directory being inspected (a fresh, uncached probe when gams_dir is</span>
+    <span class="c1"># given, so the report tracks the requested install rather than the default).</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  gams.transfer usable: </span><span class="si">{</span><span class="s1">&#39;yes&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">_probe_gams_transfer</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;no&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_backend</span>
+
+        <span class="n">default_backend</span> <span class="o">=</span> <span class="n">resolve_backend</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">default_backend</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(unresolved: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Default backend: </span><span class="si">{</span><span class="n">default_backend</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">finder</span> <span class="o">=</span> <span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>

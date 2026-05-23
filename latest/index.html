@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdx-pandas documentation &mdash; gdx-pandas 2.0.0 documentation</title>
+  <title>gdx-pandas documentation &mdash; gdx-pandas 2.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=51b770b3"></script>
+      <script src="_static/documentation_options.js?v=20623aea"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -53,6 +53,11 @@
 <li class="toctree-l3"><a class="reference internal" href="overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="overview.html#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
@@ -68,6 +73,13 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
@@ -84,6 +96,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
@@ -188,6 +201,7 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#direct-conversion">Direct Conversion</a></li>
 <li class="toctree-l2"><a class="reference internal" href="overview.html#backend-classes">Backend Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="overview.html#configuration">Configuration</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
@@ -212,6 +226,7 @@
 pip<span class="w"> </span>install<span class="w"> </span>gamsapi<span class="o">[</span>transfer<span class="o">]==</span>xx.y.z
 </pre></div>
 </div>
+<p>Installing <code class="docutils literal notranslate"><span class="pre">gamsapi</span></code> this way also enables the optional, much-faster <code class="docutils literal notranslate"><span class="pre">gams.transfer</span></code> I/O engine for large files (see <a class="reference internal" href="#configure">Configure</a> below).</p>
 <p><strong>Legacy.</strong> Use the standalone <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code> package from PyPI by installing <code class="docutils literal notranslate"><span class="pre">gdxpds</span></code> with the <code class="docutils literal notranslate"><span class="pre">legacy</span></code> extra (see below). <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code> is older and is not version-matched to your GAMS install, but the SWIG-bound C ABI is stable enough that it generally works.</p>
 </li>
 </ul>
@@ -227,6 +242,15 @@ pip<span class="w"> </span>install<span class="w"> </span>gdxpds<span class="o">
 </div>
 <p>Versions are listed at <a class="reference external" href="https://pypi.python.org/pypi/gdxpds/">pypi</a> and
 https://github.com/NatLabRockies/gdx-pandas/releases.</p>
+</section>
+<section id="configure">
+<h3>Configure<a class="headerlink" href="#configure" title="Link to this heading"></a></h3>
+<p>gdxpds needs to know <strong>where GAMS is</strong>, and optionally <strong>which I/O engine</strong> to use. Set either once via an environment variable, or per call with the <code class="docutils literal notranslate"><span class="pre">gams_dir=</span></code> / <code class="docutils literal notranslate"><span class="pre">backend=</span></code> keywords (also <code class="docutils literal notranslate"><span class="pre">--gams_dir</span></code> / <code class="docutils literal notranslate"><span class="pre">--backend</span></code> on the CLIs):</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">export</span><span class="w"> </span><span class="nv">GAMS_DIR</span><span class="o">=</span>/path/to/gams<span class="w">        </span><span class="c1"># otherwise auto-discovered</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">GDXPDS_BACKEND</span><span class="o">=</span>gams_transfer<span class="w">  </span><span class="c1"># default: gdxcc; gams_transfer is much faster on large files (needs gamsapi)</span>
+</pre></div>
+</div>
+<p>See <em>Configuration</em> in the <a class="reference external" href="https://NatLabRockies.github.io/gdx-pandas">documentation</a> for the full keyword / environment-variable / CLI matrix and the speed trade-offs.</p>
 </section>
 </section>
 <section id="verify-installation">

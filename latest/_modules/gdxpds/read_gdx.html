@@ -5,14 +5,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.read_gdx &mdash; gdx-pandas 2.0.0 documentation</title>
+  <title>gdxpds.read_gdx &mdash; gdx-pandas 2.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../../_static/documentation_options.js?v=20623aea"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../../_static/js/theme.js"></script>
@@ -51,6 +51,11 @@
 <li class="toctree-l3"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
@@ -66,6 +71,13 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
@@ -82,6 +94,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
@@ -168,11 +181,14 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.gdx</span><span class="w"> </span><span class="kn">import</span> <span class="n">GamsDataType</span><span class="p">,</span> <span class="n">GdxFile</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Error</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.gdx</span><span class="w"> </span><span class="kn">import</span> <span class="n">GamsDataType</span><span class="p">,</span> <span class="n">GdxFile</span><span class="p">,</span> <span class="n">SymbolNotFoundError</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">Backend</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -180,8 +196,8 @@
 <div class="viewcode-block" id="Translator">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.Translator">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Translator</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="n">lazy_load</span><span class="p">)</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="n">lazy_load</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -203,7 +219,11 @@
     <span class="nd">@gdx_file</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">gdx_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="n">cleanup</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span>
+            <span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span>
+            <span class="n">lazy_load</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">,</span>
+            <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">_backend_kind</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -213,13 +233,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">symbol</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
-                    <span class="n">symbol</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span><span class="p">[</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">symbol</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_dataframes</span><span class="p">()</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -233,20 +247,29 @@
 <a class="viewcode-back" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.Translator.dataframe">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">symbol_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No symbol named &#39;</span><span class="si">{</span><span class="n">symbol_name</span><span class="si">}</span><span class="s2">&#39; in &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx_file</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">SymbolNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No symbol named &#39;</span><span class="si">{</span><span class="n">symbol_name</span><span class="si">}</span><span class="s2">&#39; in &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gdx_file</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="p">[</span><span class="n">symbol_name</span><span class="p">]</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="p">[</span><span class="n">symbol_name</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span><span class="p">)</span>
         <span class="c1"># This was returning { symbol_name: dataframe }, which seems intuitively off.</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">gdx</span><span class="p">[</span><span class="n">symbol_name</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
 
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">_get_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_get_dataframes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># One eager load, then collect a copy of each symbol&#39;s dataframe.</span>
+        <span class="c1"># `symbols=None` loads/returns every symbol in file order; a list</span>
+        <span class="c1"># loads/returns only those, in the given order. Backends optimize the</span>
+        <span class="c1"># load: gdxcc loops per symbol; gams.transfer does a single (bulk or</span>
+        <span class="c1"># targeted) read.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">symbol</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
-                    <span class="n">symbol</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span><span class="p">[</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">symbol</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">symbols</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="n">load_all</span><span class="p">(</span><span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span><span class="p">)</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">symbol</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="o">.</span><span class="n">load_symbols</span><span class="p">(</span><span class="n">symbols</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span><span class="p">)</span>
+                <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gdx</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">names</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__dataframes</span></div>
 
 
@@ -257,6 +280,8 @@
     <span class="n">gdx_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">load_set_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Backend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">symbols</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Primary interface for converting a GAMS GDX file to pandas DataFrames.</span>
@@ -270,18 +295,24 @@
 <span class="sd">    load_set_text : bool</span>
 <span class="sd">        If True (default is False), then for every symbol that is a Set, loads</span>
 <span class="sd">        the GDX Text field into the dataframe rather than a `c_bool`.</span>
+<span class="sd">    backend : None or str or :py:class:`gdxpds.Backend`</span>
+<span class="sd">        Which I/O engine to use. ``None`` (default) resolves via the</span>
+<span class="sd">        ``GDXPDS_BACKEND`` env var, falling back to ``gdxcc``.</span>
+<span class="sd">    symbols : None or list of str</span>
+<span class="sd">        If None (default), every symbol is read. Otherwise only the named</span>
+<span class="sd">        symbols are read and returned, in the given order; an unknown name</span>
+<span class="sd">        raises :class:`~gdxpds.gdx.SymbolNotFoundError` and ``[]`` returns an</span>
+<span class="sd">        empty dict.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict of str to pd.DataFrame</span>
-<span class="sd">        Returns a dict of Pandas DataFrames, one item for each symbol in the GDX</span>
-<span class="sd">        file, keyed with the symbol name.</span>
+<span class="sd">        Returns a dict of Pandas DataFrames, one item for each requested symbol</span>
+<span class="sd">        in the GDX file, keyed with the symbol name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">load_set_text</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">_get_dataframes</span><span class="p">(</span>
-            <span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span><span class="o">.</span><span class="n">dataframes</span></div>
+    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span><span class="o">.</span><span class="n">_get_dataframes</span><span class="p">(</span>
+        <span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span><span class="p">,</span> <span class="n">symbols</span><span class="o">=</span><span class="n">symbols</span>
+    <span class="p">)</span></div>
 
 
 
@@ -290,6 +321,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">list_symbols</span><span class="p">(</span>
     <span class="n">gdx_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Backend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the list of symbols available in gdx_file.</span>
@@ -300,13 +332,15 @@
 <span class="sd">        Path to the GDX file to read</span>
 <span class="sd">    gams_dir : None or pathlib.Path or str</span>
 <span class="sd">        optional path to GAMS directory</span>
+<span class="sd">    backend : None or str or :py:class:`gdxpds.Backend`</span>
+<span class="sd">        Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    list of str</span>
 <span class="sd">        List of symbol names</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">symbols</span></div>
+    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span><span class="o">.</span><span class="n">symbols</span></div>
 
 
 
@@ -315,6 +349,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get_data_types</span><span class="p">(</span>
     <span class="n">gdx_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Backend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns a dict of the symbols&#39; :py:class:`GamsDataTypes &lt;GamsDataType&gt;`.</span>
@@ -325,13 +360,15 @@
 <span class="sd">        Path to the GDX file to read</span>
 <span class="sd">    gams_dir : None or pathlib.Path or str</span>
 <span class="sd">        optional path to GAMS directory</span>
+<span class="sd">    backend : None or str or :py:class:`gdxpds.Backend`</span>
+<span class="sd">        Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dict of str to :py:class:GamsDataType`</span>
 <span class="sd">        Map of symbol names to the corresponding :py:class:GamsDataType`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">data_types</span></div>
+    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span><span class="o">.</span><span class="n">data_types</span></div>
 
 
 
@@ -340,6 +377,7 @@
 <span class="k">def</span><span class="w"> </span><span class="nf">get_subset_relationships</span><span class="p">(</span>
     <span class="n">gdx_file</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Backend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name.</span>
@@ -360,6 +398,8 @@
 <span class="sd">        Path to the GDX file to read</span>
 <span class="sd">    gams_dir : None or pathlib.Path or str</span>
 <span class="sd">        optional path to GAMS directory</span>
+<span class="sd">    backend : None or str or :py:class:`gdxpds.Backend`</span>
+<span class="sd">        Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -368,7 +408,7 @@
 <span class="sd">        file shape.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
-    <span class="n">gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">gdx</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span>
     <span class="n">gdx</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">gdx</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">symbol</span><span class="o">.</span><span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -386,6 +426,7 @@
     <span class="n">symbol_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
     <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">load_set_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Backend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Interface for getting the data for a single symbol</span>
@@ -395,19 +436,22 @@
 <span class="sd">    gdx_file : pathlib.Path or str</span>
 <span class="sd">        Path to the GDX file to read</span>
 <span class="sd">    symbol_name : str</span>
-<span class="sd">        Name of the symbol whose data are to be read</span>
+<span class="sd">        Name of the symbol whose data are to be read. An unknown name raises</span>
+<span class="sd">        :class:`~gdxpds.gdx.SymbolNotFoundError`.</span>
 <span class="sd">    gams_dir : None or pathlib.Path or str</span>
 <span class="sd">        optional path to GAMS directory</span>
 <span class="sd">    load_set_text : bool</span>
 <span class="sd">        If True (default is False) and symbol_name is a Set, loads the GDX Text</span>
 <span class="sd">        field into the dataframe rather than a `c_bool`.</span>
+<span class="sd">    backend : None or str or :py:class:`gdxpds.Backend`</span>
+<span class="sd">        Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    pd.DataFrame</span>
 <span class="sd">        The data for symbol_name as a pandas DataFrame.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span>
+    <span class="k">return</span> <span class="n">Translator</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">backend</span><span class="p">)</span><span class="o">.</span><span class="n">dataframe</span><span class="p">(</span>
         <span class="n">symbol_name</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span>
     <span class="p">)</span></div>
 

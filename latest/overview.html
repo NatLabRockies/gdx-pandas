@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview &mdash; gdx-pandas 2.0.0 documentation</title>
+  <title>Overview &mdash; gdx-pandas 2.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=51b770b3"></script>
+      <script src="_static/documentation_options.js?v=20623aea"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="_static/js/theme.js"></script>
@@ -54,6 +54,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#subset-domain-relationships">Subset (Domain) Relationships</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
@@ -69,6 +74,13 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
@@ -85,6 +97,7 @@
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
@@ -167,8 +180,8 @@
              
   <section id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
-<p>There are two main ways to use gdxpds. The first use case is the one that was initially supported: direct conversion between GDX files on disk and pandas DataFrames or a csv version thereof. Starting with the Version 1.0.0 rewrite, there is now a second style of use which involves interfacing with GDX files and symbols via the <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a> and <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol" title="gdxpds.gdx.GdxSymbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxSymbol</span></code></a> classes.</p>
-<p><a class="reference internal" href="#direct-conversion">Direct Conversion</a> | <a class="reference internal" href="#backend-classes">Backend Classes</a></p>
+<p>There are two main ways to use gdxpds. The first use case is the one that was initially supported: direct conversion between GDX files on disk and pandas DataFrames or a csv version thereof. Starting with the Version 1.0.0 rewrite, there is now a second style of use which involves interfacing with GDX files and symbols via the <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a> and <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol" title="gdxpds.gdx.GdxSymbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxSymbol</span></code></a> classes. Either way, <a class="reference internal" href="#configuration">Configuration</a> — where to find GAMS and which I/O engine to use — works the same.</p>
+<p><a class="reference internal" href="#direct-conversion">Direct Conversion</a> | <a class="reference internal" href="#backend-classes">Backend Classes</a> | <a class="reference internal" href="#configuration">Configuration</a></p>
 <section id="direct-conversion">
 <h2>Direct Conversion<a class="headerlink" href="#direct-conversion" title="Link to this heading"></a></h2>
 <p>The two primary points of reference for the direct conversion utilities are GDX files on disk and python dicts of <code class="docutils literal notranslate"><span class="pre">{symbol_name:</span> <span class="pre">pandas.DataFrame}</span></code>, where each <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> contains data for a single set, parameter, equation, or variable. For sets and parameters, the last column of the DataFrame is assumed to contain the value of the element, which for sets should be <code class="docutils literal notranslate"><span class="pre">True</span></code>, and for parameters should be a <code class="docutils literal notranslate"><span class="pre">float</span></code> (or one of the <a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.NUMPY_SPECIAL_VALUES" title="gdxpds.special.NUMPY_SPECIAL_VALUES"><code class="xref py py-const docutils literal notranslate"><span class="pre">gdxpds.special.NUMPY_SPECIAL_VALUES</span></code></a>). Equations and variables have additional ‘value’ columns, in particular a level, a marginal value, a lower bound, an upper bound, and a scale, as enumerated in <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType" title="gdxpds.gdx.GamsValueType"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GamsValueType</span></code></a>. These values are all assumed to be found in the last five columns of the DataFrame, also see <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP" title="gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="xref py py-data docutils literal notranslate"><span class="pre">gdxpds.gdx.GAMS_VALUE_COLS_MAP</span></code></a>.</p>
@@ -354,6 +367,73 @@ csv_to_gdx<span class="w"> </span>--help
 <p>or simply build in dependency order from the start.</p>
 <p><strong>Mutation rules.</strong> Setting <code class="docutils literal notranslate"><span class="pre">domain</span></code> after a symbol has records updates the strict refs and renames the DataFrame column headers to match the parent names. Setting <code class="docutils literal notranslate"><span class="pre">dims</span></code> clears any strict refs (the two attributes are coupled and last write wins). Removing a parent (<code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">gdx['a']</span></code>) or replacing it with a same-name symbol is fine — strict resolution happens by name at write time.</p>
 <p>If you prefer the simpler API that works with dicts of DataFrames, see <a class="reference internal" href="#direct-conversion">the <code class="docutils literal notranslate"><span class="pre">domains=</span></code> kwarg on <code class="docutils literal notranslate"><span class="pre">to_gdx</span></code> and <code class="docutils literal notranslate"><span class="pre">gdxpds.get_subset_relationships()</span></code></a> for the string-based equivalent.</p>
+</section>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
+<p>Two runtime choices control how gdxpds talks to GAMS, and both are set the same three ways — a keyword argument, an environment variable, or (for the command-line utilities) a flag. In each case the explicit keyword wins, then the environment variable, then a fallback:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Setting</p></th>
+<th class="head"><p>Keyword</p></th>
+<th class="head"><p>Environment variable</p></th>
+<th class="head"><p>CLI flag</p></th>
+<th class="head"><p>Fallback</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GAMS install location</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gams_dir=</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GAMS_DIR</span></code>, then <code class="docutils literal notranslate"><span class="pre">GAMSDIR</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-g</span></code> / <code class="docutils literal notranslate"><span class="pre">--gams_dir</span></code></p></td>
+<td><p>auto-discovery: <code class="docutils literal notranslate"><span class="pre">where</span></code>/<code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">gams</span></code>, then the newest install under <code class="docutils literal notranslate"><span class="pre">C:\GAMS</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>I/O engine</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">backend=</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GDXPDS_BACKEND</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-b</span></code> / <code class="docutils literal notranslate"><span class="pre">--backend</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gdxcc</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The keyword arguments are accepted by every read/write entry point — <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframes" title="gdxpds.to_dataframes"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_dataframes()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframe" title="gdxpds.to_dataframe"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_dataframe()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.list_symbols" title="gdxpds.list_symbols"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.list_symbols()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_data_types" title="gdxpds.get_data_types"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.get_data_types()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_subset_relationships" title="gdxpds.get_subset_relationships"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.get_subset_relationships()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_gdx" title="gdxpds.to_gdx"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_gdx()</span></code></a>, and <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a>. Either choice may be omitted to use its fallback.</p>
+<p>Direct conversion example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds</span>
+
+<span class="n">dataframes</span> <span class="o">=</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">to_dataframes</span><span class="p">(</span><span class="s1">&#39;data.gdx&#39;</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;C:\GAMS\48&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;gams_transfer&#39;</span><span class="p">)</span>
+<span class="n">gdxpds</span><span class="o">.</span><span class="n">to_gdx</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="s1">&#39;out.gdx&#39;</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;C:\GAMS\48&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">gdxpds</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="n">GAMS_TRANSFER</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Backend classes example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds.gdx</span>
+
+<span class="k">with</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;C:\GAMS\48&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;gams_transfer&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;data.gdx&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The same two choices are flags on the <code class="docutils literal notranslate"><span class="pre">gdx_to_csv</span></code> / <code class="docutils literal notranslate"><span class="pre">csv_to_gdx</span></code> utilities:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gdx_to_csv<span class="w"> </span>-i<span class="w"> </span>data.gdx<span class="w"> </span>-o<span class="w"> </span>out_dir<span class="w"> </span>--gams_dir<span class="w"> </span>/opt/gams/48<span class="w"> </span>--backend<span class="w"> </span>gams_transfer
+csv_to_gdx<span class="w"> </span>-i<span class="w"> </span>data.txt<span class="w"> </span>-o<span class="w"> </span>out.gdx<span class="w"> </span>--gams_dir<span class="w"> </span>/opt/gams/48<span class="w"> </span>--backend<span class="w"> </span>gams_transfer
+</pre></div>
+</div>
+<p>Or set either one once — for a whole process or shell session — through its environment variable instead of passing it at every call site (PowerShell shown; use <code class="docutils literal notranslate"><span class="pre">export</span></code> on POSIX):</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nv">$Env:GAMS_DIR</span> <span class="p">=</span> <span class="s1">&#39;C:\GAMS\48&#39;</span>
+<span class="nv">$Env:GDXPDS_BACKEND</span> <span class="p">=</span> <span class="s1">&#39;gams_transfer&#39;</span>
+<span class="n">gdx_to_csv</span> <span class="n">-i</span> <span class="n">data</span><span class="p">.</span><span class="n">gdx</span> <span class="n">-o</span> <span class="n">out_dir</span>
+</pre></div>
+</div>
+<section id="gams-install-location-gams-dir">
+<h3>GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)<a class="headerlink" href="#gams-install-location-gams-dir" title="Link to this heading"></a></h3>
+<p>gdxpds always needs to locate your GAMS installation, because the GDX shared library lives there (not in the Python package) — so <code class="docutils literal notranslate"><span class="pre">gams_dir</span></code> is required even when the Python bindings are pip-installed. If you do not set it explicitly, gdxpds auto-discovers it as described in the table above; calling <code class="docutils literal notranslate"><span class="pre">gdxpds</span> <span class="pre">info</span></code> on the command line reports which directory was chosen and via which route.</p>
+</section>
+<section id="i-o-engine-backend">
+<h3>I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)<a class="headerlink" href="#i-o-engine-backend" title="Link to this heading"></a></h3>
+<p>gdxpds can move data between GDX files and DataFrames through either of two engines, named by string or <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend" title="gdxpds.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.Backend</span></code></a> value. (This “backend” is a different concept from the <a class="reference internal" href="#backend-classes">Backend Classes</a> above — the <code class="docutils literal notranslate"><span class="pre">GdxFile</span></code> / <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code> objects; here it means the underlying read/write <em>engine</em>.)</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">&quot;gdxcc&quot;</span></code></strong> (the legacy engine and current default) uses SWIG-bound <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code> calls and works with either GAMS Python binding.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">&quot;gams_transfer&quot;</span></code></strong> uses GAMS’s <code class="docutils literal notranslate"><span class="pre">gams.transfer</span></code> library (shipped inside <code class="docutils literal notranslate"><span class="pre">gamsapi</span></code>). It is <strong>much faster on large files</strong> — roughly 2× faster to read and 4× faster to write a ~2 MB GDX, widening to an order of magnitude or more on hundreds-of-MB files — but its fixed per-file overhead makes it <em>slower</em> than <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code> on very small files.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">gams.transfer</span></code> is only usable when a compatible <code class="docutils literal notranslate"><span class="pre">gamsapi</span></code> is installed (see <a class="reference internal" href="index.html#install"><span class="std std-ref">Install</span></a>); check <code class="docutils literal notranslate"><span class="pre">gdxpds.HAVE_GAMS_TRANSFER</span></code> at runtime. Requesting it when it is unavailable raises <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.BackendError" title="gdxpds.BackendError"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.BackendError</span></code></a> rather than silently falling back. Both engines produce identical DataFrames and GDX files.</p>
 </section>
 </section>
 </section>

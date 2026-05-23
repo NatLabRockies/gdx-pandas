@@ -6,14 +6,14 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.gdx &mdash; gdx-pandas 2.0.0 documentation</title>
+  <title>gdxpds.gdx &mdash; gdx-pandas 2.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=51b770b3"></script>
+      <script src="../_static/documentation_options.js?v=20623aea"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
     <script src="../_static/js/theme.js"></script>
@@ -54,6 +54,11 @@
 <li class="toctree-l3"><a class="reference internal" href="../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="../api.html">API Reference</a><ul class="current">
@@ -69,6 +74,13 @@
 <li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
@@ -85,6 +97,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
@@ -209,9 +222,17 @@ string passed to <a class="reference internal" href="#gdxpds.gdx.GdxSymbol.domai
 callers may continue catching the broader category if they wish.</p>
 </dd></dl>
 
+<dl class="py exception">
+<dt class="sig sig-object py" id="gdxpds.gdx.SymbolNotFoundError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gdxpds.gdx.</span></span><span class="sig-name descname"><span class="pre">SymbolNotFoundError</span></span><a class="reference internal" href="../_modules/gdxpds/gdx.html#SymbolNotFoundError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.gdx.SymbolNotFoundError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="gdxpds.tools.html#gdxpds.tools.Error" title="gdxpds.tools.Error"><code class="xref py py-class docutils literal notranslate"><span class="pre">Error</span></code></a></p>
+<p>Raised when a requested symbol name is not present in a <a class="reference internal" href="#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">GdxFile</span></code></a>.</p>
+<p>Subclass of <code class="xref py py-class docutils literal notranslate"><span class="pre">Error</span></code>, so <code class="docutils literal notranslate"><span class="pre">except</span> <span class="pre">Error</span></code> still catches it.</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="gdxpds.gdx.GdxFile">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gdxpds.gdx.</span></span><span class="sig-name descname"><span class="pre">GdxFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lazy_load</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/gdx.html#GdxFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.gdx.GdxFile" title="Link to this definition"></a></dt>
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">gdxpds.gdx.</span></span><span class="sig-name descname"><span class="pre">GdxFile</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">gams_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lazy_load</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="gdxpds.html#gdxpds.Backend" title="gdxpds._backend.Backend"><span class="pre">Backend</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/gdxpds/gdx.html#GdxFile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.gdx.GdxFile" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">MutableSequence</span></code>, <a class="reference internal" href="gdxpds.tools.html#gdxpds.tools.NeedsGamsDir" title="gdxpds.tools.NeedsGamsDir"><code class="xref py py-class docutils literal notranslate"><span class="pre">NeedsGamsDir</span></code></a></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="gdxpds.gdx.GdxFile.cleanup">
@@ -246,7 +267,12 @@ a new file.</p>
 <dl class="py property">
 <dt class="sig sig-object py" id="gdxpds.gdx.GdxFile.H">
 <span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">H</span></span><a class="headerlink" href="#gdxpds.gdx.GdxFile.H" title="Link to this definition"></a></dt>
-<dd><p>GDX object handle</p>
+<dd><p>GDX object handle (gdxcc backend only; <code class="docutils literal notranslate"><span class="pre">None</span></code> for backends without one,
+and after <a class="reference internal" href="#gdxpds.gdx.GdxFile.cleanup" title="gdxpds.gdx.GdxFile.cleanup"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cleanup()</span></code></a>).</p>
+<p>This is a gdxcc-specific escape hatch (e.g. for driving raw <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code>
+calls). It is a candidate for deprecation/removal in v3.0.0, when the
+default backend flips and <code class="docutils literal notranslate"><span class="pre">None</span></code> becomes the common return — see the
+“Known warts” section of <code class="docutils literal notranslate"><span class="pre">dev/ROADMAP.md</span></code>.</p>
 </dd></dl>
 
 <dl class="py property">
@@ -295,6 +321,24 @@ also loads all symbols.</p>
 <dd class="field-odd"><p><strong>filename</strong> (<em>pathlib.Path</em><em> or </em><em>str</em>)</p>
 </dd>
 </dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gdxpds.gdx.GdxFile.load_all">
+<span class="sig-name descname"><span class="pre">load_all</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_set_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/gdxpds/gdx.html#GdxFile.load_all"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.gdx.GdxFile.load_all" title="Link to this definition"></a></dt>
+<dd><p>Eagerly load every symbol’s records into its <a class="reference internal" href="#gdxpds.gdx.GdxSymbol.dataframe" title="gdxpds.gdx.GdxSymbol.dataframe"><code class="xref py py-attr docutils literal notranslate"><span class="pre">GdxSymbol.dataframe</span></code></a>.</p>
+<p>Already-loaded symbols are skipped. Pass <code class="docutils literal notranslate"><span class="pre">load_set_text=True</span></code> to surface
+GAMS element text for Sets instead of the membership <code class="docutils literal notranslate"><span class="pre">c_bool</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="gdxpds.gdx.GdxFile.load_symbols">
+<span class="sig-name descname"><span class="pre">load_symbols</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">names</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Sequence</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">load_set_text</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/gdxpds/gdx.html#GdxFile.load_symbols"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#gdxpds.gdx.GdxFile.load_symbols" title="Link to this definition"></a></dt>
+<dd><p>Eagerly load the records of the named symbols (a subset of the file).</p>
+<p>Resolves each name to its <a class="reference internal" href="#gdxpds.gdx.GdxSymbol" title="gdxpds.gdx.GdxSymbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">GdxSymbol</span></code></a> and loads via the backend
+(gams.transfer issues a single targeted read; gdxcc loops per symbol).
+Raises <a class="reference internal" href="#gdxpds.gdx.SymbolNotFoundError" title="gdxpds.gdx.SymbolNotFoundError"><code class="xref py py-class docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a> for an unknown name; already-loaded
+symbols are skipped.</p>
 </dd></dl>
 
 <dl class="py method">
