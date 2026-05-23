@@ -1,0 +1,475 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overview &mdash; gdx-pandas 2.1.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=20623aea"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="gdx-pandas documentation" href="index.html" />
+    <link href="_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            gdx-pandas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    <div id="gdxpds-version-selector" hidden></div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#direct-conversion">Direct Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#backend-classes">Backend Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="_autosummary/gdxpds.html">gdxpds</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir_cache"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir_cache</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.GamsDirFinder.source"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.cli.gdx_to_csv.html">gdxpds.cli.gdx_to_csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.cli.main.html">gdxpds.cli.main</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType"><code class="docutils literal notranslate"><span class="pre">GamsDomainType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS"><code class="docutils literal notranslate"><span class="pre">GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol"><code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_set"><code class="docutils literal notranslate"><span class="pre">append_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_parameter"><code class="docutils literal notranslate"><span class="pre">append_parameter()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.read_gdx.html">gdxpds.read_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.special.html">gdxpds.special</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.NUMPY_SPECIAL_VALUES"><code class="docutils literal notranslate"><span class="pre">NUMPY_SPECIAL_VALUES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.convert_gdx_to_np_svs"><code class="docutils literal notranslate"><span class="pre">convert_gdx_to_np_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.is_np_eps"><code class="docutils literal notranslate"><span class="pre">is_np_eps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.is_np_sv"><code class="docutils literal notranslate"><span class="pre">is_np_sv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.convert_np_to_gdx_svs"><code class="docutils literal notranslate"><span class="pre">convert_np_to_gdx_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.pd_isnan"><code class="docutils literal notranslate"><span class="pre">pd_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.pd_val_equal"><code class="docutils literal notranslate"><span class="pre">pd_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.gdx_isnan"><code class="docutils literal notranslate"><span class="pre">gdx_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.gdx_val_equal"><code class="docutils literal notranslate"><span class="pre">gdx_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.load_specials"><code class="docutils literal notranslate"><span class="pre">load_specials()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.tools.html">gdxpds.tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.tools.html#gdxpds.tools.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.tools.html#gdxpds.tools.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.tools.html#gdxpds.tools.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.tools.html#gdxpds.tools.NeedsGamsDir"><code class="docutils literal notranslate"><span class="pre">NeedsGamsDir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.tools.html#gdxpds.tools.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.tools.html#gdxpds.tools.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="_autosummary/gdxpds.write_gdx.html">gdxpds.write_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.write_gdx.html#gdxpds.write_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="_autosummary/gdxpds.write_gdx.html#gdxpds.write_gdx.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">gdx-pandas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Overview</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/overview.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h1>
+<p>There are two main ways to use gdxpds. The first use case is the one that was initially supported: direct conversion between GDX files on disk and pandas DataFrames or a csv version thereof. Starting with the Version 1.0.0 rewrite, there is now a second style of use which involves interfacing with GDX files and symbols via the <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a> and <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol" title="gdxpds.gdx.GdxSymbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxSymbol</span></code></a> classes. Either way, <a class="reference internal" href="#configuration">Configuration</a> — where to find GAMS and which I/O engine to use — works the same.</p>
+<p><a class="reference internal" href="#direct-conversion">Direct Conversion</a> | <a class="reference internal" href="#backend-classes">Backend Classes</a> | <a class="reference internal" href="#configuration">Configuration</a></p>
+<section id="direct-conversion">
+<h2>Direct Conversion<a class="headerlink" href="#direct-conversion" title="Link to this heading"></a></h2>
+<p>The two primary points of reference for the direct conversion utilities are GDX files on disk and python dicts of <code class="docutils literal notranslate"><span class="pre">{symbol_name:</span> <span class="pre">pandas.DataFrame}</span></code>, where each <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> contains data for a single set, parameter, equation, or variable. For sets and parameters, the last column of the DataFrame is assumed to contain the value of the element, which for sets should be <code class="docutils literal notranslate"><span class="pre">True</span></code>, and for parameters should be a <code class="docutils literal notranslate"><span class="pre">float</span></code> (or one of the <a class="reference internal" href="_autosummary/gdxpds.special.html#gdxpds.special.NUMPY_SPECIAL_VALUES" title="gdxpds.special.NUMPY_SPECIAL_VALUES"><code class="xref py py-const docutils literal notranslate"><span class="pre">gdxpds.special.NUMPY_SPECIAL_VALUES</span></code></a>). Equations and variables have additional ‘value’ columns, in particular a level, a marginal value, a lower bound, an upper bound, and a scale, as enumerated in <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType" title="gdxpds.gdx.GamsValueType"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GamsValueType</span></code></a>. These values are all assumed to be found in the last five columns of the DataFrame, also see <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP" title="gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="xref py py-data docutils literal notranslate"><span class="pre">gdxpds.gdx.GAMS_VALUE_COLS_MAP</span></code></a>.</p>
+<p>The basic interface to convert from GDX to DataFrames is <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframes" title="gdxpds.to_dataframes"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_dataframes()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds</span>
+
+<span class="n">gdx_file</span> <span class="o">=</span> <span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">path_to_my_gdx</span><span class="se">\\</span><span class="s1">data.gdx&#39;</span>
+<span class="n">dataframes</span> <span class="o">=</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">to_dataframes</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">symbol_name</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">dataframes</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Doing work with </span><span class="si">{</span><span class="n">symbol_name</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>And vice-versa we have <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_gdx" title="gdxpds.to_gdx"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_gdx()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds</span>
+
+<span class="c1"># assume we have a DataFrame df with last column &#39;value&#39;</span>
+<span class="n">data_ready_for_GAMS</span> <span class="o">=</span> <span class="p">{</span> <span class="s1">&#39;symbol_name&#39;</span><span class="p">:</span> <span class="n">df</span> <span class="p">}</span>
+
+<span class="n">gdx_file</span> <span class="o">=</span> <span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">path_to_my_output_gdx</span><span class="se">\\</span><span class="s1">data_to_send_to_gams.gdx&#39;</span>
+<span class="n">gdx</span> <span class="o">=</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">to_gdx</span><span class="p">(</span><span class="n">data_ready_for_GAMS</span><span class="p">,</span> <span class="n">gdx_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that providing a <code class="docutils literal notranslate"><span class="pre">gdx_file</span></code> path is optional. In either case the in-memory gdx file is returned as an object of type <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a>.</p>
+<p>Additional functions include:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.list_symbols" title="gdxpds.list_symbols"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.list_symbols()</span></code></a></p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_data_types" title="gdxpds.get_data_types"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.get_data_types()</span></code></a></p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframe" title="gdxpds.to_dataframe"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_dataframe()</span></code></a> — returns the named symbol’s data as a plain DataFrame.</p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_subset_relationships" title="gdxpds.get_subset_relationships"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.get_subset_relationships()</span></code></a> — read the subset (domain) relationships out of a GDX file, returned as <code class="docutils literal notranslate"><span class="pre">{symbol_name:</span> <span class="pre">[parent_name_or_None_for_wildcard,</span> <span class="pre">...]}</span></code>.</p></li>
+</ul>
+<p>To create a GDX with strict subset relationships from the direct-conversion API, pass a <code class="docutils literal notranslate"><span class="pre">domains=</span></code> mapping to <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_gdx" title="gdxpds.to_gdx"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_gdx()</span></code></a>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">dataframes</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;a&#39;</span><span class="p">:</span>     <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a2&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a3&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">]],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">]),</span>
+    <span class="s1">&#39;sub_a&#39;</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a3&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">]],</span>                <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">]),</span>
+<span class="p">}</span>
+<span class="n">gdxpds</span><span class="o">.</span><span class="n">to_gdx</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="s1">&#39;data.gdx&#39;</span><span class="p">,</span> <span class="n">domains</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;sub_a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]})</span>
+
+<span class="c1"># Read the relationship info back. Domain names are reported verbatim; only</span>
+<span class="c1"># the wildcard &#39;*&#39; (or a dimension with no recorded domain) comes through as</span>
+<span class="c1"># None. Here &#39;a&#39; is a root Set whose single dimension is labeled with its own</span>
+<span class="c1"># name, so it round-trips as &#39;a&#39; rather than None.</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">gdxpds</span><span class="o">.</span><span class="n">get_subset_relationships</span><span class="p">(</span><span class="s1">&#39;data.gdx&#39;</span><span class="p">))</span>
+<span class="c1"># {&#39;a&#39;: [&#39;a&#39;], &#39;sub_a&#39;: [&#39;a&#39;]}</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">domains=</span></code> keys are child symbol names; each value is the list of parent Set names (or <code class="docutils literal notranslate"><span class="pre">None</span></code> for the wildcard <code class="docutils literal notranslate"><span class="pre">'*'</span></code>), one entry per dimension. <code class="docutils literal notranslate"><span class="pre">to_gdx</span></code> topologically sorts the input so each parent is written before its children. The Direct Conversion API is <strong>string-based</strong> — parents are named by string. For an object-reference-based API (live links to parent <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code>s, useful when mutating or composing files in Python), see <a class="reference internal" href="#subset-domain-relationships">Subset (Domain) Relationships</a> under Backend Classes.</p>
+<p>The package also includes command line utilities for converting between GDX and CSV. After <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">gdxpds</span></code>, these are on <code class="docutils literal notranslate"><span class="pre">PATH</span></code>:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gdx_to_csv<span class="w"> </span>--help
+csv_to_gdx<span class="w"> </span>--help
+</pre></div>
+</div>
+</section>
+<section id="backend-classes">
+<h2>Backend Classes<a class="headerlink" href="#backend-classes" title="Link to this heading"></a></h2>
+<p>The basic functionalities described above can also be achieved with direct use of the backend classes available in <a class="reference internal" href="_autosummary/gdxpds.gdx.html#module-gdxpds.gdx" title="gdxpds.gdx"><code class="xref py py-mod docutils literal notranslate"><span class="pre">gdxpds.gdx</span></code></a>. To duplicate the GDX read functionality shown above one would write:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds</span>
+
+<span class="n">gdx_file</span> <span class="o">=</span> <span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">path_to_my_gdx</span><span class="se">\\</span><span class="s1">data.gdx&#39;</span>
+<span class="k">with</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxFile</span><span class="p">(</span><span class="n">lazy_load</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">symbol_name</span> <span class="o">=</span> <span class="n">symbol</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">symbol</span><span class="o">.</span><span class="n">dataframe</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Doing work with </span><span class="si">{</span><span class="n">symbol_name</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This interface also provides more precise control over what data is loaded at any particular time:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds</span>
+
+<span class="n">gdx_file</span> <span class="o">=</span> <span class="s1">&#39;C:</span><span class="se">\\</span><span class="s1">path_to_my_gdx</span><span class="se">\\</span><span class="s1">data.gdx&#39;</span>
+<span class="k">with</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>  <span class="c1"># lazy_load defaults to True</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">)</span>
+
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;param_1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">df_1</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;param_1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;param_1&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unload</span><span class="p">()</span>
+
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;param_12&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">df_12</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;param_12&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span>
+    <span class="n">f</span><span class="p">[</span><span class="s1">&#39;param_12&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">unload</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>And enables more transparent creation of new GDX files:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">itertools</span><span class="w"> </span><span class="kn">import</span> <span class="n">product</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.gdx</span><span class="w"> </span><span class="kn">import</span> <span class="n">GdxFile</span><span class="p">,</span> <span class="n">GdxSymbol</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="p">,</span> <span class="n">append_set</span><span class="p">,</span> <span class="n">append_parameter</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="n">out_file</span> <span class="o">=</span> <span class="s1">&#39;my_new_gdx_data.gdx&#39;</span>
+<span class="k">with</span> <span class="n">GdxFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">gdx</span><span class="p">:</span>
+
+    <span class="c1"># Create a new set with one dimension</span>
+    <span class="n">gdx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="s1">&#39;my_set&#39;</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="s1">&#39;u&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">)])</span>
+    <span class="n">data</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">gdx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="c1"># Create a new parameter with one dimension</span>
+    <span class="n">gdx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="s1">&#39;my_parameter&#39;</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Parameter</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">]))</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([[</span><span class="s1">&#39;u&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">100</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">)],</span>
+                        <span class="n">columns</span><span class="o">=</span><span class="p">(</span><span class="n">gdx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dims</span> <span class="o">+</span> <span class="n">gdx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">value_col_names</span><span class="p">))</span>
+    <span class="n">gdx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">data</span>
+
+    <span class="c1"># Create new sets with convenience function append_set</span>
+    <span class="n">append_set</span><span class="p">(</span><span class="n">gdx</span><span class="p">,</span> <span class="s2">&quot;my_other_set&quot;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">[[</span><span class="s1">&#39;v&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;v&#39;</span><span class="p">])</span>
+    <span class="p">)</span>
+    <span class="n">append_set</span><span class="p">(</span><span class="n">gdx</span><span class="p">,</span> <span class="s2">&quot;my_combo_set&quot;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="n">product</span><span class="p">([</span><span class="s1">&#39;u&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">11</span><span class="p">)],</span> <span class="p">[</span><span class="s1">&#39;v&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">6</span><span class="p">)]),</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;u&#39;</span><span class="p">,</span> <span class="s1">&#39;v&#39;</span><span class="p">])</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Create a new parameter with convenience function append_parameter</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">gdx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
+    <span class="n">append_parameter</span><span class="p">(</span><span class="n">gdx</span><span class="p">,</span> <span class="s1">&#39;my_other_parameter&#39;</span><span class="p">,</span> <span class="n">df</span><span class="p">)</span>
+
+    <span class="c1"># Write the file to disk</span>
+    <span class="n">gdx</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">out_file</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The key classes and functions for directly using the backend are:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a></p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol" title="gdxpds.gdx.GdxSymbol"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxSymbol</span></code></a></p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType" title="gdxpds.gdx.GamsDataType"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GamsDataType</span></code></a></p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType" title="gdxpds.gdx.GamsDomainType"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GamsDomainType</span></code></a></p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_set" title="gdxpds.gdx.append_set"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.gdx.append_set()</span></code></a></p></li>
+<li><p><a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_parameter" title="gdxpds.gdx.append_parameter"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.gdx.append_parameter()</span></code></a></p></li>
+</ul>
+<p>Starting with Version 1.1.0, gdxpds does not allow the <em>number</em> of dimensions on a <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code> to change once it has been firmly established (as evidenced by <code class="docutils literal notranslate"><span class="pre">GdxSymbol.num_dims</span> <span class="pre">&gt;</span> <span class="pre">0</span></code> or <code class="docutils literal notranslate"><span class="pre">GdxSymbol.num_records</span> <span class="pre">&gt;</span> <span class="pre">0</span></code>). The dimension <em>names</em> (<code class="docutils literal notranslate"><span class="pre">GdxSymbol.dims</span></code>) may still be reassigned in place — the DataFrame columns are renamed automatically — and <code class="docutils literal notranslate"><span class="pre">GdxSymbol.dataframe</span></code> may be set using only the dimensional columns, with <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code> filling in the remaining columns with default values.</p>
+<section id="subset-domain-relationships">
+<h3>Subset (Domain) Relationships<a class="headerlink" href="#subset-domain-relationships" title="Link to this heading"></a></h3>
+<p>A Set in GAMS may be declared as a <em>subset</em> of another Set — <code class="docutils literal notranslate"><span class="pre">set</span> <span class="pre">sub_a(a)</span></code> declares <code class="docutils literal notranslate"><span class="pre">sub_a</span></code> over the domain <code class="docutils literal notranslate"><span class="pre">a</span></code>. GDX records this relationship per symbol via the <code class="xref c c-func docutils literal notranslate"><span class="pre">gdxSymbolGetDomainX()</span></code> / <code class="xref c c-func docutils literal notranslate"><span class="pre">gdxSymbolSetDomain()</span></code> API. <code class="docutils literal notranslate"><span class="pre">gdxpds</span></code> surfaces it through two complementary attributes on <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code>:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">GdxSymbol.dims</span></code> is the always-string list of dimension labels (today’s API; unchanged).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GdxSymbol.domain</span></code> is an optional list of parent-set <em>references</em> — each entry is either a <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code> object (the parent) or <code class="docutils literal notranslate"><span class="pre">None</span></code> (the wildcard <code class="docutils literal notranslate"><span class="pre">'*'</span></code>). When set, this attribute flags the symbol for strict (<code class="docutils literal notranslate"><span class="pre">gdxSymbolSetDomain</span></code>) writes.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">GdxSymbol.domain_type</span></code> is a derived <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType" title="gdxpds.gdx.GamsDomainType"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GamsDomainType</span></code></a> — <code class="docutils literal notranslate"><span class="pre">NONE</span></code>, <code class="docutils literal notranslate"><span class="pre">RELAXED</span></code>, or <code class="docutils literal notranslate"><span class="pre">REGULAR</span></code> — matching the GDX-level codes from <code class="xref c c-func docutils literal notranslate"><span class="pre">gdxSymbolGetDomainX()</span></code>.</p></li>
+</ul>
+<p><strong>Viewing on read.</strong> When a GDX file with strict-domain symbols is read in, the relationships are reconstructed as <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code> references:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds.gdx</span>
+<span class="k">with</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxFile</span><span class="p">(</span><span class="n">lazy_load</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="k">as</span> <span class="n">gdx</span><span class="p">:</span>
+    <span class="n">gdx</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;data.gdx&#39;</span><span class="p">)</span>
+    <span class="n">sub</span> <span class="o">=</span> <span class="n">gdx</span><span class="p">[</span><span class="s1">&#39;sub_a&#39;</span><span class="p">]</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">domain_type</span><span class="p">)</span>           <span class="c1"># GamsDomainType.REGULAR</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">domain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="n">gdx</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">])</span> <span class="c1"># True — points at the parent Set</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sub</span><span class="o">.</span><span class="n">dims</span><span class="p">)</span>                  <span class="c1"># [&#39;a&#39;] — the string view also works</span>
+</pre></div>
+</div>
+<p><strong>Setting on write.</strong> Build a parent Set, then a child whose <code class="docutils literal notranslate"><span class="pre">domain=</span></code> references it:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds.gdx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<span class="k">with</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">gdx</span><span class="p">:</span>
+    <span class="n">gdx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]))</span>
+    <span class="n">gdx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">[[</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a2&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a3&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">]],</span>
+        <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">])</span>
+
+    <span class="n">gdx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxSymbol</span><span class="p">(</span>
+        <span class="s1">&#39;sub_a&#39;</span><span class="p">,</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span><span class="n">dims</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">],</span> <span class="n">domain</span><span class="o">=</span><span class="p">[</span><span class="n">gdx</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]]))</span>
+    <span class="n">gdx</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+        <span class="p">[[</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;a3&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">]],</span> <span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">])</span>
+
+    <span class="n">gdx</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;data.gdx&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The convenience functions <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_set" title="gdxpds.gdx.append_set"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.gdx.append_set()</span></code></a> and <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_parameter" title="gdxpds.gdx.append_parameter"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.gdx.append_parameter()</span></code></a> both accept a <code class="docutils literal notranslate"><span class="pre">domain=</span></code> kwarg and return the appended <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code>, so the same flow chains naturally:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">parent</span> <span class="o">=</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">append_set</span><span class="p">(</span><span class="n">gdx</span><span class="p">,</span> <span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a1&#39;</span><span class="p">,</span> <span class="s1">&#39;a2&#39;</span><span class="p">]}))</span>
+<span class="n">child</span>  <span class="o">=</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">append_set</span><span class="p">(</span><span class="n">gdx</span><span class="p">,</span> <span class="s1">&#39;sub_a&#39;</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;a&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a1&#39;</span><span class="p">]}),</span> <span class="n">domain</span><span class="o">=</span><span class="p">[</span><span class="n">parent</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Passing a <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code> reference in <code class="docutils literal notranslate"><span class="pre">domain</span></code> is the only trigger for strict writes. Plain strings via <code class="docutils literal notranslate"><span class="pre">dims=</span></code> always stay relaxed — there is no auto-promotion from name to ref.</p>
+<p><strong>Write order matters.</strong> Strict <code class="xref c c-func docutils literal notranslate"><span class="pre">gdxSymbolSetDomain()</span></code> validates that the named parent already exists in the GDX symbol table at the moment the child’s write begins. Symbols are written in <code class="docutils literal notranslate"><span class="pre">GdxFile._symbols</span></code> insertion order, so parents must be appended (or otherwise placed) before their children. If the order is wrong at write time, the strict path is skipped for that symbol and <code class="docutils literal notranslate"><span class="pre">gdxpds</span></code> falls back to relaxed (logging an info message); the resulting GDX is still valid. Two ways to fix:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># After building the file in any order:</span>
+<span class="n">gdx</span><span class="o">.</span><span class="n">reorder_for_strict_domains</span><span class="p">()</span>   <span class="c1"># stable topological sort</span>
+<span class="n">gdx</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;data.gdx&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>or simply build in dependency order from the start.</p>
+<p><strong>Mutation rules.</strong> Setting <code class="docutils literal notranslate"><span class="pre">domain</span></code> after a symbol has records updates the strict refs and renames the DataFrame column headers to match the parent names. Setting <code class="docutils literal notranslate"><span class="pre">dims</span></code> clears any strict refs (the two attributes are coupled and last write wins). Removing a parent (<code class="docutils literal notranslate"><span class="pre">del</span> <span class="pre">gdx['a']</span></code>) or replacing it with a same-name symbol is fine — strict resolution happens by name at write time.</p>
+<p>If you prefer the simpler API that works with dicts of DataFrames, see <a class="reference internal" href="#direct-conversion">the <code class="docutils literal notranslate"><span class="pre">domains=</span></code> kwarg on <code class="docutils literal notranslate"><span class="pre">to_gdx</span></code> and <code class="docutils literal notranslate"><span class="pre">gdxpds.get_subset_relationships()</span></code></a> for the string-based equivalent.</p>
+</section>
+</section>
+<section id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Link to this heading"></a></h2>
+<p>Two runtime choices control how gdxpds talks to GAMS, and both are set the same three ways — a keyword argument, an environment variable, or (for the command-line utilities) a flag. In each case the explicit keyword wins, then the environment variable, then a fallback:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Setting</p></th>
+<th class="head"><p>Keyword</p></th>
+<th class="head"><p>Environment variable</p></th>
+<th class="head"><p>CLI flag</p></th>
+<th class="head"><p>Fallback</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>GAMS install location</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gams_dir=</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GAMS_DIR</span></code>, then <code class="docutils literal notranslate"><span class="pre">GAMSDIR</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-g</span></code> / <code class="docutils literal notranslate"><span class="pre">--gams_dir</span></code></p></td>
+<td><p>auto-discovery: <code class="docutils literal notranslate"><span class="pre">where</span></code>/<code class="docutils literal notranslate"><span class="pre">which</span> <span class="pre">gams</span></code>, then the newest install under <code class="docutils literal notranslate"><span class="pre">C:\GAMS</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>I/O engine</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">backend=</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">GDXPDS_BACKEND</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">-b</span></code> / <code class="docutils literal notranslate"><span class="pre">--backend</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">gdxcc</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p>The keyword arguments are accepted by every read/write entry point — <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframes" title="gdxpds.to_dataframes"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_dataframes()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_dataframe" title="gdxpds.to_dataframe"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_dataframe()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.list_symbols" title="gdxpds.list_symbols"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.list_symbols()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_data_types" title="gdxpds.get_data_types"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.get_data_types()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.get_subset_relationships" title="gdxpds.get_subset_relationships"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.get_subset_relationships()</span></code></a>, <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.to_gdx" title="gdxpds.to_gdx"><code class="xref py py-func docutils literal notranslate"><span class="pre">gdxpds.to_gdx()</span></code></a>, and <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile" title="gdxpds.gdx.GdxFile"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GdxFile</span></code></a>. Either choice may be omitted to use its fallback.</p>
+<p>Direct conversion example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds</span>
+
+<span class="n">dataframes</span> <span class="o">=</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">to_dataframes</span><span class="p">(</span><span class="s1">&#39;data.gdx&#39;</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;C:\GAMS\48&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;gams_transfer&#39;</span><span class="p">)</span>
+<span class="n">gdxpds</span><span class="o">.</span><span class="n">to_gdx</span><span class="p">(</span><span class="n">dataframes</span><span class="p">,</span> <span class="s1">&#39;out.gdx&#39;</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;C:\GAMS\48&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="n">gdxpds</span><span class="o">.</span><span class="n">Backend</span><span class="o">.</span><span class="n">GAMS_TRANSFER</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Backend classes example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gdxpds.gdx</span>
+
+<span class="k">with</span> <span class="n">gdxpds</span><span class="o">.</span><span class="n">gdx</span><span class="o">.</span><span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="sa">r</span><span class="s1">&#39;C:\GAMS\48&#39;</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="s1">&#39;gams_transfer&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="s1">&#39;data.gdx&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The same two choices are flags on the <code class="docutils literal notranslate"><span class="pre">gdx_to_csv</span></code> / <code class="docutils literal notranslate"><span class="pre">csv_to_gdx</span></code> utilities:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>gdx_to_csv<span class="w"> </span>-i<span class="w"> </span>data.gdx<span class="w"> </span>-o<span class="w"> </span>out_dir<span class="w"> </span>--gams_dir<span class="w"> </span>/opt/gams/48<span class="w"> </span>--backend<span class="w"> </span>gams_transfer
+csv_to_gdx<span class="w"> </span>-i<span class="w"> </span>data.txt<span class="w"> </span>-o<span class="w"> </span>out.gdx<span class="w"> </span>--gams_dir<span class="w"> </span>/opt/gams/48<span class="w"> </span>--backend<span class="w"> </span>gams_transfer
+</pre></div>
+</div>
+<p>Or set either one once — for a whole process or shell session — through its environment variable instead of passing it at every call site (PowerShell shown; use <code class="docutils literal notranslate"><span class="pre">export</span></code> on POSIX):</p>
+<div class="highlight-powershell notranslate"><div class="highlight"><pre><span></span><span class="nv">$Env:GAMS_DIR</span> <span class="p">=</span> <span class="s1">&#39;C:\GAMS\48&#39;</span>
+<span class="nv">$Env:GDXPDS_BACKEND</span> <span class="p">=</span> <span class="s1">&#39;gams_transfer&#39;</span>
+<span class="n">gdx_to_csv</span> <span class="n">-i</span> <span class="n">data</span><span class="p">.</span><span class="n">gdx</span> <span class="n">-o</span> <span class="n">out_dir</span>
+</pre></div>
+</div>
+<section id="gams-install-location-gams-dir">
+<h3>GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)<a class="headerlink" href="#gams-install-location-gams-dir" title="Link to this heading"></a></h3>
+<p>gdxpds always needs to locate your GAMS installation, because the GDX shared library lives there (not in the Python package) — so <code class="docutils literal notranslate"><span class="pre">gams_dir</span></code> is required even when the Python bindings are pip-installed. If you do not set it explicitly, gdxpds auto-discovers it as described in the table above; calling <code class="docutils literal notranslate"><span class="pre">gdxpds</span> <span class="pre">info</span></code> on the command line reports which directory was chosen and via which route.</p>
+</section>
+<section id="i-o-engine-backend">
+<h3>I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)<a class="headerlink" href="#i-o-engine-backend" title="Link to this heading"></a></h3>
+<p>gdxpds can move data between GDX files and DataFrames through either of two engines, named by string or <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.Backend" title="gdxpds.Backend"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.Backend</span></code></a> value. (This “backend” is a different concept from the <a class="reference internal" href="#backend-classes">Backend Classes</a> above — the <code class="docutils literal notranslate"><span class="pre">GdxFile</span></code> / <code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code> objects; here it means the underlying read/write <em>engine</em>.)</p>
+<ul class="simple">
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">&quot;gdxcc&quot;</span></code></strong> (the legacy engine and current default) uses SWIG-bound <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code> calls and works with either GAMS Python binding.</p></li>
+<li><p><strong><code class="docutils literal notranslate"><span class="pre">&quot;gams_transfer&quot;</span></code></strong> uses GAMS’s <code class="docutils literal notranslate"><span class="pre">gams.transfer</span></code> library (shipped inside <code class="docutils literal notranslate"><span class="pre">gamsapi</span></code>). It is <strong>much faster on large files</strong> — roughly 2× faster to read and 4× faster to write a ~2 MB GDX, widening to an order of magnitude or more on hundreds-of-MB files — but its fixed per-file overhead makes it <em>slower</em> than <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code> on very small files.</p></li>
+</ul>
+<p><code class="docutils literal notranslate"><span class="pre">gams.transfer</span></code> is only usable when a compatible <code class="docutils literal notranslate"><span class="pre">gamsapi</span></code> is installed (see <a class="reference internal" href="index.html#install"><span class="std std-ref">Install</span></a>); check <code class="docutils literal notranslate"><span class="pre">gdxpds.HAVE_GAMS_TRANSFER</span></code> at runtime. Requesting it when it is unavailable raises <a class="reference internal" href="_autosummary/gdxpds.html#gdxpds.BackendError" title="gdxpds.BackendError"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.BackendError</span></code></a> rather than silently falling back. Both engines produce identical DataFrames and GDX files.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="gdx-pandas documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, The Alliance for Energy Innovation, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <script src="_static/versions.js"></script>
+
+
+</body>
+</html>
