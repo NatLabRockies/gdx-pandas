@@ -338,3 +338,5 @@ gdxpds can move data between GDX files and DataFrames through either of two engi
 - **`"gdxcc"`** (the fallback) uses SWIG-bound `gdxcc` calls and works with either GAMS Python binding.
 
 `gams.transfer` is only usable when a compatible `gamsapi` is installed (see [Install](index.md#install)); check `gdxpds.HAVE_GAMS_TRANSFER` at runtime. The **default** prefers `gams.transfer` and quietly falls back to `gdxcc` when it isn't usable, so gdxcc-only environments are unaffected. An *explicit* request for an unavailable engine raises {py:class}`gdxpds.BackendError` rather than falling back. Both engines produce identical DataFrames and GDX files.
+
+One behavioral difference between the engines is visible only **before a symbol's records are loaded**: `gdxcc` exposes a symbol's record count (`GdxSymbol.num_records`) and the file's `version`/`producer` from the GDX header, whereas `gams.transfer` does not (they read as `0` / `None` until the records are loaded). After loading — i.e. once you touch `GdxSymbol.dataframe`, or read with `lazy_load=False` — `num_records` reflects the DataFrame on both engines.

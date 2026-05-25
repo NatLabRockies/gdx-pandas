@@ -244,7 +244,7 @@ class GdxccBackend(GdxBackend):
             raise Error(f"Cannot write unloaded symbol {symbol.name!r}.")
         H = self.handle
 
-        if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
+        if symbol.data_type == GamsDataType.Set:
             symbol._fixup_set_value()
 
         if index is not None:
@@ -311,10 +311,11 @@ class GdxccBackend(GdxBackend):
         # make sure index is clean -- needed for merging in convert_np_to_gdx_svs
         symbol.dataframe = symbol.dataframe.reset_index(drop=True)
 
-        if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
+        if symbol.data_type == GamsDataType.Set:
             # Each row is a member; the value column is its element text ("" = no
             # text). Non-empty text is registered with gdxAddSetText and the row
-            # stores the returned table index (0 means no text).
+            # stores the returned table index (0 means no text). (Aliases returned
+            # above; only Sets reach this data-write path.)
             for row in symbol.dataframe.itertuples(index=False, name=None):
                 dims = [str(x) for x in row[: symbol.num_dims]]
                 vals = row[symbol.num_dims :]

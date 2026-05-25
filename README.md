@@ -46,7 +46,7 @@ gdxpds needs to know **where GAMS is**, and optionally **which I/O engine** to u
 
 ```bash
 export GAMS_DIR=/path/to/gams        # otherwise auto-discovered
-export GDXPDS_BACKEND=gams_transfer  # default: gdxcc; gams_transfer is much faster on large files (needs gamsapi)
+export GDXPDS_BACKEND=gdxcc          # default: gams_transfer when usable (much faster on large files), else gdxcc
 ```
 
 See *Configuration* in the [documentation](https://NatLabRockies.github.io/gdx-pandas) for the full keyword / environment-variable / CLI matrix and the speed trade-offs.

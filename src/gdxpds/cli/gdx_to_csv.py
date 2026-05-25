@@ -56,7 +56,7 @@ def main(argv=None):
         choices=[b.value for b in gdxpds.Backend],
         default=None,
         help="""I/O engine to use. Defaults to the GDXPDS_BACKEND environment
-                        variable, then 'gdxcc'.""",
+                        variable, then 'gams_transfer' when usable, otherwise 'gdxcc'.""",
     )
 
     args = parser.parse_args(argv)

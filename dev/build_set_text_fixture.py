@@ -1,10 +1,9 @@
 """Generate tests/data/set_text_fixture.gdx.
 
-A 1D Set whose elements carry GAMS explanatory *text*, used by the
-load_set_text=True read test in tests/test_read.py. gdxpds has no API for
-*writing* set element text, so this fixture is built with the raw gdxcc bindings
-(the same low-level approach used in tests/test_specials.py). Committed to the
-repo; only re-run this if the schema changes.
+A 1D Set whose elements carry GAMS explanatory *text*, used by the set-element-text
+read tests in tests/test_read.py. Built with the raw gdxcc bindings (the same
+low-level approach used in tests/test_specials.py) so the read tests stay independent
+of gdxpds's own write path. Committed to the repo; only re-run this if the schema changes.
 
 Usage (from repo root, with the venv active and $env:GAMS_DIR set):
 

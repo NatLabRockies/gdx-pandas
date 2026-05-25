@@ -24,12 +24,6 @@ from gdxpds._backend import resolve_backend
 from gdxpds.tools import Error
 
 
-def _normalize(df):
-    """Hook for canonicalizing values before comparison. Set/Alias values are now
-    plain strings and other types are floats, so DataFrames already compare by value."""
-    return df.copy()
-
-
 def test_have_gams_transfer_is_bool():
     assert isinstance(gdxpds.HAVE_GAMS_TRANSFER, bool)
 
@@ -123,7 +117,7 @@ def test_to_dataframes_symbols_subset(data_dir):
     assert list(dfs) == subset
     # and equal to the full-read result restricted to them
     for name in subset:
-        pd.testing.assert_frame_equal(_normalize(dfs[name]), _normalize(full[name]))
+        pd.testing.assert_frame_equal(dfs[name], full[name])
 
 
 def test_to_dataframes_symbols_empty_and_unknown(data_dir):

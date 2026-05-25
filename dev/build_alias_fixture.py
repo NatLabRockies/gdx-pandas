@@ -1,10 +1,9 @@
 """Generate tests/data/alias_fixture.gdx.
 
 A 1D parent Set plus an Alias of it, used by the backend read-parity tests.
-gdxpds has no API for *writing* aliases (to_gdx infers types from DataFrame
-shape and never emits an alias), so this is built with the raw gdxcc bindings
-(gdxAddAlias), the same low-level approach used in build_set_text_fixture.py.
-Committed to the repo; only re-run this if the schema changes.
+Built with the raw gdxcc bindings (gdxAddAlias) so the read tests stay independent
+of gdxpds's own alias-write path, the same low-level approach used in
+build_set_text_fixture.py. Committed to the repo; only re-run this if the schema changes.
 
 Usage (from repo root, with the venv active and $env:GAMS_DIR set):
 

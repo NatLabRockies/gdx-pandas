@@ -25,19 +25,14 @@ FIXTURES = sorted(
 )
 
 
-def _normalize(df):
-    """Set/Alias values are plain strings and the other types are floats, so the
-    DataFrames already compare by value (assert_frame_equal treats NaNs as equal).
-    Kept as a hook in case a future value type needs canonicalizing."""
-    return df.copy()
-
-
 def _assert_same(a, b):
     # Same symbols in the same order (both backends read in GDX order), then
-    # identical contents per symbol.
+    # identical contents per symbol. Set/Alias values are plain strings and the
+    # other types are floats, so DataFrames compare directly (assert_frame_equal
+    # treats NaNs as equal).
     assert list(a) == list(b)
     for name in a:
-        pd.testing.assert_frame_equal(_normalize(a[name]), _normalize(b[name]), check_dtype=True)
+        pd.testing.assert_frame_equal(a[name], b[name], check_dtype=True)
 
 
 @pytest.mark.parametrize("fixture", FIXTURES)
