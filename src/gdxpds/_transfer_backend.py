@@ -386,9 +386,14 @@ class TransferBackend(GdxBackend):
 
         # A Set/Alias value is its element text ("" = no text); membership is row
         # presence. An Alias delegates its .records to the parent Set, so the same
-        # path applies.
+        # path applies. A universe alias (alias of '*') has only the member column
+        # and no element-text column, so its members all carry empty text.
         if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
-            value_data = records.iloc[:, num_dims].astype(str).reset_index(drop=True).to_frame()
+            if records.shape[1] > num_dims:
+                text = records.iloc[:, num_dims].astype(str)
+            else:
+                text = pd.Series([""] * len(records))
+            value_data = text.reset_index(drop=True).to_frame()
         else:
             value_data = _convert_transfer_specials(
                 records.iloc[:, num_dims:].reset_index(drop=True)

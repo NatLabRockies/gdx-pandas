@@ -20,8 +20,15 @@ pytestmark = pytest.mark.skipif(not gdxpds.HAVE_GAMS_TRANSFER, reason="gams.tran
 # Computed at import (collection) time because @parametrize needs the values
 # before the conftest ``data_dir`` fixture is available. Test bodies use the
 # ``data_dir`` fixture (repo convention); this constant just feeds parametrize.
+#
+# universe_alias_fixture.gdx is excluded: the two engines legitimately disagree on
+# a universe alias's membership (gdxcc includes the '*' UEL, gams.transfer does
+# not), so it can't satisfy strict cross-backend parity. It is covered separately
+# by tests/test_alias.py::test_universe_alias_reads_and_roundtrips.
 FIXTURES = sorted(
-    os.path.basename(p) for p in glob.glob(os.path.join(os.path.dirname(__file__), "data", "*.gdx"))
+    os.path.basename(p)
+    for p in glob.glob(os.path.join(os.path.dirname(__file__), "data", "*.gdx"))
+    if "universe_alias" not in os.path.basename(p)
 )
 
 

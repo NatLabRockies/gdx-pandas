@@ -84,6 +84,26 @@ def test_to_gdx_aliases_non_set_parent_raises():
         )
 
 
+def test_universe_alias_reads_and_roundtrips(data_dir, tmp_path):
+    # A universe alias (alias of '*', not a named Set) reads with aliased_with
+    # resolved to the file's universal_set, and round-trips on both backends.
+    src = os.path.join(data_dir, "universe_alias_fixture.gdx")
+    backends = ["gdxcc"] + (["gams_transfer"] if gdxpds.HAVE_GAMS_TRANSFER else [])
+    for be in backends:
+        with GdxFile(lazy_load=False, backend=be) as f:
+            f.read(src)
+            u = f["u"]
+            assert u.data_type == GamsDataType.Alias
+            assert u.aliased_with is f.universal_set
+            assert u.aliased_with.name == "*"
+            out = str(tmp_path / f"rt_{be}.gdx")
+            f.clone().write(out)
+        with GdxFile(lazy_load=False, backend=be) as g:
+            g.read(out)
+            assert g["u"].data_type == GamsDataType.Alias
+            assert g["u"].aliased_with is g.universal_set
+
+
 def test_to_gdx_aliases_name_collision_raises():
     with pytest.raises(DomainError):
         gdxpds.to_gdx(

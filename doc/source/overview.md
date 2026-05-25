@@ -205,6 +205,10 @@ child  = gdxpds.gdx.append_set(gdx, 'sub_a', pd.DataFrame({'a': ['a1']}), domain
 
 Passing a `GdxSymbol` reference in `domain` is the only trigger for strict writes. Plain strings via `dims=` always stay relaxed — there is no auto-promotion from name to ref.
 
+:::{note}
+The two I/O engines differ on one strict-domain edge case: a domain that *mixes* a strict parent with a wildcard — e.g. `domain=[gdx['a'], None]`, which is `('a', '*')` — is written as a **regular** (strict) domain by the `gdxcc` engine but **relaxed** by `gams.transfer`. If you need such a partial-wildcard domain recorded as strict, write that file with `backend="gdxcc"`. Fully-strict and fully-relaxed domains round-trip identically on both engines.
+:::
+
 **Write order matters.** Strict {c:func}`gdxSymbolSetDomain` validates that the named parent already exists in the GDX symbol table at the moment the child's write begins. Symbols are written in `GdxFile._symbols` insertion order, so parents must be appended (or otherwise placed) before their children. If the order is wrong at write time, the strict path is skipped for that symbol and `gdxpds` falls back to relaxed (logging an info message); the resulting GDX is still valid. Two ways to fix:
 
 ```python
@@ -272,15 +276,27 @@ From the dict-of-DataFrames API, pass an `aliases=` mapping (alias name → pare
 gdxpds.to_gdx(dataframes, 'data.gdx', aliases={'at': 't'})
 ```
 
-## Migration to 3.0.0
+:::{note}
+Aliases of a *named Set* (the common case) are fully supported on both engines. A **universe alias** — an alias of the universe set `*` (`aliased_with` resolves to the file's `universal_set`) — reads without error and round-trips within a single engine, but the engines disagree on its membership (`gdxcc` includes the `*` element, `gams.transfer` does not), so it is not cross-engine identical.
+:::
 
-Version 3.0.0 is a breaking release. The main changes for callers:
+## Migration from 1.x / 2.x
+
+Releases 2.0.0 and 3.0.0 each made breaking changes. If you are upgrading from 1.5.x, you cross both — the relevant changes for callers are collected here.
+
+**3.0.0 (breaking):**
 
 - **Default I/O engine is now `gams.transfer`** (when a compatible `gamsapi` is installed), falling back to `gdxcc`. To keep the previous behavior, pass `backend="gdxcc"` or set `GDXPDS_BACKEND=gdxcc`.
 - **Set/Alias values are element-text strings, not booleans.** Reading a Set now yields a string value column (`""` for no text); membership is row presence. Code that checked a Set's value as a boolean should switch to testing row presence (or, for text, the string).
 - **`load_set_text` is removed.** Element text is always read and written, so drop the argument from any `to_dataframe` / `to_dataframes` / `GdxSymbol.load` / `GdxFile.load_all` / `load_symbols` calls.
 - **`GdxFile.H` is removed.** If you drove raw `gdxcc` calls through it, use `gdx_file._backend_impl.handle` instead.
 - **GDX UNDEF is preserved on write** (round-trips as `None`) instead of collapsing to `0.0`.
+
+**2.0.0 (breaking) — also relevant if you skipped it:**
+
+- **`to_dataframe()` always returns a plain DataFrame.** The `old_interface` argument is gone; drop any `old_interface=False` (the old `old_interface=True` returned a `{symbol_name: DataFrame}` dict).
+- **The `.py`-suffixed CLI commands were removed.** Use `csv_to_gdx` / `gdx_to_csv` (not `csv_to_gdx.py` / `gdx_to_csv.py`).
+- **The optional `gdx2py` read accelerator was removed** (not an API change); Parameter reads use the standard path.
 
 ## Configuration
 
