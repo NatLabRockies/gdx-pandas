@@ -152,6 +152,7 @@ The key classes and functions for directly using the backend are:
 - {py:class}`gdxpds.gdx.GamsDomainType`
 - {py:func}`gdxpds.gdx.append_set`
 - {py:func}`gdxpds.gdx.append_parameter`
+- {py:func}`gdxpds.gdx.append_alias`
 
 Starting with Version 1.1.0, gdxpds does not allow the *number* of dimensions on a `GdxSymbol` to change once it has been firmly established (as evidenced by `GdxSymbol.num_dims > 0` or `GdxSymbol.num_records > 0`). The dimension *names* (`GdxSymbol.dims`) may still be reassigned in place — the DataFrame columns are renamed automatically — and `GdxSymbol.dataframe` may be set using only the dimensional columns, with `GdxSymbol` filling in the remaining columns with default values.
 
@@ -218,6 +219,69 @@ or simply build in dependency order from the start.
 
 If you prefer the simpler API that works with dicts of DataFrames, see [the `domains=` kwarg on `to_gdx` and `gdxpds.get_subset_relationships()`](#direct-conversion) for the string-based equivalent.
 
+### Set membership and element text
+
+A Set (or Alias) `GdxSymbol` has a single value column whose entries are the GAMS **element text** — a string, with `""` denoting a member that has no text. Membership itself is conveyed by **row presence**: every row in the DataFrame is a member. On write, the value column is flexible — a Set can be built from the dimension columns alone, from a boolean column (any truthy/falsy value means "member, no text"), or from explicit text strings; only a non-empty string is written as element text.
+
+```python
+import gdxpds.gdx
+import pandas as pd
+with gdxpds.gdx.GdxFile() as gdx:
+    s = gdxpds.gdx.append_set(gdx, 's', pd.DataFrame({'i': ['a', 'b', 'c']}))
+    s.dataframe['Value'] = ['alpha', '', 'gamma']   # element text; '' = no text
+    gdx.write('data.gdx')
+
+df = gdxpds.to_dataframe('data.gdx', 's')
+print(df['Value'].tolist())   # ['alpha', '', 'gamma']
+```
+
+### Aliases
+
+GAMS lets one Set be an *alias* of another — `alias(t, at)` makes `at` another name for set `t`. `gdxpds` surfaces the relationship on `GdxSymbol`:
+
+- `GdxSymbol.data_type` is {py:attr}`gdxpds.gdx.GamsDataType.Alias`, and the symbol reads like the Set it aliases (same elements, same element text).
+- `GdxSymbol.aliased_with` is the parent Set as a `GdxSymbol` reference (or `None` for non-aliases). Unlike a relaxed domain, an alias has no fallback: its parent must exist in the file when it is written, or the write raises {py:class}`gdxpds.DomainError`.
+
+**Viewing on read:**
+
+```python
+import gdxpds.gdx
+with gdxpds.gdx.GdxFile(lazy_load=False) as gdx:
+    gdx.read('data.gdx')
+    at = gdx['at']
+    print(at.data_type)                 # GamsDataType.Alias
+    print(at.aliased_with is gdx['t'])  # True — points at the parent Set
+```
+
+**Setting on write.** Build the parent Set, then the alias — via {py:func}`gdxpds.gdx.append_alias` or a `GdxSymbol` with `aliased_with`:
+
+```python
+import gdxpds.gdx
+import pandas as pd
+with gdxpds.gdx.GdxFile() as gdx:
+    t = gdxpds.gdx.append_set(gdx, 't', pd.DataFrame({'i': ['a', 'b', 'c']}))
+    gdxpds.gdx.append_alias(gdx, 'at', t)   # or append_alias(gdx, 'at', 't')
+    gdx.write('data.gdx')
+```
+
+Aliases must be written after their parent Set. As with strict domains, build in dependency order or call {py:meth}`gdxpds.gdx.GdxFile.reorder_for_strict_domains` before writing.
+
+From the dict-of-DataFrames API, pass an `aliases=` mapping (alias name → parent Set name) to {py:func}`gdxpds.to_gdx`:
+
+```python
+gdxpds.to_gdx(dataframes, 'data.gdx', aliases={'at': 't'})
+```
+
+## Migration to 3.0.0
+
+Version 3.0.0 is a breaking release. The main changes for callers:
+
+- **Default I/O engine is now `gams.transfer`** (when a compatible `gamsapi` is installed), falling back to `gdxcc`. To keep the previous behavior, pass `backend="gdxcc"` or set `GDXPDS_BACKEND=gdxcc`.
+- **Set/Alias values are element-text strings, not booleans.** Reading a Set now yields a string value column (`""` for no text); membership is row presence. Code that checked a Set's value as a boolean should switch to testing row presence (or, for text, the string).
+- **`load_set_text` is removed.** Element text is always read and written, so drop the argument from any `to_dataframe` / `to_dataframes` / `GdxSymbol.load` / `GdxFile.load_all` / `load_symbols` calls.
+- **`GdxFile.H` is removed.** If you drove raw `gdxcc` calls through it, use `gdx_file._backend_impl.handle` instead.
+- **GDX UNDEF is preserved on write** (round-trips as `None`) instead of collapsing to `0.0`.
+
 ## Configuration
 
 Two runtime choices control how gdxpds talks to GAMS, and both are set the same three ways — a keyword argument, an environment variable, or (for the command-line utilities) a flag. In each case the explicit keyword wins, then the environment variable, then a fallback:
@@ -225,7 +289,7 @@ Two runtime choices control how gdxpds talks to GAMS, and both are set the same 
 | Setting | Keyword | Environment variable | CLI flag | Fallback |
 |---|---|---|---|---|
 | GAMS install location | `gams_dir=` | `GAMS_DIR`, then `GAMSDIR` | `-g` / `--gams_dir` | auto-discovery: `where`/`which gams`, then the newest install under `C:\GAMS` |
-| I/O engine | `backend=` | `GDXPDS_BACKEND` | `-b` / `--backend` | `gdxcc` |
+| I/O engine | `backend=` | `GDXPDS_BACKEND` | `-b` / `--backend` | `gams_transfer` when usable, otherwise `gdxcc` |
 
 The keyword arguments are accepted by every read/write entry point — {py:func}`gdxpds.to_dataframes`, {py:func}`gdxpds.to_dataframe`, {py:func}`gdxpds.list_symbols`, {py:func}`gdxpds.get_data_types`, {py:func}`gdxpds.get_subset_relationships`, {py:func}`gdxpds.to_gdx`, and {py:class}`gdxpds.gdx.GdxFile`. Either choice may be omitted to use its fallback.
 
@@ -270,7 +334,7 @@ gdxpds always needs to locate your GAMS installation, because the GDX shared lib
 
 gdxpds can move data between GDX files and DataFrames through either of two engines, named by string or {py:class}`gdxpds.Backend` value. (This "backend" is a different concept from the [Backend Classes](#backend-classes) above — the `GdxFile` / `GdxSymbol` objects; here it means the underlying read/write *engine*.)
 
-- **`"gdxcc"`** (the legacy engine and current default) uses SWIG-bound `gdxcc` calls and works with either GAMS Python binding.
-- **`"gams_transfer"`** uses GAMS's `gams.transfer` library (shipped inside `gamsapi`). It is **much faster on large files** — roughly 2× faster to read and 4× faster to write a ~2 MB GDX, widening to an order of magnitude or more on hundreds-of-MB files — but its fixed per-file overhead makes it *slower* than `gdxcc` on very small files.
+- **`"gams_transfer"`** (the default, when usable) uses GAMS's `gams.transfer` library (shipped inside `gamsapi`). It is **much faster on large files** — roughly 2× faster to read and 4× faster to write a ~2 MB GDX, widening to an order of magnitude or more on hundreds-of-MB files — but its fixed per-file overhead makes it *slower* than `gdxcc` on very small files.
+- **`"gdxcc"`** (the fallback) uses SWIG-bound `gdxcc` calls and works with either GAMS Python binding.
 
-`gams.transfer` is only usable when a compatible `gamsapi` is installed (see [Install](index.md#install)); check `gdxpds.HAVE_GAMS_TRANSFER` at runtime. Requesting it when it is unavailable raises {py:class}`gdxpds.BackendError` rather than silently falling back. Both engines produce identical DataFrames and GDX files.
+`gams.transfer` is only usable when a compatible `gamsapi` is installed (see [Install](index.md#install)); check `gdxpds.HAVE_GAMS_TRANSFER` at runtime. The **default** prefers `gams.transfer` and quietly falls back to `gdxcc` when it isn't usable, so gdxcc-only environments are unaffected. An *explicit* request for an unavailable engine raises {py:class}`gdxpds.BackendError` rather than falling back. Both engines produce identical DataFrames and GDX files.

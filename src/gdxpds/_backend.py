@@ -47,8 +47,9 @@ class Backend(StrEnum):
     GAMS_TRANSFER = "gams_transfer"
 
 
-#: The backend used when none is explicitly requested. v3.0.0 will flip this.
-DEFAULT_BACKEND = Backend.GDXCC
+#: The backend used when none is explicitly requested: gams.transfer when it is
+#: usable, otherwise gdxcc (the fallback resolved in :func:`resolve_backend`).
+DEFAULT_BACKEND = Backend.GAMS_TRANSFER
 
 
 class GdxBackend(abc.ABC):
@@ -77,8 +78,6 @@ class GdxBackend(abc.ABC):
         self,
         gdx_file: GdxFile,
         symbols: Sequence[GdxSymbol] | None = None,
-        *,
-        load_set_text: bool = False,
     ) -> None:
         """Load records into the given ``symbols`` of ``gdx_file``.
 
@@ -87,20 +86,21 @@ class GdxBackend(abc.ABC):
         so callers pass objects, not names). Already-loaded symbols are skipped.
         """
 
-    def load_file(self, gdx_file: GdxFile, *, load_set_text: bool = False) -> None:
+    def load_file(self, gdx_file: GdxFile) -> None:
         """Eagerly load every symbol's records."""
-        self.load_symbols(gdx_file, None, load_set_text=load_set_text)
+        self.load_symbols(gdx_file, None)
 
-    def load_symbol(self, symbol: GdxSymbol, *, load_set_text: bool = False) -> None:
+    def load_symbol(self, symbol: GdxSymbol) -> None:
         """Load the records of a single symbol."""
-        self.load_symbols(symbol.file, [symbol], load_set_text=load_set_text)
+        self.load_symbols(symbol.file, [symbol])
 
     @property
     def handle(self) -> object | None:
         """Native engine handle, if any.
 
         The gdxcc backend returns its GDX pointer; backends without one (e.g.
-        gams.transfer) return ``None``. Surfaced through ``GdxFile.H``.
+        gams.transfer) return ``None``. Reached as ``gdx_file._backend_impl.handle``
+        for the rare case of driving raw ``gdxcc`` calls.
         """
         return None
 
@@ -135,11 +135,20 @@ def resolve_backend(explicit: str | Backend | None) -> Backend:
 
     Order: ``explicit`` value → ``GDXPDS_BACKEND`` env var → :data:`DEFAULT_BACKEND`.
     Strings are normalized to :class:`Backend` members. An unrecognized value
-    raises :class:`BackendError`; requesting ``GAMS_TRANSFER`` when gams.transfer
-    is not importable also raises (no silent fallback).
+    raises :class:`BackendError`.
+
+    The default (no explicit arg / env var) prefers ``GAMS_TRANSFER`` but falls
+    back to ``GDXCC`` when gams.transfer is not usable, so gdxcc-only environments
+    are unaffected. An *explicit* ``GAMS_TRANSFER`` request that can't be satisfied
+    raises instead of falling back.
     """
     raw = explicit if explicit is not None else os.environ.get("GDXPDS_BACKEND")
     if raw is None or raw == "":
+        if DEFAULT_BACKEND is Backend.GAMS_TRANSFER:
+            from gdxpds.tools import _probe_gams_transfer
+
+            if not _probe_gams_transfer():
+                return Backend.GDXCC
         return DEFAULT_BACKEND
     try:
         backend = Backend(raw)

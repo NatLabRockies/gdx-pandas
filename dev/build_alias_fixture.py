@@ -32,31 +32,32 @@ ELEMENTS = ["a", "b", "c"]
 
 
 def main():
-    # Pin the gdxcc backend: this script drives raw gdxcc calls through f.H,
-    # which is None under the gams.transfer backend (so GDXPDS_BACKEND must not
-    # be allowed to redirect us).
+    # Pin the gdxcc backend: this script drives raw gdxcc calls through the GDX
+    # handle, which the gams.transfer backend does not have (so GDXPDS_BACKEND
+    # must not be allowed to redirect us).
     with gdxpds.gdx.GdxFile(backend="gdxcc") as f:
-        if not gdxcc.gdxOpenWrite(f.H, OUT_PATH, "gdxpds"):
-            raise gdxpds.gdx.GdxError(f.H, f"Could not open {OUT_PATH!r} for writing")
+        H = f._backend_impl.handle
+        if not gdxcc.gdxOpenWrite(H, OUT_PATH, "gdxpds"):
+            raise gdxpds.gdx.GdxError(H, f"Could not open {OUT_PATH!r} for writing")
         f.universal_set.write()
 
         # Parent set t = {a, b, c}.
         if not gdxcc.gdxDataWriteStrStart(
-            f.H, "t", "parent set", 1, gdxpds.gdx.GamsDataType.Set.value, 0
+            H, "t", "parent set", 1, gdxpds.gdx.GamsDataType.Set.value, 0
         ):
-            raise gdxpds.gdx.GdxError(f.H, "Could not start writing data for symbol t")
-        gdxcc.gdxSymbolSetDomainX(f.H, 1, ["*"])
+            raise gdxpds.gdx.GdxError(H, "Could not start writing data for symbol t")
+        gdxcc.gdxSymbolSetDomainX(H, 1, ["*"])
         values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
         values[gdxcc.GMS_VAL_LEVEL] = 0.0
         for elem in ELEMENTS:
-            gdxcc.gdxDataWriteStr(f.H, [elem], values)
-        gdxcc.gdxDataWriteDone(f.H)
+            gdxcc.gdxDataWriteStr(H, [elem], values)
+        gdxcc.gdxDataWriteDone(H)
 
         # Alias at -> t.
-        if not gdxcc.gdxAddAlias(f.H, "t", "at"):
-            raise gdxpds.gdx.GdxError(f.H, "Could not add alias at -> t")
+        if not gdxcc.gdxAddAlias(H, "t", "at"):
+            raise gdxpds.gdx.GdxError(H, "Could not add alias at -> t")
 
-        gdxcc.gdxClose(f.H)
+        gdxcc.gdxClose(H)
 
     print(f"Wrote {OUT_PATH} ({os.path.getsize(OUT_PATH)} bytes)")
 

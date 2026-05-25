@@ -1,7 +1,7 @@
-__version__ = "2.1.0"
+__version__ = "3.0.0"
 
 from gdxpds._backend import Backend, BackendError
-from gdxpds.gdx import GdxError, SymbolNotFoundError
+from gdxpds.gdx import DomainError, GdxError, SymbolNotFoundError, TransferError
 from gdxpds.read_gdx import (
     get_data_types,
     get_subset_relationships,
@@ -25,6 +25,8 @@ __all__ = [
     "Error",
     "GamsLoadError",
     "GdxError",
+    "TransferError",
+    "DomainError",
     "GamsDirFinder",
     "Backend",
     "BackendError",

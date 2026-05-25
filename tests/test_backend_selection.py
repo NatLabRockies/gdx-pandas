@@ -1,10 +1,7 @@
-"""Step 1 coverage: the Backend enum, capability flag, backend resolution, and
-the to_dataframes(symbols=...) subset feature. The gams.transfer backend itself
-is not yet constructible (Phase A), so these exercise selection/plumbing on the
-default gdxcc backend."""
+"""Coverage for the Backend enum, capability flag, backend resolution, and the
+to_dataframes(symbols=...) subset feature."""
 
 import os
-from ctypes import c_bool
 
 import pandas as pd
 import pytest
@@ -13,7 +10,9 @@ import gdxpds
 from gdxpds import (
     Backend,
     BackendError,
+    DomainError,
     SymbolNotFoundError,
+    TransferError,
     get_data_types,
     get_subset_relationships,
     list_symbols,
@@ -26,16 +25,9 @@ from gdxpds.tools import Error
 
 
 def _normalize(df):
-    """Map ctypes c_bool cells to plain bool so DataFrames compare by value.
-
-    Set ``Value`` columns hold distinct c_bool *objects* that never compare
-    equal element-wise, which trips assert_frame_equal even on identical data.
-    """
-    df = df.copy()
-    for col in df.columns:
-        if df[col].map(lambda v: isinstance(v, c_bool)).any():
-            df[col] = df[col].map(lambda v: bool(v) if isinstance(v, c_bool) else v)
-    return df
+    """Hook for canonicalizing values before comparison. Set/Alias values are now
+    plain strings and other types are floats, so DataFrames already compare by value."""
+    return df.copy()
 
 
 def test_have_gams_transfer_is_bool():
@@ -46,11 +38,24 @@ def test_new_exceptions_subclass_error():
     # Non-breaking: existing ``except Error`` still catches the specific types.
     assert issubclass(BackendError, Error)
     assert issubclass(SymbolNotFoundError, Error)
+    assert issubclass(TransferError, Error)
+    assert issubclass(DomainError, Error)
+
+
+def test_transfer_error_on_bad_read(tmp_path):
+    # A gams.transfer I/O failure surfaces as TransferError (an Error subclass).
+    if not gdxpds.HAVE_GAMS_TRANSFER:
+        pytest.skip("gams.transfer not available")
+    missing = tmp_path / "does_not_exist.gdx"
+    with pytest.raises(TransferError):
+        to_dataframes(str(missing), backend="gams_transfer")
 
 
 def test_resolve_backend_default(monkeypatch):
+    # The default prefers gams.transfer when usable, falling back to gdxcc.
     monkeypatch.delenv("GDXPDS_BACKEND", raising=False)
-    assert resolve_backend(None) is Backend.GDXCC
+    expected = Backend.GAMS_TRANSFER if gdxpds.HAVE_GAMS_TRANSFER else Backend.GDXCC
+    assert resolve_backend(None) is expected
 
 
 def test_resolve_backend_env(monkeypatch):
@@ -93,7 +98,7 @@ def test_info_mentions_transfer_and_default_backend():
 
 
 def test_to_dataframes_explicit_gdxcc(data_dir):
-    # Explicitly selecting the default backend is a no-op vs leaving it None.
+    # Pinning gdxcc reads the same symbols as the resolved default backend.
     gdx_file = os.path.join(data_dir, "set_text_fixture.gdx")
     explicit = to_dataframes(gdx_file, backend="gdxcc")
     implicit = to_dataframes(gdx_file)

@@ -124,7 +124,10 @@ def roundtrip_one_gdx(data_dir, run_dir):
 
     def _roundtrip(filename, dirname):
         gdx_file = os.path.join(data_dir, filename)
-        with gdxpds.gdx.GdxFile() as gdx:
+        # Pin gdxcc for the in-process metadata checks below: only gdxcc reports a
+        # symbol's num_records before its data are loaded. (The CLI conversions
+        # invoked via subprocess still use the default backend.)
+        with gdxpds.gdx.GdxFile(backend="gdxcc") as gdx:
             gdx.read(gdx_file)
             num_records = {}
             total_records = 0
@@ -148,7 +151,7 @@ def roundtrip_one_gdx(data_dir, run_dir):
         roundtripped_gdx = os.path.join(out_dir, "output.gdx")
         subprocess.run(["csv_to_gdx", "-i", txt_file, "-o", roundtripped_gdx], check=True)
 
-        with gdxpds.gdx.GdxFile(lazy_load=True) as gdx:
+        with gdxpds.gdx.GdxFile(lazy_load=True, backend="gdxcc") as gdx:
             gdx.read(roundtripped_gdx)
             for symbol_name, records in num_records.items():
                 if records > 0:

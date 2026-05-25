@@ -2,7 +2,6 @@ import copy
 import gc
 import logging
 import os
-from ctypes import c_bool
 
 import numpy as np
 import pandas as pd
@@ -26,7 +25,8 @@ def test_from_scratch_sets(run_dir):
         data = pd.DataFrame([["u" + str(i)] for i in range(1, 11)])
         data["Value"] = True
         gdx[-1].dataframe = data
-        assert isinstance(gdx[-1].dataframe[gdx[-1].dataframe.columns[-1]].values[0], c_bool)
+        # A Set's value column normalizes to element-text strings (bool -> "").
+        assert isinstance(gdx[-1].dataframe[gdx[-1].dataframe.columns[-1]].values[0], str)
         gdx.append(gdxpds.gdx.GdxSymbol("my_other_set", gdxpds.gdx.GamsDataType.Set, dims=["u"]))
         data = pd.DataFrame([["u" + str(i)] for i in range(1, 11)], columns=["u"])
         data["Value"] = True
@@ -40,7 +40,8 @@ def test_from_scratch_sets(run_dir):
             assert sym.dims[0] == "u"
             assert sym.data_type == gdxpds.gdx.GamsDataType.Set
             assert sym.num_records == 10
-            assert isinstance(sym.dataframe[sym.dataframe.columns[-1]].values[0], c_bool)
+            # Read back, a Set's value column is element text (no text -> "").
+            assert isinstance(sym.dataframe[sym.dataframe.columns[-1]].values[0], str)
 
 
 def test_unnamed_dimensions(run_dir):
@@ -366,9 +367,9 @@ def test_setting_dataframes(run_dir):
         assert gdx["sym_10"].num_dims == 4
         assert gdx["sym_11"].num_dims == 2
         assert gdx["sym_11"].num_records == 4
-        # ETH@20181007 - Tried to test for some values being c_bool(False) in sym_11, but
-        # c_bool(True) != c_bool(True), so that makes it hard to test such things.
-        # Also, c_bool(False) appears to be interpreted as True in GDX. Ick and yikes.
+        # A Set's value column is element text; every listed element is a member
+        # (row presence), so the input booleans normalize to "" (no text).
+        assert gdx["sym_11"].dataframe["Value"].tolist() == ["", "", "", ""]
         assert gdx["sym_12"].num_dims == 2
         assert gdx["sym_12"].num_records == 0
         assert gdx["sym_13"].dims == ["u", "q", "c"]
@@ -515,8 +516,6 @@ def test_symbol_types_round_trip(data_dir, run_dir):
             g.write(rt)
 
     def cell_equal(x, y):
-        if isinstance(x, c_bool) or isinstance(y, c_bool):
-            return bool(x) == bool(y)
         if isinstance(x, float) or isinstance(y, float):
             return gdxpds.special.pd_val_equal(x, y)
         return x == y

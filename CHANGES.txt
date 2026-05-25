@@ -1,3 +1,23 @@
+v3.0.0, 05/25/26 -- BREAKING: the default I/O engine is now gams.transfer when it is
+                    usable, falling back to gdxcc otherwise; pass backend="gdxcc" (or set
+                    GDXPDS_BACKEND) to pin the gdxcc engine
+                    BREAKING: a Set or Alias value column is now always the GAMS element
+                    text (a string; "" for a member with no text), and membership is
+                    conveyed by row presence. The load_set_text argument is removed: text
+                    is always read, and any non-empty text is always written
+                    aliases are now fully supported: they read with a populated
+                    GdxSymbol.aliased_with (the parent Set), round-trip through both
+                    engines, and can be created via to_gdx(aliases={alias: parent}) or
+                    gdxpds.gdx.append_alias()
+                    BREAKING: GDX UNDEF (Python None) is now preserved on write by both
+                    engines, round-tripping as None (previously it collapsed to 0.0)
+                    BREAKING: removed GdxFile.H; reach the raw gdxcc handle, if needed, via
+                    gdx_file._backend_impl.handle
+                    import gdxpds no longer requires a GAMS binding to be installed; the
+                    bindings load on the first GDX operation, so gdxpds info / gdxpds test
+                    can diagnose a no-bindings environment
+                    new TransferError for gams.transfer I/O failures (a subclass of
+                    gdxpds.tools.Error, parallel to GdxError)
 v2.1.0, 05/23/26 -- gams.transfer I/O engine for reading and writing GDX, opt-in
                     and non-breaking; select it with the backend= keyword, the GDXPDS_BACKEND
                     environment variable, or the --backend CLI flag. gdxcc stays the default,

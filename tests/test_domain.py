@@ -99,8 +99,11 @@ def test_wildcard_is_none(run_dir):
 # 4. Wildcard inside a strict domain
 # ---------------------------------------------------------------------------
 def test_wildcard_inside_strict(run_dir):
+    # gdxcc writes a strict domain that mixes a Set ref with a wildcard ('*') as
+    # REGULAR; the gams.transfer write path relaxes such a partial-wildcard domain
+    # (a known backend difference), so this gdxcc-specific behavior is pinned here.
     out = os.path.join(run_dir, "wildcard_inside_strict.gdx")
-    with GdxFile() as gdx:
+    with GdxFile(backend="gdxcc") as gdx:
         parent = GdxSymbol("a", GamsDataType.Set, dims=["a"])
         gdx.append(parent)
         gdx[-1].dataframe = _set_df(["a1", "a2"], col="a")
@@ -113,7 +116,7 @@ def test_wildcard_inside_strict(run_dir):
         )
         gdx.write(out)
 
-    with GdxFile(lazy_load=False) as gdx:
+    with GdxFile(lazy_load=False, backend="gdxcc") as gdx:
         gdx.read(out)
         mix = gdx["mix"]
         assert mix.domain_type == GamsDomainType.REGULAR

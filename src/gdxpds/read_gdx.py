@@ -63,15 +63,15 @@ class Translator:
     def data_types(self):
         return {symbol.name: symbol.data_type for symbol in self.gdx}
 
-    def dataframe(self, symbol_name, load_set_text=False):
+    def dataframe(self, symbol_name):
         if symbol_name not in self.gdx:
             raise SymbolNotFoundError(f"No symbol named '{symbol_name}' in '{self.gdx_file}'.")
         if not self.gdx[symbol_name].loaded:
-            self.gdx[symbol_name].load(load_set_text=load_set_text)
+            self.gdx[symbol_name].load()
         # This was returning { symbol_name: dataframe }, which seems intuitively off.
         return self.gdx[symbol_name].dataframe.copy()
 
-    def _get_dataframes(self, load_set_text=False, symbols=None):
+    def _get_dataframes(self, symbols=None):
         # One eager load, then collect a copy of each symbol's dataframe.
         # `symbols=None` loads/returns every symbol in file order; a list
         # loads/returns only those, in the given order. Backends optimize the
@@ -79,10 +79,10 @@ class Translator:
         # targeted) read.
         if self.__dataframes is None:
             if symbols is None:
-                self.__gdx.load_all(load_set_text=load_set_text)
+                self.__gdx.load_all()
                 names = [symbol.name for symbol in self.__gdx]
             else:
-                self.__gdx.load_symbols(symbols, load_set_text=load_set_text)
+                self.__gdx.load_symbols(symbols)
                 names = list(symbols)
             self.__dataframes = OrderedDict(
                 (name, self.__gdx[name].dataframe.copy()) for name in names
@@ -93,7 +93,6 @@ class Translator:
 def to_dataframes(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
-    load_set_text: bool = False,
     backend: str | Backend | None = None,
     symbols: list[str] | None = None,
 ) -> dict[str, pd.DataFrame]:
@@ -106,12 +105,10 @@ def to_dataframes(
         Path to the GDX file to read
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
-    load_set_text : bool
-        If True (default is False), then for every symbol that is a Set, loads
-        the GDX Text field into the dataframe rather than a `c_bool`.
     backend : None or str or :py:class:`gdxpds.Backend`
         Which I/O engine to use. ``None`` (default) resolves via the
-        ``GDXPDS_BACKEND`` env var, falling back to ``gdxcc``.
+        ``GDXPDS_BACKEND`` env var, then the default engine (``gams.transfer``
+        when usable, otherwise ``gdxcc``).
     symbols : None or list of str
         If None (default), every symbol is read. Otherwise only the named
         symbols are read and returned, in the given order; an unknown name
@@ -122,10 +119,12 @@ def to_dataframes(
     -------
     dict of str to pd.DataFrame
         Returns a dict of Pandas DataFrames, one item for each requested symbol
-        in the GDX file, keyed with the symbol name.
+        in the GDX file, keyed with the symbol name. For a Set or Alias, the
+        value column holds the GAMS element text (``""`` for a member with no
+        text); membership is conveyed by row presence.
     """
     return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, backend=backend)._get_dataframes(
-        load_set_text=load_set_text, symbols=symbols
+        symbols=symbols
     )
 
 
@@ -227,7 +226,6 @@ def to_dataframe(
     gdx_file: str | os.PathLike[str],
     symbol_name: str,
     gams_dir: str | os.PathLike[str] | None = None,
-    load_set_text: bool = False,
     backend: str | Backend | None = None,
 ) -> pd.DataFrame:
     """
@@ -242,17 +240,16 @@ def to_dataframe(
         :class:`~gdxpds.gdx.SymbolNotFoundError`.
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
-    load_set_text : bool
-        If True (default is False) and symbol_name is a Set, loads the GDX Text
-        field into the dataframe rather than a `c_bool`.
     backend : None or str or :py:class:`gdxpds.Backend`
         Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).
 
     Returns
     -------
     pd.DataFrame
-        The data for symbol_name as a pandas DataFrame.
+        The data for symbol_name as a pandas DataFrame. For a Set or Alias, the
+        value column holds the GAMS element text (``""`` for a member with no
+        text); membership is conveyed by row presence.
     """
     return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, backend=backend).dataframe(
-        symbol_name, load_set_text=load_set_text
+        symbol_name
     )

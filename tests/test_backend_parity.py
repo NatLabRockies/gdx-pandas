@@ -1,12 +1,11 @@
-"""Phase A read parity: the gams_transfer backend must produce DataFrames
-identical to the gdxcc oracle for every in-tree GDX fixture, with and without
-set text, plus a controlled special-value round-trip. Skipped when
-gams.transfer is unavailable."""
+"""Read/write parity between the gdxcc and gams_transfer backends: both must
+produce identical DataFrames for every in-tree GDX fixture (including set text
+and aliases) and identical GDX on write, plus controlled special-value
+round-trips. Skipped when gams.transfer is unavailable."""
 
 import glob
 import os
 import tempfile
-from ctypes import c_bool
 
 import numpy as np
 import pandas as pd
@@ -27,15 +26,10 @@ FIXTURES = sorted(
 
 
 def _normalize(df):
-    """c_bool cells -> plain bool so DataFrames compare by value (NaNs are
-    treated as equal by assert_frame_equal). Iterates by position to handle the
-    duplicate '*' column labels that multi-dim universe symbols carry."""
-    df = df.copy()
-    for i in range(df.shape[1]):
-        s = df.iloc[:, i]
-        if s.map(lambda v: isinstance(v, c_bool)).any():
-            df.isetitem(i, s.map(lambda v: bool(v) if isinstance(v, c_bool) else v))
-    return df
+    """Set/Alias values are plain strings and the other types are floats, so the
+    DataFrames already compare by value (assert_frame_equal treats NaNs as equal).
+    Kept as a hook in case a future value type needs canonicalizing."""
+    return df.copy()
 
 
 def _assert_same(a, b):
@@ -47,11 +41,10 @@ def _assert_same(a, b):
 
 
 @pytest.mark.parametrize("fixture", FIXTURES)
-@pytest.mark.parametrize("load_set_text", [False, True])
-def test_read_parity(data_dir, fixture, load_set_text):
+def test_read_parity(data_dir, fixture):
     path = os.path.join(data_dir, fixture)
-    a = to_dataframes(path, backend="gdxcc", load_set_text=load_set_text)
-    b = to_dataframes(path, backend="gams_transfer", load_set_text=load_set_text)
+    a = to_dataframes(path, backend="gdxcc")
+    b = to_dataframes(path, backend="gams_transfer")
     _assert_same(a, b)
 
 
@@ -155,11 +148,9 @@ def test_write_parity_special_values(tmp_path):
 
 
 def test_write_parity_undef(tmp_path):
-    # A Python None in a value column is gdxpds' canonical GDX UNDEF. The gdxcc
-    # oracle's write path can't emit UNDEF -- a None isn't a Number, so it falls
-    # through to 0.0 -- and v2.1.0 holds strict parity, so the gams_transfer write
-    # must also yield 0.0 (not NA). Keep the whole write x read matrix consistent.
-    # (1.0 first so to_gdx infers a Parameter, not a Set.)
+    # A Python None in a value column is gdxpds' canonical GDX UNDEF, distinct from
+    # NA (np.nan). Both backends preserve the distinction on write: UNDEF round-trips
+    # as None and NA as NaN. (1.0 first so to_gdx infers a Parameter, not a Set.)
     dfs = {
         "p": pd.DataFrame(
             {"i": ["one", "undef", "na"], "Value": pd.Series([1.0, None, np.nan], dtype=object)}
@@ -170,34 +161,58 @@ def test_write_parity_undef(tmp_path):
     for dfs_out in matrix.values():
         vals = list(dfs_out["p"]["Value"])
         assert vals[0] == 1.0
-        # The point of this test is that the write path treats UNDEF and NA
-        # *differently*: UNDEF (None) collapses to 0.0, while NA stays NaN -- and
-        # NA must not itself collapse to None (which would mean it got confused
-        # with UNDEF). The `is not None` guard makes that distinction explicit and
-        # short-circuits before np.isnan (which would raise on None); pd.isna would
-        # be too weak here, since pd.isna(None) is also True.
-        assert vals[1] == 0.0
-        assert vals[2] is not None and np.isnan(vals[2])
+        # The `is not None` guard short-circuits before np.isnan (which would raise
+        # on None); pd.isna would be too weak, since pd.isna(None) is also True.
+        assert vals[1] is None  # UNDEF preserved, not collapsed to 0.0 or NA
+        assert vals[2] is not None and np.isnan(vals[2])  # NA stays NaN
 
 
 def test_write_parity_mixed_boolean_set(tmp_path):
-    # R12 gate: gdxcc collapses every set element to 0.0 / c_bool(False) on write
-    # (the membership-boolean wart), so a Set with mixed True/False must read back
-    # all-False no matter which engine wrote *or* read it.
+    # A Set's value column may be booleans on input, but membership is conveyed by
+    # row presence: every listed element is a member, and reads back with empty
+    # element text ("") regardless of the input bool. Holds across the whole matrix.
     dfs = {"s": pd.DataFrame({"i": ["a", "b", "c"], "Value": [True, False, True]})}
     matrix = _write_read_matrix(dfs, tmp_path)
     _assert_matrix_consistent(matrix)
     for dfs in matrix.values():
-        assert [bool(v) for v in dfs["s"]["Value"]] == [False, False, False]
+        assert dfs["s"].iloc[:, 0].tolist() == ["a", "b", "c"]
+        assert dfs["s"]["Value"].tolist() == ["", "", ""]
 
 
-def test_write_alias_unsupported(data_dir, tmp_path):
-    # to_gdx never infers an Alias, so the parity tests never reach the write
-    # path's Alias branch. A GdxFile read from an alias-bearing GDX *does* carry
-    # an Alias symbol; writing it via gams_transfer is explicitly unsupported in
-    # v2.1.0 (use backend='gdxcc'). Lock in the NotImplementedError contract.
-    f = GdxFile(lazy_load=False, backend="gams_transfer")
+def test_write_parity_set_text(tmp_path):
+    # Element text round-trips identically across the write x read matrix; an empty
+    # string is a member with no text.
+    dfs = {"s": pd.DataFrame({"i": ["a", "b", "c"], "Value": ["alpha", "", "gamma"]})}
+    matrix = _write_read_matrix(dfs, tmp_path)
+    _assert_matrix_consistent(matrix)
+    for dfs in matrix.values():
+        assert dfs["s"]["Value"].tolist() == ["alpha", "", "gamma"]
+
+
+@pytest.mark.parametrize("backend", ["gdxcc", "gams_transfer"])
+def test_write_alias_roundtrip(data_dir, tmp_path, backend):
+    # Read an alias-bearing GDX and write it back via each backend; the alias's
+    # type, parent (aliased_with), and elements must survive.
+    f = GdxFile(lazy_load=False, backend=backend)
     f.read(os.path.join(data_dir, "alias_fixture.gdx"))
     assert any(s.data_type == GamsDataType.Alias for s in f)
-    with pytest.raises(NotImplementedError):
-        f.write(str(tmp_path / "out.gdx"))
+    out = str(tmp_path / "out.gdx")
+    f.clone().write(out)
+    with GdxFile(lazy_load=False, backend=backend) as g:
+        g.read(out)
+        at = g["at"]
+        assert at.data_type == GamsDataType.Alias
+        assert at.aliased_with is g["t"]
+        assert at.dataframe.iloc[:, 0].tolist() == g["t"].dataframe.iloc[:, 0].tolist()
+
+
+@pytest.mark.parametrize("backend", ["gdxcc", "gams_transfer"])
+def test_write_alias_via_to_gdx(tmp_path, backend):
+    # to_gdx(aliases=) builds an alias of a Set given as a DataFrame, on both backends.
+    dfs = {"t": pd.DataFrame({"i": ["a", "b", "c"], "Value": ["", "", ""]})}
+    out = str(tmp_path / "al.gdx")
+    to_gdx(dfs, out, backend=backend, aliases={"at": "t"})
+    with GdxFile(lazy_load=False, backend=backend) as g:
+        g.read(out)
+        assert g["at"].data_type == GamsDataType.Alias
+        assert g["at"].aliased_with is g["t"]

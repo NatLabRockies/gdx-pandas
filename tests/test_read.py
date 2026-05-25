@@ -1,6 +1,5 @@
 import logging
 import os
-from ctypes import c_bool
 
 import numpy as np
 import pandas as pd
@@ -23,9 +22,11 @@ def test_read(data_dir):
 
 
 def test_read_none():
-    with pytest.raises(gdxpds.gdx.GdxError) as excinfo:
+    # The error type is backend-specific (GdxError vs TransferError), but both
+    # subclass gdxpds.Error and name the offending path.
+    with pytest.raises(gdxpds.Error) as excinfo:
         to_dataframes(None)
-    assert "Could not open None" in str(excinfo.value)
+    assert "None" in str(excinfo.value)
 
 
 def test_read_path(data_dir):
@@ -82,18 +83,13 @@ def test_symbol_types_read(data_dir):
     with gdxpds.gdx.GdxFile(lazy_load=False) as f:
         f.read(gdx_file)
 
-        # Set t: a single boolean Value column; membership is conveyed by row
-        # presence. gdxpds-written Sets store value 0.0 (see _fixup_set_value),
-        # so the boolean reads False even though each element is a member.
+        # Set t: a single Value column holding element text; membership is
+        # conveyed by row presence. These elements carry no text, so Value is "".
         t = f["t"]
         assert t.data_type == gdxpds.gdx.GamsDataType.Set
         assert list(t.dataframe.columns) == ["*", "Value"]
         assert t.dataframe["*"].tolist() == ["a", "b", "c", "d", "e"]
-        assert all(isinstance(v, c_bool) for v in t.dataframe["Value"])
-        # ...and every value reads False: gdxpds-written Sets store 0.0, so the
-        # boolean is the truthiness of that stored value, not "is a member".
-        # Pin it so the alternative backend can't silently change it.
-        assert all(not bool(v) for v in t.dataframe["Value"])
+        assert t.dataframe["Value"].tolist() == ["", "", "", "", ""]
 
         # Strict subset of t.
         sub_t = f["sub_t"]
@@ -150,44 +146,29 @@ def test_to_dataframe_single_symbol(data_dir):
 
 
 def test_set_element_text(data_dir):
-    """load_set_text=True surfaces GAMS element text in place of the membership
-    boolean. See dev/build_set_text_fixture.py."""
+    """A Set's Value column is its GAMS element text; membership is row presence.
+    See dev/build_set_text_fixture.py."""
     gdx_file = os.path.join(data_dir, "set_text_fixture.gdx")
 
-    # Default: membership booleans (the raw-written values are non-zero, so True).
-    default = to_dataframe(gdx_file, "st")
-    assert default["*"].tolist() == ["a", "b", "c"]
-    assert all(isinstance(v, c_bool) for v in default["Value"])
-    # ...and they read True here: the raw-written text-node indices are non-zero,
-    # in contrast to the all-False plain-membership Set above.
-    assert all(bool(v) for v in default["Value"])
-
-    # load_set_text=True: the explanatory text replaces the boolean Value.
-    with_text = to_dataframe(gdx_file, "st", load_set_text=True)
-    assert with_text["Value"].tolist() == ["alpha", "beta", "gamma"]
+    df = to_dataframe(gdx_file, "st")
+    assert df["*"].tolist() == ["a", "b", "c"]
+    assert df["Value"].tolist() == ["alpha", "beta", "gamma"]
 
 
 def test_set_element_text_to_dataframes(data_dir):
-    """to_dataframes pipes load_set_text through the eager bulk-load path
+    """to_dataframes surfaces element text via the eager bulk-load path
     (load_all -> load_file -> load_symbols), the plural counterpart of
     test_set_element_text. See dev/build_set_text_fixture.py."""
     gdx_file = os.path.join(data_dir, "set_text_fixture.gdx")
 
-    # Default: membership booleans on the eager path.
-    default = to_dataframes(gdx_file)["st"]
-    assert all(isinstance(v, c_bool) for v in default["Value"])
-    assert all(bool(v) for v in default["Value"])
-
-    # load_set_text=True: element text replaces the boolean Value, via the plural
-    # eager path (not the single-symbol lazy path exercised above).
-    with_text = to_dataframes(gdx_file, load_set_text=True)["st"]
-    assert with_text["Value"].tolist() == ["alpha", "beta", "gamma"]
+    df = to_dataframes(gdx_file)["st"]
+    assert df["Value"].tolist() == ["alpha", "beta", "gamma"]
 
 
 def test_alias_reads_like_its_set(data_dir):
-    """An Alias reads like the Set it aliases -- membership c_bool values, not a
-    degenerate float column -- while keeping its Alias data type. The cross-
-    backend equality of this read is covered by test_backend_parity. See
+    """An Alias reads like the Set it aliases -- the same elements and element
+    text -- while keeping its Alias data type and recording its parent in
+    aliased_with. Cross-backend equality is covered by test_backend_parity. See
     dev/build_alias_fixture.py."""
     gdx_file = os.path.join(data_dir, "alias_fixture.gdx")
     assert get_data_types(gdx_file)["at"] == gdxpds.gdx.GamsDataType.Alias
@@ -195,7 +176,11 @@ def test_alias_reads_like_its_set(data_dir):
     t = to_dataframe(gdx_file, "t")
     at = to_dataframe(gdx_file, "at")
     assert list(at.columns) == list(t.columns)
-    assert all(isinstance(v, c_bool) for v in at["Value"])
-    # The alias surfaces the same elements and membership values as its set.
+    # The alias surfaces the same elements and element text as its set.
     assert at["*"].tolist() == t["*"].tolist()
-    assert [bool(v) for v in at["Value"]] == [bool(v) for v in t["Value"]]
+    assert at["Value"].tolist() == t["Value"].tolist()
+
+    # aliased_with resolves to the parent Set GdxSymbol.
+    with gdxpds.gdx.GdxFile(lazy_load=False) as f:
+        f.read(gdx_file)
+        assert f["at"].aliased_with is f["t"]

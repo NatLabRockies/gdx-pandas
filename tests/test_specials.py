@@ -26,7 +26,8 @@ def test_roundtrip_just_special_values(run_dir, roundtrip_one_gdx):
     if not os.path.exists(outdir):
         os.mkdir(outdir)
     # create gdx file containing all special values
-    with gdxpds.gdx.GdxFile() as f:
+    with gdxpds.gdx.GdxFile(backend="gdxcc") as f:
+        H = f._backend_impl.handle  # raw gdxcc escape hatch (GdxFile.H removed)
         df = pd.DataFrame(
             [
                 ["sv" + str(i + 1), gdxpds.special.SPECIAL_VALUES[i]]
@@ -38,21 +39,21 @@ def test_roundtrip_just_special_values(run_dir, roundtrip_one_gdx):
 
         # save this directly as a GdxSymbol
         filename = os.path.join(outdir, "direct_write_special_values.gdx")
-        ret = gdxcc.gdxOpenWrite(f.H, filename, "gdxpds")
+        ret = gdxcc.gdxOpenWrite(H, filename, "gdxpds")
         if not ret:
             raise gdxpds.gdx.GdxError(
-                f.H,
+                H,
                 f"Could not open {repr(filename)} for writing. Consider cloning this file (.clone()) before trying to write",
             )
         # write the universal set
         f.universal_set.write()
         if not gdxcc.gdxDataWriteStrStart(
-            f.H, "special_values", "", 1, gdxpds.gdx.GamsDataType.Parameter.value, 0
+            H, "special_values", "", 1, gdxpds.gdx.GamsDataType.Parameter.value, 0
         ):
-            raise gdxpds.gdx.GdxError(f.H, "Could not start writing data for symbol special_values")
+            raise gdxpds.gdx.GdxError(H, "Could not start writing data for symbol special_values")
         # set domain information
-        if not gdxcc.gdxSymbolSetDomainX(f.H, 1, [df.columns[0]]):
-            raise gdxpds.gdx.GdxError(f.H, "Could not set domain information for special_values.")
+        if not gdxcc.gdxSymbolSetDomainX(H, 1, [df.columns[0]]):
+            raise gdxpds.gdx.GdxError(H, "Could not set domain information for special_values.")
         values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
         for row in df.itertuples(index=False, name=None):
             dims = [str(x) for x in row[:1]]
@@ -61,9 +62,9 @@ def test_roundtrip_just_special_values(run_dir, roundtrip_one_gdx):
                 gdxpds.gdx.GamsDataType.Parameter
             ]:
                 values[col_ind] = float(vals[col_ind])
-            gdxcc.gdxDataWriteStr(f.H, dims, values)
-        gdxcc.gdxDataWriteDone(f.H)
-        gdxcc.gdxClose(f.H)
+            gdxcc.gdxDataWriteStr(H, dims, values)
+        gdxcc.gdxDataWriteDone(H)
+        gdxcc.gdxClose(H)
 
     # general test for expected values
     def check_special_values(gdx_file):

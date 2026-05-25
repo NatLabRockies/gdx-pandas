@@ -1,9 +1,5 @@
 import logging
 
-try:
-    from gams.core import gdx as gdxcc
-except ImportError:
-    import gdxcc
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -215,6 +211,13 @@ def load_specials(gams_dir_finder):
     global SPECIAL_VALUES
     global GDX_TO_NP_SVS
     global NP_TO_GDX_SVS
+
+    # Imported lazily so `import gdxpds` succeeds with no binding installed; this
+    # function only runs once a GDX op has located GAMS.
+    try:
+        from gams.core import gdx as gdxcc
+    except ImportError:
+        import gdxcc
 
     from gdxpds.tools import _GdxHandle, _require_gams_installation
 

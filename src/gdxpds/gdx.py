@@ -13,7 +13,6 @@ import os
 import weakref
 from collections import OrderedDict, defaultdict
 from collections.abc import MutableSequence, Sequence
-from ctypes import c_bool
 from enum import Enum
 
 import numpy as np
@@ -32,13 +31,6 @@ from gdxpds.special import (
     is_np_sv,  # noqa: F401
 )
 from gdxpds.tools import Error, NeedsGamsDir
-
-# gdxcc bindings: modern (shipped inside gamsapi) is preferred; the standalone
-# legacy PyPI package is the fallback.
-try:
-    from gams.core import gdx as gdxcc
-except ImportError:
-    import gdxcc
 
 logger = logging.getLogger(__name__)
 
@@ -134,8 +126,26 @@ class GdxError(Error):
             msg that is passed in with a gdxErrorStr appended
         """
         if H:
+            # Imported lazily: GdxError is only raised on the gdxcc path, where a
+            # binding is necessarily present. Keeping it out of module scope lets
+            # `import gdxpds` succeed with no binding installed.
+            try:
+                from gams.core import gdx as gdxcc
+            except ImportError:
+                import gdxcc
             msg += ". " + gdxcc.gdxErrorStr(H, gdxcc.gdxGetLastError(H))[1] + "."
         super().__init__(msg)
+
+
+class TransferError(Error):
+    """Raised when a ``gams.transfer`` read or write operation fails.
+
+    The gams.transfer counterpart to :class:`GdxError`. There is no GDX handle or
+    last-error registry behind gams.transfer, so the underlying exception is
+    carried by chaining (``raise TransferError(...) from e``) rather than a
+    handle-derived message. Subclass of :class:`Error`, so ``except Error`` still
+    catches it.
+    """
 
 
 class DomainError(Error):
@@ -181,8 +191,9 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             available in memory after the call to :py:meth:`read`.
         backend : None or str or :py:class:`gdxpds.Backend`
             Which I/O engine to use. ``None`` (default) resolves via the
-            ``GDXPDS_BACKEND`` env var, falling back to the default backend
-            (``gdxcc``). Pass ``"gdxcc"`` / ``Backend.GDXCC`` to pin it.
+            ``GDXPDS_BACKEND`` env var, then the default engine: ``gams.transfer``
+            when usable, otherwise ``gdxcc``. Pass ``"gdxcc"`` / ``Backend.GDXCC``
+            to pin the gdxcc engine.
         """
         self.lazy_load = lazy_load
         self._version = None
@@ -251,19 +262,6 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         return len(self) == 0
 
     @property
-    def H(self):
-        """
-        GDX object handle (gdxcc backend only; ``None`` for backends without one,
-        and after :py:meth:`cleanup`).
-
-        This is a gdxcc-specific escape hatch (e.g. for driving raw ``gdxcc``
-        calls). It is a candidate for deprecation/removal in v3.0.0, when the
-        default backend flips and ``None`` becomes the common return — see the
-        "Known warts" section of ``dev/ROADMAP.md``.
-        """
-        return self._backend_impl.handle if self._backend_impl is not None else None
-
-    @property
     def filename(self):
         """
         Filename this :py:class:`GdxFile` is associated with, if any
@@ -324,16 +322,15 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             self.load_all()
         return
 
-    def load_all(self, *, load_set_text: bool = False) -> None:
+    def load_all(self) -> None:
         """
         Eagerly load every symbol's records into its :py:attr:`GdxSymbol.dataframe`.
 
-        Already-loaded symbols are skipped. Pass ``load_set_text=True`` to surface
-        GAMS element text for Sets instead of the membership ``c_bool``.
+        Already-loaded symbols are skipped.
         """
-        self._backend_impl.load_file(self, load_set_text=load_set_text)
+        self._backend_impl.load_file(self)
 
-    def load_symbols(self, names: Sequence[str], *, load_set_text: bool = False) -> None:
+    def load_symbols(self, names: Sequence[str]) -> None:
         """
         Eagerly load the records of the named symbols (a subset of the file).
 
@@ -347,18 +344,20 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             if name not in self:
                 raise SymbolNotFoundError(f"No symbol named {name!r} in {self.filename!r}.")
             symbols.append(self[name])
-        self._backend_impl.load_symbols(self, symbols, load_set_text=load_set_text)
+        self._backend_impl.load_symbols(self, symbols)
 
     def reorder_for_strict_domains(self):
         """
-        Reorder ``self._symbols`` in place so every symbol with a strict (``GdxSymbol``-ref)
-        ``domain`` follows all of its parents. Stable topological sort: symbols that don't
-        reference each other keep their current relative order. No-ops on cycles (logs a warning
-        and leaves the original order untouched).
+        Reorder ``self._symbols`` in place so every symbol follows the symbols it depends
+        on: each strict (``GdxSymbol``-ref) ``domain`` parent, and the parent Set of each
+        :py:attr:`GamsDataType.Alias`. Stable topological sort: symbols that don't reference
+        each other keep their current relative order. No-ops on cycles (logs a warning and
+        leaves the original order untouched).
 
-        Strict-domain writes require the parent's ``gdxDataWriteDone`` to have completed before
-        the child's write starts. Calling this before :py:meth:`write` is the easy way to satisfy
-        that constraint when symbols were appended in an unordered way.
+        Strict-domain and alias writes require the parent's ``gdxDataWriteDone`` (or, for an
+        alias, the parent's registration) to have completed before the dependent symbol is
+        written. Calling this before :py:meth:`write` is the easy way to satisfy that
+        constraint when symbols were appended in an unordered way.
         """
         names = list(self._symbols.keys())
         parents_of = {}
@@ -369,6 +368,9 @@ class GdxFile(MutableSequence, NeedsGamsDir):
                     if d is None or d is s:
                         continue
                     ps.add(d.name)
+            # An alias must be written after the Set it aliases.
+            if s.aliased_with_name is not None and s.aliased_with_name != s.name:
+                ps.add(s.aliased_with_name)
             parents_of[s.name] = ps
 
         ordered, cycle = _stable_topological_sort(names, parents_of)
@@ -526,34 +528,39 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         return
 
 
+# GAMS GDX type codes, hardcoded so `import gdxpds` needs no binding at module
+# load. These mirror the gdxcc ``GMS_*`` constants; ``test_gms_constants_match_gdxcc``
+# verifies the match whenever a binding is installed.
 class GamsDataType(Enum):
-    Set = gdxcc.GMS_DT_SET
-    Parameter = gdxcc.GMS_DT_PAR
-    Variable = gdxcc.GMS_DT_VAR
-    Equation = gdxcc.GMS_DT_EQU
-    Alias = gdxcc.GMS_DT_ALIAS
+    Set = 0  # GMS_DT_SET
+    Parameter = 1  # GMS_DT_PAR
+    Variable = 2  # GMS_DT_VAR
+    Equation = 3  # GMS_DT_EQU
+    Alias = 4  # GMS_DT_ALIAS
 
 
 class GamsVariableType(Enum):
-    Unknown = gdxcc.GMS_VARTYPE_UNKNOWN
-    Binary = gdxcc.GMS_VARTYPE_BINARY
-    Integer = gdxcc.GMS_VARTYPE_INTEGER
-    Positive = gdxcc.GMS_VARTYPE_POSITIVE
-    Negative = gdxcc.GMS_VARTYPE_NEGATIVE
-    Free = gdxcc.GMS_VARTYPE_FREE
-    SOS1 = gdxcc.GMS_VARTYPE_SOS1
-    SOS2 = gdxcc.GMS_VARTYPE_SOS2
-    Semicont = gdxcc.GMS_VARTYPE_SEMICONT
-    Semiint = gdxcc.GMS_VARTYPE_SEMIINT
+    Unknown = 0  # GMS_VARTYPE_UNKNOWN
+    Binary = 1  # GMS_VARTYPE_BINARY
+    Integer = 2  # GMS_VARTYPE_INTEGER
+    Positive = 3  # GMS_VARTYPE_POSITIVE
+    Negative = 4  # GMS_VARTYPE_NEGATIVE
+    Free = 5  # GMS_VARTYPE_FREE
+    SOS1 = 6  # GMS_VARTYPE_SOS1
+    SOS2 = 7  # GMS_VARTYPE_SOS2
+    Semicont = 8  # GMS_VARTYPE_SEMICONT
+    Semiint = 9  # GMS_VARTYPE_SEMIINT
 
 
+# Offset by 53 so the values don't collide with GamsVariableType's; the GMS_EQUTYPE_*
+# codes themselves are 0..5.
 class GamsEquationType(Enum):
-    Equality = 53 + gdxcc.GMS_EQUTYPE_E
-    GreaterThan = 53 + gdxcc.GMS_EQUTYPE_G
-    LessThan = 53 + gdxcc.GMS_EQUTYPE_L
-    NothingEnforced = 53 + gdxcc.GMS_EQUTYPE_N
-    External = 53 + gdxcc.GMS_EQUTYPE_X
-    Conic = 53 + gdxcc.GMS_EQUTYPE_C
+    Equality = 53 + 0  # GMS_EQUTYPE_E
+    GreaterThan = 53 + 1  # GMS_EQUTYPE_G
+    LessThan = 53 + 2  # GMS_EQUTYPE_L
+    NothingEnforced = 53 + 3  # GMS_EQUTYPE_N
+    External = 53 + 4  # GMS_EQUTYPE_X
+    Conic = 53 + 5  # GMS_EQUTYPE_C
 
 
 class GamsDomainType(Enum):
@@ -576,11 +583,11 @@ class GamsDomainType(Enum):
 
 
 class GamsValueType(Enum):
-    Level = gdxcc.GMS_VAL_LEVEL  # .l
-    Marginal = gdxcc.GMS_VAL_MARGINAL  # .m
-    Lower = gdxcc.GMS_VAL_LOWER  # .lo
-    Upper = gdxcc.GMS_VAL_UPPER  # .ub
-    Scale = gdxcc.GMS_VAL_SCALE  # .scale
+    Level = 0  # GMS_VAL_LEVEL, .l
+    Marginal = 1  # GMS_VAL_MARGINAL, .m
+    Lower = 2  # GMS_VAL_LOWER, .lo
+    Upper = 3  # GMS_VAL_UPPER, .ub
+    Scale = 4  # GMS_VAL_SCALE, .scale
 
     @classmethod
     def _missing_(cls, value):
@@ -643,6 +650,7 @@ class GdxSymbol:
         variable_type: GamsVariableType | int | None = None,
         equation_type: GamsEquationType | int | None = None,
         domain: Sequence[GdxSymbol | None] | None = None,
+        aliased_with: GdxSymbol | None = None,
     ) -> None:
         """
         In-memory representation of a GAMS GDX Symbol
@@ -673,6 +681,10 @@ class GdxSymbol:
             :c:func:`gdxSymbolSetDomain` writes (subject to the parent existing in the file at
             write time; otherwise the symbol falls back to relaxed). Plain strings are not
             accepted here; use ``dims`` for string-only domains.
+        aliased_with : None or :py:class:`GdxSymbol`
+            Only for ``data_type == GamsDataType.Alias``: the parent Set this alias refers to,
+            as a :py:class:`GdxSymbol` reference. The parent must exist in the same file at
+            write time (an alias has no relaxed fallback). See :py:attr:`aliased_with`.
         """
         self._name = name
         self.description = description
@@ -686,6 +698,11 @@ class GdxSymbol:
         self._dims = None
         self._domain = None
         self._strict_on_disk = False
+        # Alias target: the parent Set, as a GdxSymbol ref (_aliased_with) plus its
+        # name (_aliased_with_name), the latter surviving when the ref can't yet be
+        # resolved (forward reference) or after a clone into another file.
+        self._aliased_with = None
+        self._aliased_with_name = None
         # Record count per GAMS; meaningful only before load (afterwards
         # num_records uses the dataframe). The backend's open_read overwrites
         # this for symbols read from a file.
@@ -693,12 +710,11 @@ class GdxSymbol:
         self.dims = dims
         if domain is not None:
             self.domain = domain
+        if aliased_with is not None:
+            self.aliased_with = aliased_with
         assert self._dataframe is not None
         self._file = file
         self._index = index
-
-        # adding this flag to implement ability to load set text instead of boolean values
-        self._fixup_set_vals = True
 
         # A symbol constructed without a file is being built for writing and is
         # ready to use immediately. A symbol constructed with a file is being
@@ -732,7 +748,11 @@ class GdxSymbol:
             variable_type=self.variable_type,
             equation_type=self.equation_type,
             domain=self._domain,
+            aliased_with=self._aliased_with,
         )
+        # Preserve the parent name even when the ref couldn't be resolved; write-time
+        # lookup resolves it against whatever file the clone ends up in.
+        result._aliased_with_name = self.aliased_with_name
         result.dataframe = copy.deepcopy(self.dataframe)
         assert result.loaded
         return result
@@ -893,7 +913,9 @@ class GdxSymbol:
         value_col = GamsValueType(value_col_name)
         if self.data_type in (GamsDataType.Set, GamsDataType.Alias):
             assert value_col == GamsValueType.Level
-            return c_bool(True)
+            # A Set/Alias value is its GAMS element text; "" means a member with
+            # no text. Membership itself is conveyed by row presence.
+            return ""
         if (self.data_type == GamsDataType.Variable) and (
             (value_col == GamsValueType.Lower) or (value_col == GamsValueType.Upper)
         ):
@@ -1159,6 +1181,80 @@ class GdxSymbol:
         return True
 
     @property
+    def aliased_with(self):
+        """
+        For an :py:attr:`GamsDataType.Alias`, the parent Set it refers to, as a
+        :py:class:`GdxSymbol` reference; ``None`` for any other symbol type and for
+        an alias whose parent could not be resolved against its file.
+
+        Unlike :py:attr:`domain`, an alias has no relaxed fallback: the parent must
+        exist in the same file when the alias is written, or the write raises
+        :py:class:`DomainError`.
+
+        Returns
+        -------
+        None or :py:class:`GdxSymbol`
+        """
+        return self._aliased_with
+
+    @aliased_with.setter
+    def aliased_with(self, value):
+        if value is None:
+            self._aliased_with = None
+            self._aliased_with_name = None
+            return
+        if not isinstance(value, GdxSymbol):
+            raise DomainError(
+                "aliased_with must be a GdxSymbol reference (the parent Set) or None. "
+                f"Was passed {value!r} of type {type(value)}."
+            )
+        self._aliased_with = value
+        self._aliased_with_name = value.name
+
+    @property
+    def aliased_with_name(self):
+        """Name of the parent Set this alias refers to (or ``None``). Survives when
+        the :py:attr:`aliased_with` reference is not yet resolved or after a clone
+        into another file; the write path resolves the parent by this name."""
+        if self._aliased_with is not None:
+            return self._aliased_with.name
+        return self._aliased_with_name
+
+    def resolve_aliased_with(self):
+        """
+        Populate :py:attr:`aliased_with` with a live :py:class:`GdxSymbol` reference by
+        looking :py:attr:`aliased_with_name` up in ``self.file``. Idempotent; no-ops when
+        already resolved, when there is no file, or when no parent name is recorded.
+
+        Mirrors :py:meth:`resolve_domain` for the forward-reference / post-read case
+        (an alias whose parent has a higher GDX index than the alias itself). The
+        universe set (``'*'``) resolves to the file's ``universal_set``.
+
+        Returns
+        -------
+        bool
+            True if ``aliased_with`` was populated as a result of this call.
+        """
+        if self._aliased_with is not None:
+            return False
+        if self.file is None or self._aliased_with_name is None:
+            return False
+        name = self._aliased_with_name
+        if name in self.file._symbols:
+            self._aliased_with = self.file._symbols[name]
+            return True
+        if self.file.universal_set is not None and name == self.file.universal_set.name:
+            self._aliased_with = self.file.universal_set
+            return True
+        logger.warning(
+            "resolve_aliased_with: alias %r references parent %r which is not in "
+            "this file; leaving it unresolved.",
+            self.name,
+            name,
+        )
+        return False
+
+    @property
     def num_dims(self):
         """
         Number of dimensions over which this symbol is defined
@@ -1261,8 +1357,9 @@ class GdxSymbol:
     def _init_dataframe(self):
         self._dataframe = pd.DataFrame([], columns=self.dims + self.value_col_names)
         if self.data_type in (GamsDataType.Set, GamsDataType.Alias):
+            # A Set/Alias value column holds element-text strings ("" = no text).
             colname = self._dataframe.columns[-1]
-            replace_df_column(self._dataframe, colname, self._dataframe[colname].astype(c_bool))
+            replace_df_column(self._dataframe, colname, self._dataframe[colname].astype(str))
         return
 
     def _append_default_values(self, df):
@@ -1273,15 +1370,12 @@ class GdxSymbol:
 
     def _fixup_set_value(self):
         """
-        Tricky to get boolean set values to come through right.
-        isinstance(True,Number) == True and float(True) = 1, but
-        isinstance(c_bool(True),Number) == False, and this keeps the default
-        value of 0.0.
-
-        Could just test for isinstance(,bool), but this fix has the added
-        advantage of speaking the GDX bindings data type language, and also
-        fills in any missing values, so users no longer need to actually specify
-        self.dataframe['Value'] = True.
+        Normalize a Set/Alias value column to its canonical element-text form: one
+        string per row, where ``""`` denotes a member with no text. Membership is
+        conveyed by row presence, so any non-string value -- a boolean or ``c_bool``
+        membership flag, a missing value, etc. -- maps to ``""``; existing strings
+        are kept verbatim. This lets callers build a Set from dimension columns
+        alone, from booleans, or from text, and get a consistent representation.
         """
         assert self.data_type in (GamsDataType.Set, GamsDataType.Alias)
 
@@ -1289,17 +1383,11 @@ class GdxSymbol:
         assert colname == self.value_col_names[0], (
             f"Unexpected final column {colname!r} in Set dataframe"
         )
-        if self._dataframe[colname].isnull().values.any():
-            logger.warning(
-                f"Filling null values in {self} with True. To be "
-                f"filled:\n{self._dataframe[self._dataframe[colname].isnull()]}"
-            )
-            replace_df_column(self._dataframe, colname, self._dataframe[colname].fillna(value=True))
-        if self._fixup_set_vals:
-            replace_df_column(
-                self._dataframe, colname, self._dataframe[colname].apply(lambda x: c_bool(x))
-            )
-        self._fixup_set_vals = True
+        replace_df_column(
+            self._dataframe,
+            colname,
+            self._dataframe[colname].map(lambda v: v if isinstance(v, str) else ""),
+        )
         return
 
     @property
@@ -1327,16 +1415,10 @@ class GdxSymbol:
         s += ", loaded" if self.loaded else ", not loaded"
         return s
 
-    def load(self, load_set_text: bool = False) -> None:
+    def load(self) -> None:
         """
         Loads this :py:class:`GdxSymbol` from its :py:attr:`file`, thereby popluating
         :py:attr:`dataframe`.
-
-        Parameters
-        ----------
-        load_set_text : bool
-            If True (default is False) and this symbol is a :class:`GamsDataType.Set <GamsDataType>`,
-            loads the GDX Text field into the :py:attr:`dataframe` rather than a `c_bool`.
         """
         if self.loaded:
             logger.info("Nothing to do. Symbol already loaded.")
@@ -1346,7 +1428,7 @@ class GdxSymbol:
         # The backend reads the records and populates this symbol's dataframe.
         # The "no symbol index" guard now lives in the gdxcc backend, which is
         # the path that needs it.
-        self.file._backend_impl.load_symbol(self, load_set_text=load_set_text)
+        self.file._backend_impl.load_symbol(self)
         return
 
     def unload(self) -> None:
@@ -1512,4 +1594,47 @@ def append_parameter(
     gdx_file[-1].dataframe = tmp
     # debug descripton of what happened
     logger.debug(f"Added parameter {param_name!r} to {gdx_file!r} using processed data:\n{tmp!r}")
+    return gdx_file[-1]
+
+
+def append_alias(
+    gdx_file: GdxFile,
+    alias_name: str,
+    parent: GdxSymbol | str,
+) -> GdxSymbol:
+    """
+    Convenience function that appends ``alias_name`` to ``gdx_file`` as a
+    :class:`GamsDataType.Alias <GamsDataType>` of ``parent`` (an existing Set).
+
+    Parameters
+    ----------
+    gdx_file : :class:`GdxFile`
+        file to which the new alias is to be added
+    alias_name : str
+        name of the alias to be added
+    parent : :class:`GdxSymbol` or str
+        the Set the alias refers to, as a :class:`GdxSymbol` reference or the name
+        of a Set already in ``gdx_file``. An unknown name, or a parent that is not
+        a Set, raises :class:`DomainError` (an alias has no relaxed fallback).
+
+    Returns
+    -------
+    :class:`GdxSymbol`
+        The freshly appended alias symbol.
+    """
+    if isinstance(parent, str):
+        if parent not in gdx_file:
+            raise DomainError(f"append_alias: parent Set {parent!r} is not in the file")
+        parent = gdx_file[parent]
+    if not isinstance(parent, GdxSymbol):
+        raise DomainError(
+            f"append_alias: parent must be a GdxSymbol or a Set name; got {type(parent).__name__}"
+        )
+    if parent.data_type not in (GamsDataType.Set, GamsDataType.Alias):
+        raise DomainError(
+            f"append_alias: parent {parent.name!r} is a {parent.data_type.name}, not a Set"
+        )
+    gdx_file.append(
+        GdxSymbol(alias_name, GamsDataType.Alias, dims=parent.dims, aliased_with=parent)
+    )
     return gdx_file[-1]

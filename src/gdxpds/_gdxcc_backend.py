@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING
 import gdxpds.special as special
 from gdxpds._backend import GdxBackend
 from gdxpds.gdx import (
+    DomainError,
     GamsDataType,
     GamsEquationType,
     GamsVariableType,
@@ -45,8 +46,8 @@ class GdxccBackend(GdxBackend):
     """Reads/writes GDX via the SWIG-bound ``gdxcc`` calls.
 
     Owns the GDX handle: a :class:`~gdxpds.tools._GdxHandle` created in
-    :meth:`__init__` and freed in :meth:`close`.
-    :attr:`gdxpds.gdx.GdxFile.H` delegates to this backend's :attr:`handle`, and
+    :meth:`__init__` and freed in :meth:`close`. The handle is exposed via
+    :attr:`handle` (reached as ``gdx_file._backend_impl.handle``), and
     :class:`~gdxpds.gdx.GdxFile` schedules :meth:`close` via ``weakref.finalize``.
     """
 
@@ -75,7 +76,7 @@ class GdxccBackend(GdxBackend):
             h.close()
 
     def open_read(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
-        H = gdx_file.H
+        H = self.handle
         rc = gdxcc.gdxOpenRead(H, str(filename))
         if not rc[0]:
             raise GdxError(H, f"Could not open {filename!r}")
@@ -108,15 +109,16 @@ class GdxccBackend(GdxBackend):
             except Exception as e:
                 logger.error(f"Unable to initialize GdxSymbol {name!r}, because {e}. SKIPPING.")
 
-        # Self-heal strict-domain refs whose parent appeared at a higher GDX
-        # index than the child (malformed but readable). No-op for well-formed
-        # files -- each symbol's in-line attempt already succeeded.
+        # Self-heal strict-domain refs and alias parents whose target appeared at
+        # a higher GDX index than the dependent symbol (malformed but readable).
+        # No-op for well-formed files -- each in-line attempt already succeeded.
         for symbol in gdx_file:
             symbol.resolve_domain()
+            symbol.resolve_aliased_with()
 
     def _make_symbol(self, gdx_file: GdxFile, name: str, data_type, dims, index: int) -> GdxSymbol:
         """Construct a GdxSymbol and populate its extended gdxcc metadata."""
-        H = gdx_file.H
+        H = self.handle
         symbol = GdxSymbol(name, data_type, dims=dims, file=gdx_file, index=index)
         ret, records, userinfo, description = gdxcc.gdxSymbolInfoX(H, index)
         if ret != 1:
@@ -126,6 +128,14 @@ class GdxccBackend(GdxBackend):
             symbol.variable_type = GamsVariableType(userinfo)
         elif symbol.data_type == GamsDataType.Equation:
             symbol.equation_type = GamsEquationType(userinfo)
+        elif symbol.data_type == GamsDataType.Alias:
+            # For an alias, gdxSymbolInfoX's userinfo is the GDX index of the
+            # aliased Set (0 = the universe set "*"). Record the parent name and
+            # resolve it to a same-file ref (open_read self-heals forward refs).
+            pret, parent_name, _pdims, _pdtype = gdxcc.gdxSymbolInfo(H, userinfo)
+            if pret == 1:
+                symbol._aliased_with_name = parent_name
+                symbol.resolve_aliased_with()
         symbol.description = description
         if index > 0:
             ret, gdx_domain = gdxcc.gdxSymbolGetDomainX(H, index)
@@ -153,8 +163,6 @@ class GdxccBackend(GdxBackend):
         self,
         gdx_file: GdxFile,
         symbols: Sequence[GdxSymbol] | None = None,
-        *,
-        load_set_text: bool = False,
     ) -> None:
         if symbols is None:
             symbols = list(gdx_file)
@@ -163,10 +171,10 @@ class GdxccBackend(GdxBackend):
                 continue
             if not symbol.index:
                 raise Error(f"Cannot load {symbol!r} because there is no symbol index")
-            self._load_one(gdx_file, symbol, load_set_text=load_set_text)
+            self._load_one(gdx_file, symbol)
 
-    def _load_one(self, gdx_file: GdxFile, symbol: GdxSymbol, *, load_set_text: bool) -> None:
-        H = gdx_file.H
+    def _load_one(self, gdx_file: GdxFile, symbol: GdxSymbol) -> None:
+        H = self.handle
         _ret, records = gdxcc.gdxDataReadStrStart(H, symbol.index)
 
         def reader():
@@ -174,25 +182,22 @@ class GdxccBackend(GdxBackend):
                 yield gdxcc.gdxDataReadStr(H)
 
         vc = symbol.value_cols  # local for speed in the comprehensions below
-        # Aliases read like the Set they alias (membership/text), so they take
-        # the same set-text path and the same _fixup; only Variables/Equations/
-        # Parameters get the special-value conversion below.
-        if load_set_text and (symbol.data_type in (GamsDataType.Set, GamsDataType.Alias)):
+        if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
+            # A Set/Alias value is its element text ("" when none); membership is
+            # row presence. An Alias reads like the Set it aliases. The stored
+            # value is the index into the element-text table.
             data = [
                 elements
                 + [gdxcc.gdxGetElemText(H, int(values[col_ind]))[1] for _col_name, col_ind in vc]
                 for _ret, elements, values, _afdim in reader()
             ]
-            # Element text loaded in place of membership booleans: tell the
-            # dataframe setter not to coerce the value column back to c_bool.
-            symbol._fixup_set_vals = False
+            symbol.dataframe = data
         else:
             data = [
                 elements + [values[col_ind] for _col_name, col_ind in vc]
                 for _ret, elements, values, _afdim in reader()
             ]
-        symbol.dataframe = data
-        if symbol.data_type not in (GamsDataType.Set, GamsDataType.Alias):
+            symbol.dataframe = data
             symbol.dataframe = special.convert_gdx_to_np_svs(symbol.dataframe, symbol.num_dims)
         symbol._loaded = True
 
@@ -202,7 +207,7 @@ class GdxccBackend(GdxBackend):
             if not symbol.loaded:
                 raise Error("All symbols must be loaded before this file can be written.")
 
-        H = gdx_file.H
+        H = self.handle
         ret = gdxcc.gdxOpenWrite(H, str(filename), "gdxpds")
         if not ret:
             raise GdxError(
@@ -237,9 +242,9 @@ class GdxccBackend(GdxBackend):
     ) -> None:
         if not symbol.loaded:
             raise Error(f"Cannot write unloaded symbol {symbol.name!r}.")
-        H = gdx_file.H
+        H = self.handle
 
-        if symbol.data_type == GamsDataType.Set:
+        if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
             symbol._fixup_set_value()
 
         if index is not None:
@@ -250,6 +255,22 @@ class GdxccBackend(GdxBackend):
             gdxcc.gdxUELRegisterRawStart(H)
             gdxcc.gdxUELRegisterRaw(H, symbol.name)
             gdxcc.gdxUELRegisterDone(H)
+            return
+
+        if symbol.data_type == GamsDataType.Alias:
+            # An alias carries no records of its own; it is registered against its
+            # parent Set, which must already be written (no relaxed fallback).
+            parent = symbol.aliased_with_name
+            if parent is None:
+                raise DomainError(
+                    f"Cannot write alias {symbol.name!r}: no parent Set (aliased_with) is set."
+                )
+            if not gdxcc.gdxAddAlias(H, parent, symbol.name):
+                raise GdxError(
+                    H,
+                    f"Could not add alias {symbol.name!r} -> {parent!r} "
+                    "(is the parent Set written before the alias?)",
+                )
             return
 
         # write the data
@@ -289,22 +310,43 @@ class GdxccBackend(GdxBackend):
         values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
         # make sure index is clean -- needed for merging in convert_np_to_gdx_svs
         symbol.dataframe = symbol.dataframe.reset_index(drop=True)
-        # convert special numeric values if appropriate
-        to_write = (
-            symbol.dataframe.copy()
-            if (symbol.data_type in (GamsDataType.Set, GamsDataType.Alias))
-            else special.convert_np_to_gdx_svs(symbol.dataframe, symbol.num_dims)
-        )
-        # write each row
-        for row in to_write.itertuples(index=False, name=None):
-            dims = [str(x) for x in row[: symbol.num_dims]]
-            vals = row[symbol.num_dims :]
-            for _col_name, col_ind in symbol.value_cols:
-                values[col_ind] = 0.0
-                try:
-                    if isinstance(vals[col_ind], Number):
-                        values[col_ind] = float(vals[col_ind])
-                except Exception:
-                    raise Error(f"Unable to set element {col_ind} from {vals}.")
-            gdxcc.gdxDataWriteStr(H, dims, values)
+
+        if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
+            # Each row is a member; the value column is its element text ("" = no
+            # text). Non-empty text is registered with gdxAddSetText and the row
+            # stores the returned table index (0 means no text).
+            for row in symbol.dataframe.itertuples(index=False, name=None):
+                dims = [str(x) for x in row[: symbol.num_dims]]
+                vals = row[symbol.num_dims :]
+                for _col_name, col_ind in symbol.value_cols:
+                    text = vals[col_ind]
+                    node = 0
+                    if isinstance(text, str) and text != "":
+                        rc, node = gdxcc.gdxAddSetText(H, text)
+                        if not rc:
+                            raise GdxError(
+                                H, f"Could not add set text {text!r} for {symbol.name!r}"
+                            )
+                    values[col_ind] = float(node)
+                gdxcc.gdxDataWriteStr(H, dims, values)
+        else:
+            to_write = special.convert_np_to_gdx_svs(symbol.dataframe, symbol.num_dims)
+            undef = special.SPECIAL_VALUES[0]  # GDX UNDEF magic float
+            for row in to_write.itertuples(index=False, name=None):
+                dims = [str(x) for x in row[: symbol.num_dims]]
+                vals = row[symbol.num_dims :]
+                for _col_name, col_ind in symbol.value_cols:
+                    v = vals[col_ind]
+                    try:
+                        if v is None:
+                            # gdxpds canonical UNDEF -> a genuine GDX UNDEF, which
+                            # reads back as None (convert_np_to_gdx_svs can't key None).
+                            values[col_ind] = undef
+                        elif isinstance(v, Number):
+                            values[col_ind] = float(v)
+                        else:
+                            values[col_ind] = 0.0
+                    except Exception:
+                        raise Error(f"Unable to set element {col_ind} from {vals}.")
+                gdxcc.gdxDataWriteStr(H, dims, values)
         gdxcc.gdxDataWriteDone(H)

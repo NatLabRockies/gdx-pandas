@@ -4,8 +4,7 @@ Read: ``open_read`` builds the symbol metadata from a ``gams.transfer`` Containe
 (records-free), and ``load_symbols`` reads records (bulk or targeted) and
 translates each symbol into the gdxpds DataFrame shape so the result matches the
 gdxcc backend. Write: ``write_file`` builds a Container from the gdxpds symbols
-(the inverse translation) and writes it. Writing aliases is not supported
-(to_gdx never infers one); use ``backend='gdxcc'`` for that.
+(the inverse translation) and writes it, including Sets, aliases, and element text.
 
 ``gams.transfer`` is imported at module load, but this module is itself imported
 lazily by :func:`gdxpds._backend.make_backend`, so ``import gdxpds`` stays free
@@ -23,7 +22,14 @@ import numpy as np
 import pandas as pd
 
 from gdxpds._backend import GdxBackend
-from gdxpds.gdx import GamsDataType, GamsEquationType, GamsVariableType, GdxSymbol
+from gdxpds.gdx import (
+    DomainError,
+    GamsDataType,
+    GamsEquationType,
+    GamsVariableType,
+    GdxSymbol,
+    TransferError,
+)
 from gdxpds.special import NUMPY_SPECIAL_VALUES
 from gdxpds.tools import Error
 
@@ -70,13 +76,11 @@ def _np_to_transfer_specials(records: pd.DataFrame, value_cols: list[str]) -> No
     (gt's ``-0.0``); NaN -> NA (gt's NA sentinel); +/-inf already match. Genuine
     0.0 is left alone (only eps maps to EPS).
 
-    The one asymmetry is GDX UNDEF (gdxpds canonical ``None``; see
-    :data:`special.NUMPY_SPECIAL_VALUES`). For strict v2.1.0 parity we mirror the
-    gdxcc write path, which *cannot* emit UNDEF: there a ``None`` isn't a
-    ``Number`` and falls through to ``0.0``. So a ``None`` (only possible in an
-    object column) maps to ``0.0`` here too -- not NA, which the plain float64
-    coercion below would otherwise produce. v3.0.0 may revisit emitting a genuine
-    UNDEF (which would read back as ``None``).
+    GDX UNDEF is gdxpds' canonical ``None`` (see
+    :data:`special.NUMPY_SPECIAL_VALUES`), only possible in an object column. It
+    maps to a genuine ``gt.SpecialValues.UNDEF``, which reads back as ``None`` --
+    distinct from NA (``np.nan``), which the plain float64 coercion would otherwise
+    produce.
     """
     eps = NUMPY_SPECIAL_VALUES[-1]
     for col in value_cols:
@@ -92,7 +96,7 @@ def _np_to_transfer_specials(records: pd.DataFrame, value_cols: list[str]) -> No
         is_nan = np.isnan(arr) & ~is_none  # genuine NaN (NA), not a coerced None
         arr[is_nan] = gt.SpecialValues.NA
         arr[is_eps] = gt.SpecialValues.EPS
-        arr[is_none] = 0.0  # UNDEF -> 0.0, matching gdxcc
+        arr[is_none] = gt.SpecialValues.UNDEF  # GDX UNDEF, reads back as None
         records[col] = arr
 
 
@@ -109,7 +113,7 @@ def _data_type_of(gt_sym) -> GamsDataType:
         return GamsDataType.Variable
     if isinstance(gt_sym, gt.Equation):
         return GamsDataType.Equation
-    raise Error(f"Unsupported gams.transfer symbol type {type(gt_sym).__name__!r}.")
+    raise TransferError(f"Unsupported gams.transfer symbol type {type(gt_sym).__name__!r}.")
 
 
 def _dims_of(gt_sym) -> list[str]:
@@ -125,8 +129,8 @@ def _convert_transfer_specials(values: pd.DataFrame) -> pd.DataFrame:
     UNDEF (gt's plain NaN) -> ``None``; +/-inf already match. Genuine ``0.0`` is
     left alone (only negative zero is EPS).
 
-    Keeping UNDEF distinct from NA is what byte-for-byte parity with gdxcc
-    requires: gdxcc maps GDX UNDEF -> ``None`` and GDX NA -> ``np.nan`` (see
+    UNDEF is kept distinct from NA, matching the gdxcc backend: gdxcc maps GDX
+    UNDEF -> ``None`` and GDX NA -> ``np.nan`` (see
     :data:`special.GDX_TO_NP_SVS`). A column carrying any UNDEF therefore comes
     back as object dtype (so ``None`` survives), matching gdxcc; a column with no
     UNDEF stays ``float64``.
@@ -181,9 +185,11 @@ class TransferBackend(GdxBackend):
         for symbol in gdx_file:
             self._add_symbol(container, symbol, name_positions)
         try:
-            container.write(str(filename))
+            # eps_to_zero defaults True, which silently drops EPS to 0.0; keep EPS
+            # so it round-trips like the gdxcc path.
+            container.write(str(filename), eps_to_zero=False)
         except Exception as e:
-            raise Error(f"gams.transfer failed to write {filename!r}: {e}")
+            raise TransferError(f"gams.transfer failed to write {filename!r}: {e}") from e
         gdx_file._filename = filename
 
     def _gt_domain(self, container, symbol: GdxSymbol, name_positions: dict):
@@ -201,11 +207,28 @@ class TransferBackend(GdxBackend):
     def _add_symbol(self, container, symbol: GdxSymbol, name_positions: dict) -> None:
         data_type = symbol.data_type
         if data_type == GamsDataType.Alias:
-            # to_gdx never infers an Alias, and writing one needs alias_with
-            # plumbing; out of scope for v2.1.0 (use backend='gdxcc').
-            raise NotImplementedError(
-                "Writing aliases via the gams_transfer backend is not supported."
+            # An alias carries no records of its own; it points at its parent Set,
+            # which must already be in the container (no relaxed fallback).
+            parent = symbol.aliased_with_name
+            if parent is None:
+                raise DomainError(
+                    f"Cannot write alias {symbol.name!r}: no parent Set (aliased_with) is set."
+                )
+            universe = (
+                symbol.file.universal_set.name
+                if symbol.file is not None and symbol.file.universal_set is not None
+                else "*"
             )
+            if parent == universe:
+                gt.UniverseAlias(container, symbol.name)
+            elif parent in container.data:
+                gt.Alias(container, symbol.name, container.data[parent])
+            else:
+                raise DomainError(
+                    f"Cannot write alias {symbol.name!r} -> {parent!r}: the parent Set is not "
+                    "in this file or has not been written before the alias."
+                )
+            return
 
         num_dims = symbol.num_dims
         domain = self._gt_domain(container, symbol, name_positions)
@@ -218,7 +241,8 @@ class TransferBackend(GdxBackend):
         if data_type == GamsDataType.Set:
             records = symbol.dataframe.iloc[:, :num_dims].copy()
             records.columns = dim_names
-            records["element_text"] = ""  # v2.1.0: no set-text-write (parity with gdxcc)
+            # The value column is the element text ("" = a member with no text).
+            records["element_text"] = symbol.dataframe.iloc[:, num_dims].astype(str).to_numpy()
             gt.Set(container, symbol.name, domain=domain, description=description, records=records)
             return
 
@@ -260,7 +284,10 @@ class TransferBackend(GdxBackend):
         # read lazily on load (gams.transfer can't add records to an existing
         # container, so loads use a separate records=True read).
         container = gt.Container(system_directory=self.gams_dir)
-        container.read(str(filename), records=False)
+        try:
+            container.read(str(filename), records=False)
+        except Exception as e:
+            raise TransferError(f"gams.transfer failed to open {filename!r}: {e}") from e
         gdx_file._filename = filename
         # gams.transfer exposes neither the GDX file version/producer nor a
         # pre-load record count, so those stay at their defaults (None / 0).
@@ -271,9 +298,11 @@ class TransferBackend(GdxBackend):
             except Exception as e:
                 logger.error(f"Unable to initialize GdxSymbol {name!r}, because {e}. SKIPPING.")
 
-        # Self-heal strict-domain refs (parent appearing after the child).
+        # Self-heal strict-domain refs and alias parents (target appearing after
+        # the dependent symbol).
         for symbol in gdx_file:
             symbol.resolve_domain()
+            symbol.resolve_aliased_with()
 
     def _make_symbol(self, gdx_file: GdxFile, name: str, gt_sym, index: int) -> GdxSymbol:
         data_type = _data_type_of(gt_sym)
@@ -284,6 +313,14 @@ class TransferBackend(GdxBackend):
             symbol.variable_type = _VAR_TYPE.get(gt_sym.type, GamsVariableType.Free)
         elif data_type == GamsDataType.Equation:
             symbol.equation_type = _EQU_TYPE.get(gt_sym.type, GamsEquationType.Equality)
+        elif data_type == GamsDataType.Alias:
+            # gt.Alias.alias_with is the parent gt.Set; gt.UniverseAlias.alias_with
+            # is the string "*". Record the parent name and resolve to a same-file ref.
+            parent = getattr(gt_sym, "alias_with", None)
+            parent_name = parent if isinstance(parent, str) else getattr(parent, "name", None)
+            if parent_name is not None:
+                symbol._aliased_with_name = parent_name
+                symbol.resolve_aliased_with()
         # A non-wildcard domain entry (a Set reference) means a strict/regular
         # domain; mark it and resolve names to same-file GdxSymbol refs.
         if any(not isinstance(d, str) for d in gt_sym.domain):
@@ -295,19 +332,25 @@ class TransferBackend(GdxBackend):
         self,
         gdx_file: GdxFile,
         symbols: Sequence[GdxSymbol] | None = None,
-        *,
-        load_set_text: bool = False,
     ) -> None:
         if symbols is None:
             # Bulk: the full container is read once and cached.
             targets = [s for s in gdx_file if not s.loaded]
             container = self._records_container(gdx_file) if targets else None
         else:
-            # Targeted: read just the requested symbols' records.
+            # Targeted: read just the requested symbols' records. gams.transfer
+            # requires an alias's parent Set to be present in the same read, so
+            # pull those in too (the universe parent "*" is implicit, not a symbol).
             targets = [s for s in symbols if not s.loaded]
-            container = self._read_records(gdx_file, [s.name for s in targets]) if targets else None
+            read_names = {s.name for s in targets}
+            universe = gdx_file.universal_set.name if gdx_file.universal_set is not None else "*"
+            for s in targets:
+                parent = s.aliased_with_name
+                if s.data_type == GamsDataType.Alias and parent and parent != universe:
+                    read_names.add(parent)
+            container = self._read_records(gdx_file, list(read_names)) if targets else None
         for symbol in targets:
-            self._translate(container, symbol, load_set_text=load_set_text)
+            self._translate(container, symbol)
 
     def _records_container(self, gdx_file: GdxFile):
         if self._container is None:
@@ -323,9 +366,11 @@ class TransferBackend(GdxBackend):
             return container
         except Exception as e:
             # On failure the targets stay unloaded, so a retry re-reads cleanly.
-            raise Error(f"gams.transfer failed to read records from {gdx_file.filename!r}: {e}")
+            raise TransferError(
+                f"gams.transfer failed to read records from {gdx_file.filename!r}: {e}"
+            ) from e
 
-    def _translate(self, container, symbol: GdxSymbol, *, load_set_text: bool) -> None:
+    def _translate(self, container, symbol: GdxSymbol) -> None:
         gt_sym = container.data[symbol.name]
         records = gt_sym.records
         out_cols = symbol.dims + symbol.value_col_names
@@ -339,17 +384,11 @@ class TransferBackend(GdxBackend):
         # gams.transfer yields ordered categoricals).
         dim_data = records.iloc[:, :num_dims].astype(str).reset_index(drop=True)
 
-        # An Alias reads like the Set it aliases: gams.transfer delegates its
-        # .records to the parent set, so the Set membership/text path applies.
+        # A Set/Alias value is its element text ("" = no text); membership is row
+        # presence. An Alias delegates its .records to the parent Set, so the same
+        # path applies.
         if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
-            text = records.iloc[:, num_dims].astype(str).reset_index(drop=True)
-            if load_set_text:
-                value_data = text.to_frame()
-                symbol._fixup_set_vals = False
-            else:
-                # Membership truthiness: element text present iff a non-zero value
-                # was stored, i.e. c_bool(True); empty text -> c_bool(False).
-                value_data = (text != "").to_frame()
+            value_data = records.iloc[:, num_dims].astype(str).reset_index(drop=True).to_frame()
         else:
             value_data = _convert_transfer_specials(
                 records.iloc[:, num_dims:].reset_index(drop=True)
