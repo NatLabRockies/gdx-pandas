@@ -239,6 +239,29 @@ df = gdxpds.to_dataframe('data.gdx', 's')
 print(df['Value'].tolist())   # ['alpha', '', 'gamma']
 ```
 
+### Special values
+
+In the value columns of Parameters, Variables, and Equations, GAMS's special values map to their Python/numpy equivalents on read, and back on write:
+
+| GAMS | gdxpds (DataFrame) |
+|---|---|
+| `NA` | `numpy.nan` |
+| `UNDEF` | `None` |
+| `+Inf` / `-Inf` | `numpy.inf` / `-numpy.inf` |
+| `EPS` | machine epsilon (`numpy.finfo(float).eps`) |
+
+Both I/O engines preserve all of these on write, so they round-trip unchanged.
+
+:::{tip}
+If you would rather **not** keep `EPS` values, drop them yourself before writing — there is no write-time option, so the transformation stays explicit and engine-independent:
+
+```python
+import numpy as np
+eps = np.finfo(float).eps
+df['Value'] = df['Value'].replace(eps, 0.0)   # treat EPS as plain zero
+```
+:::
+
 ### Aliases
 
 GAMS lets one Set be an *alias* of another — `alias(t, at)` makes `at` another name for set `t`. `gdxpds` surfaces the relationship on `GdxSymbol`:
