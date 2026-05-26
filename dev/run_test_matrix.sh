@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
-# Run pytest + `gdxpds test` across the GAMS matrix described in dev/README.md.
+# Run lint + pytest + `gdxpds test` across the GAMS matrix described in dev/README.md.
 #
 # Invoke from an interactive bash shell (needs the `module` function):
 #     bash dev/run_test_matrix.sh
 #
-# For each existing .venv-* below, this script:
+# Up front, once, the script runs:
+#   - `ruff check .` and `ruff format --check .` across the whole repo,
+#     matching the scope of the pre-commit hooks (which CI runs on PRs).
+#     A clean local matrix run is therefore enough to predict pre-commit CI.
+#
+# Then, for each existing .venv-* below, the script:
 #   1) sources its bin/activate (which should `module load gams/<ver>` and
 #      pin GAMS_DIR per the patches in dev/README.md);
 #   2) runs `pytest tests`;
@@ -16,8 +21,9 @@
 #      static-attr `version` read in pyproject.toml);
 #   6) deactivates.
 #
-# Per-venv logs go to dev/test_matrix_logs/<venv>.log; a top-level
-# summary is printed to stdout and saved to dev/test_matrix_logs/summary.txt.
+# Per-venv logs go to dev/test_matrix_logs/<venv>.log; the lint phase logs to
+# dev/test_matrix_logs/lint.log. A top-level summary is printed to stdout and
+# saved to dev/test_matrix_logs/summary.txt.
 #
 # For .venv-no-gams, pytest and gdxpds test are expected to FAIL cleanly
 # (non-zero exit, no segfault, useful error message); `gdxpds info` and the
@@ -124,7 +130,57 @@ run_one_venv () {
     set -u
 }
 
+run_lint () {
+    # Whole-repo lint pass matching pre-commit (the source of truth that CI
+    # runs against PRs). Uses --check modes so the script asserts the tree is
+    # already clean rather than mutating files. Resolves a ruff binary from
+    # PATH or .venv-no-gams; if none is found, the lint phase is SKIPPED with
+    # a clear message but does not fail the matrix.
+    local log="$LOG_DIR/lint.log"
+    : > "$log"
+    echo "=== lint ===" | tee -a "$log"
+
+    local ruff=""
+    if [ -x "$REPO_ROOT/.venv-no-gams/bin/ruff" ]; then
+        ruff="$REPO_ROOT/.venv-no-gams/bin/ruff"
+    elif command -v ruff >/dev/null 2>&1; then
+        ruff="$(command -v ruff)"
+    fi
+
+    if [ -z "$ruff" ]; then
+        local verdict="SKIPPED (no ruff: install via .venv-no-gams or PATH)"
+        echo "$verdict" | tee -a "$log"
+        printf "%-20s  %s  (log: %s)\n" "lint" "$verdict" "$log" >> "$SUMMARY"
+        LINT_RC=0
+        return
+    fi
+
+    echo "ruff: $ruff" | tee -a "$log"
+    echo "--- ruff check . ---" | tee -a "$log"
+    "$ruff" check . >>"$log" 2>&1
+    local check_rc=$?
+    echo "ruff check exit: $check_rc" | tee -a "$log"
+
+    echo "--- ruff format --check . ---" | tee -a "$log"
+    "$ruff" format --check . >>"$log" 2>&1
+    local fmt_rc=$?
+    echo "ruff format --check exit: $fmt_rc" | tee -a "$log"
+
+    local verdict
+    if [ "$check_rc" -eq 0 ] && [ "$fmt_rc" -eq 0 ]; then
+        verdict="PASS"
+        LINT_RC=0
+    else
+        verdict="FAIL (check=$check_rc, format=$fmt_rc)"
+        LINT_RC=1
+    fi
+    echo "verdict: $verdict" | tee -a "$log"
+    printf "%-20s  %s  (log: %s)\n" "lint" "$verdict" "$log" >> "$SUMMARY"
+}
+
 set -u
+LINT_RC=0
+run_lint
 for venv in "${VENVS[@]}"; do
     run_one_venv "$venv"
 done
