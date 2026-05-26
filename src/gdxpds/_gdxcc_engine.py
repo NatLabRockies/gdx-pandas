@@ -166,8 +166,19 @@ class GdxccEngine(GdxEngine):
     ) -> None:
         if symbols is None:
             symbols = list(gdx_file)
+        else:
+            # An alias's dataframe is a view onto its parent's, so a targeted
+            # alias load also needs the parent (and the parent's parent, for
+            # chained aliases) -- shared with the transfer engine via
+            # GdxEngine._expand_alias_targets.
+            symbols = self._expand_alias_targets(symbols)
         for symbol in symbols:
             if symbol.loaded:
+                continue
+            if symbol.data_type == GamsDataType.Alias:
+                # An alias has no records of its own; its dataframe view comes
+                # from `alias_of`. Mark loaded without reading.
+                symbol._loaded = True
                 continue
             if not symbol.index:
                 raise Error(f"Cannot load {symbol!r} because there is no symbol index")
@@ -182,14 +193,15 @@ class GdxccEngine(GdxEngine):
                 yield gdxcc.gdxDataReadStr(H)
 
         vc = symbol.value_cols  # local for speed in the comprehensions below
-        if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
-            # gdxpds surfaces a Set/Alias value as its element text (a string;
-            # `""` when none; membership conveyed by row presence; an Alias reads
-            # like the Set it aliases). On disk the gdxcc engine stores a
-            # float-encoded *index* into the element-text table per row, so this
-            # loop resolves each index back to its text via `gdxGetElemText`
-            # before handing the records to the DataFrame -- callers never see
-            # the index.
+        if symbol.data_type == GamsDataType.Set:
+            # gdxpds surfaces a Set value as its element text (a string;
+            # `""` when none; membership conveyed by row presence). On disk
+            # the gdxcc engine stores a float-encoded *index* into the
+            # element-text table per row, so this loop resolves each index back
+            # to its text via `gdxGetElemText` before handing the records to
+            # the DataFrame -- callers never see the index. (Aliases are
+            # handled in load_symbols: their dataframe is a view onto the
+            # parent's, so they don't reach this read path.)
             data = [
                 elements
                 + [gdxcc.gdxGetElemText(H, int(values[col_ind]))[1] for _col_name, col_ind in vc]

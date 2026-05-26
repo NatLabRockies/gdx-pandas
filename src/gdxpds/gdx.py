@@ -762,7 +762,11 @@ class GdxSymbol:
             domain=self._domain,
         )
         result._alias_of_name = self.alias_of_name
-        result.dataframe = copy.deepcopy(self.dataframe)
+        # An Alias has no records of its own -- its `.dataframe` is a view onto its
+        # parent (see the dataframe getter). The view resolves after the clone is
+        # inserted into a destination file and `resolve_alias_of()` rebinds the parent.
+        if self.data_type != GamsDataType.Alias:
+            result.dataframe = copy.deepcopy(self.dataframe)
         assert result.loaded
         return result
 
@@ -1293,14 +1297,27 @@ class GdxSymbol:
         """
         Data table for this symbol. Dim columns are followed by value columns, left to right.
 
+        For an :py:attr:`GamsDataType.Alias` with a resolved :py:attr:`alias_of`, the
+        returned frame is the parent's own ``dataframe`` (a live view, not a copy) --
+        an alias has no records of its own. Mutate the parent to change what an alias
+        reads; direct assignment to an alias's ``dataframe`` raises.
+
         Returns
         -------
         pd.DataFrame
         """
+        if self.data_type == GamsDataType.Alias and self._alias_of is not None:
+            return self._alias_of.dataframe
         return self._dataframe
 
     @dataframe.setter
     def dataframe(self, data):
+        if self.data_type == GamsDataType.Alias:
+            raise Error(
+                f"Cannot assign to {self.name!r}.dataframe: an Alias has no records "
+                "of its own -- its dataframe is a read-only view of its parent "
+                "(alias_of). Mutate the parent's dataframe instead."
+            )
         try:
             # get data in common format and start dealing with dimensions
             if isinstance(data, pd.DataFrame):
@@ -1442,12 +1459,19 @@ class GdxSymbol:
         """
         Loads this :py:class:`GdxSymbol` from its :py:attr:`file`, thereby popluating
         :py:attr:`dataframe`.
+
+        For an Alias, the parent's records are what the alias's ``dataframe`` view
+        surfaces, so the parent is loaded first (if not already).
         """
         if self.loaded:
             logger.info("Nothing to do. Symbol already loaded.")
             return
         if not self.file:
             raise Error(f"Cannot load {repr(self)} because there is no file pointer")
+        if self.data_type == GamsDataType.Alias and self._alias_of is not None:
+            # The alias has no records of its own; ensure the parent (which owns
+            # the data the alias's view will surface) is loaded too.
+            self._alias_of.load()
         # The engine reads the records and populates this symbol's dataframe.
         # The "no symbol index" guard now lives in the gdxcc engine, which is
         # the path that needs it.
@@ -1456,9 +1480,12 @@ class GdxSymbol:
 
     def unload(self) -> None:
         """
-        Drops this :py:class:`GdxSymbol`'s :py:attr:`dataframe`
+        Drops this :py:class:`GdxSymbol`'s :py:attr:`dataframe`. For an Alias the
+        dataframe is a view onto the parent's, so unload only flips the loaded
+        flag (the parent's data is untouched).
         """
-        self.dataframe = None
+        if self.data_type != GamsDataType.Alias:
+            self.dataframe = None
         self._loaded = False
 
     def write(self, index: int | None = None, name_positions: dict | None = None) -> None:

@@ -294,6 +294,7 @@ GAMS lets one Set be an *alias* of another — `alias(t, at)` makes `at` another
 
 - `GdxSymbol.data_type` is {py:attr}`gdxpds.gdx.GamsDataType.Alias`, and the symbol reads like the Set it aliases (same elements, same element text).
 - `GdxSymbol.alias_of` is the parent Set as a `GdxSymbol` reference (or `None` for non-aliases). Unlike a relaxed domain, an alias has no fallback: its parent must exist in the file when it is written, or the write raises {py:class}`gdxpds.DomainError`.
+- `GdxSymbol.dataframe` on an alias is a live **view** of the parent's `dataframe` -- no copy, and no per-alias slot. Mutating the parent shows through the alias immediately; direct assignment to an alias's `dataframe` raises (the alias has no records of its own to set).
 
 **Viewing on read:**
 

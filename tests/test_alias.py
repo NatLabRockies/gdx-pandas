@@ -16,6 +16,7 @@ from gdxpds.gdx import (
     append_alias,
     append_set,
 )
+from gdxpds.tools import Error
 
 
 def test_alias_of_setter_rejects_string():
@@ -258,3 +259,116 @@ def test_alias_chain_disk_shape_differs_between_engines(run_dir):
             f"engine {engine!r}: expected on-disk `aat` parent={expected!r}, "
             f"got {aat_parent_name_on_disk(out)!r}"
         )
+
+
+# --- Alias.dataframe is a read-only view onto the parent ----------------------
+
+
+def test_alias_dataframe_is_view_of_parent_in_memory():
+    # An alias carries no records of its own; its `.dataframe` is the parent's
+    # `.dataframe` (same object, not a copy).
+    with GdxFile() as gdx:
+        t = append_set(gdx, "t", pd.DataFrame({"i": ["a", "b", "c"]}))
+        at = append_alias(gdx, "at", t)
+        assert at.dataframe is t.dataframe
+
+
+def test_alias_dataframe_view_reflects_parent_mutation():
+    # Mutating the parent's `.dataframe` shows through the alias immediately:
+    # there's no per-alias copy that could drift.
+    with GdxFile() as gdx:
+        t = append_set(gdx, "t", pd.DataFrame({"i": ["a", "b"]}))
+        at = append_alias(gdx, "at", t)
+        t.dataframe = pd.DataFrame({"i": ["x", "y", "z"]})
+        assert at.dataframe is t.dataframe
+        assert list(at.dataframe["i"]) == ["x", "y", "z"]
+
+
+def test_alias_dataframe_direct_assignment_raises():
+    # Setting `alias.dataframe` directly is not allowed -- the alias has no
+    # records of its own. Mutate the parent instead.
+    with GdxFile() as gdx:
+        append_set(gdx, "t", pd.DataFrame({"i": ["a", "b"]}))
+        at = append_alias(gdx, "at", "t")
+        with pytest.raises(Error):
+            at.dataframe = pd.DataFrame({"i": ["x"], "Value": [""]})
+
+
+def test_alias_unload_does_not_assign_dataframe():
+    # unload() on an alias must not go through the dataframe setter (which
+    # would raise); it just flips the loaded flag.
+    with GdxFile() as gdx:
+        append_set(gdx, "t", pd.DataFrame({"i": ["a", "b"]}))
+        at = append_alias(gdx, "at", "t")
+        assert at.loaded
+        at.unload()
+        assert not at.loaded
+
+
+def test_alias_num_records_tracks_parent():
+    # num_records uses `self.dataframe` for loaded symbols. Since an alias's
+    # dataframe is a view of the parent, its count matches the parent's.
+    with GdxFile() as gdx:
+        t = append_set(gdx, "t", pd.DataFrame({"i": ["a", "b", "c", "d"]}))
+        at = append_alias(gdx, "at", t)
+        assert at.num_records == t.num_records == 4
+
+
+def test_alias_dataframe_view_after_read(run_dir):
+    # After reading the file back, `at.dataframe is t.dataframe` holds: the
+    # gdxcc and gams.transfer engines skip the alias's own dataframe
+    # assignment and rely on the view.
+    out = os.path.join(run_dir, "alias_view_read.gdx")
+    gdxpds.to_gdx(
+        {"t": pd.DataFrame({"i": ["a", "b", "c"], "Value": ["", "", ""]})},
+        out,
+        aliases={"at": "t"},
+    )
+    engines = ["gdxcc"] + (["gams_transfer"] if gdxpds.HAVE_GAMS_TRANSFER else [])
+    for engine in engines:
+        with GdxFile(lazy_load=False, engine=engine) as gdx:
+            gdx.read(out)
+            assert gdx["at"].dataframe is gdx["t"].dataframe
+
+
+def test_alias_lazy_load_pulls_parent_via_view(run_dir):
+    # With lazy loading, accessing the alias's records via .load() ensures the
+    # parent is loaded too -- the view on an unloaded parent would be empty.
+    engines = ["gdxcc"] + (["gams_transfer"] if gdxpds.HAVE_GAMS_TRANSFER else [])
+    for engine in engines:
+        out = os.path.join(run_dir, f"alias_lazy_{engine}.gdx")
+        gdxpds.to_gdx(
+            {"t": pd.DataFrame({"i": ["a", "b", "c"], "Value": ["", "", ""]})},
+            out,
+            aliases={"at": "t"},
+            engine=engine,
+        )
+        with GdxFile(lazy_load=True, engine=engine) as gdx:
+            gdx.read(out)
+            assert not gdx["t"].loaded
+            assert not gdx["at"].loaded
+            gdx["at"].load()
+            # Loading the alias must also have loaded the parent, so the
+            # view actually surfaces the members.
+            assert gdx["t"].loaded
+            assert gdx["at"].loaded
+            assert list(gdx["at"].dataframe.iloc[:, 0]) == ["a", "b", "c"]
+
+
+def test_clone_alias_dataframe_resolves_via_parent_in_destination(run_dir):
+    # A cloned alias has no live `alias_of` ref until re-resolved; once it is,
+    # its `.dataframe` view points at the *destination* file's parent Set,
+    # which can be a different set of members than the source file's.
+    out = os.path.join(run_dir, "clone_alias_view.gdx")
+    with GdxFile() as src:
+        append_set(src, "t", pd.DataFrame({"i": ["a", "b", "c"]}))
+        append_alias(src, "at", "t")
+        cloned_at = src["at"].clone()
+        with GdxFile() as dest:
+            append_set(dest, "t", pd.DataFrame({"i": ["x", "y"]}))
+            dest.append(cloned_at)
+            cloned_at.resolve_alias_of()
+            # The view picks up the destination file's parent records.
+            assert cloned_at.dataframe is dest["t"].dataframe
+            assert list(cloned_at.dataframe["i"]) == ["x", "y"]
+            dest.write(out)

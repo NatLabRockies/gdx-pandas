@@ -340,14 +340,13 @@ class TransferEngine(GdxEngine):
         else:
             # Targeted: read just the requested symbols' records. gams.transfer
             # requires an alias's parent Set to be present in the same read, so
-            # pull those in too (the universe parent "*" is implicit, not a symbol).
-            targets = [s for s in symbols if not s.loaded]
-            read_names = {s.name for s in targets}
+            # GdxEngine._expand_alias_targets pulls those in (also shared with
+            # the gdxcc engine). The universe parent "*" is implicit, so it is
+            # filtered out before handing names to container.read.
             universe = gdx_file.universal_set.name if gdx_file.universal_set is not None else "*"
-            for s in targets:
-                parent = s.alias_of_name
-                if s.data_type == GamsDataType.Alias and parent and parent != universe:
-                    read_names.add(parent)
+            expanded = self._expand_alias_targets([s for s in symbols if not s.loaded])
+            targets = [s for s in expanded if not s.loaded]
+            read_names = {s.name for s in expanded if s.name != universe}
             container = self._read_records(gdx_file, list(read_names)) if targets else None
         for symbol in targets:
             self._translate(container, symbol)
@@ -371,6 +370,14 @@ class TransferEngine(GdxEngine):
             ) from e
 
     def _translate(self, container, symbol: GdxSymbol) -> None:
+        if symbol.data_type == GamsDataType.Alias:
+            # An alias has no records of its own; its `.dataframe` is a view onto
+            # the parent (see GdxSymbol.dataframe). load_symbols already pulls the
+            # parent into the same read, so by here the parent is (or is about to
+            # be) translated; nothing for us to populate.
+            symbol._loaded = True
+            return
+
         gt_sym = container.data[symbol.name]
         records = gt_sym.records
         out_cols = symbol.dims + symbol.value_col_names
@@ -384,11 +391,10 @@ class TransferEngine(GdxEngine):
         # gams.transfer yields ordered categoricals).
         dim_data = records.iloc[:, :num_dims].astype(str).reset_index(drop=True)
 
-        # A Set/Alias value is its element text ("" = no text); membership is row
-        # presence. An Alias delegates its .records to the parent Set, so the same
-        # path applies. A universe alias (alias of '*') has only the member column
-        # and no element-text column, so its members all carry empty text.
-        if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
+        # A Set value is its element text ("" = no text); membership is row
+        # presence. (Aliases short-circuit above: their dataframe is a view onto
+        # the parent Set.)
+        if symbol.data_type == GamsDataType.Set:
             if records.shape[1] > num_dims:
                 text = records.iloc[:, num_dims].astype(str)
             else:

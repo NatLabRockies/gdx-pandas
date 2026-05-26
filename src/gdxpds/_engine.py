@@ -94,6 +94,32 @@ class GdxEngine(abc.ABC):
         """Load the records of a single symbol."""
         self.load_symbols(symbol.file, [symbol])
 
+    @staticmethod
+    def _expand_alias_targets(symbols: Sequence[GdxSymbol]) -> list[GdxSymbol]:
+        """Return ``symbols`` extended with the transitive ``alias_of`` parents
+        of any aliases in the input, preserving order and de-duplicating.
+
+        An Alias has no records of its own -- its ``dataframe`` is a view onto
+        its parent's (see :class:`~gdxpds.gdx.GdxSymbol.dataframe`) -- so an
+        engine asked to load an alias must also load the parent (and the
+        parent's parent, for chained aliases). Engines call this from their
+        ``load_symbols`` to build the actual target list.
+        """
+        # Late import: gdx.py imports this module, so a top-level import would cycle.
+        from gdxpds.gdx import GamsDataType
+
+        result = list(symbols)
+        seen = {id(s) for s in result}
+        for s in list(result):
+            cur = s
+            while cur.data_type == GamsDataType.Alias and cur._alias_of is not None:
+                cur = cur._alias_of
+                if id(cur) in seen:
+                    break
+                seen.add(id(cur))
+                result.append(cur)
+        return result
+
     @property
     def handle(self) -> object | None:
         """Native engine handle, if any.
