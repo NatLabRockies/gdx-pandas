@@ -5,16 +5,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.tools &mdash; gdx-pandas 2.1.0 documentation</title>
+  <title>gdxpds.tools &mdash; gdx-pandas 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -47,13 +49,28 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#object-oriented-api">Object-Oriented API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#set-details">Set details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#set-membership-and-element-text">Set membership and element text</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#aliases">Aliases</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#parameter-variable-and-equation-details">Parameter, Variable, and Equation details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#variable-and-equation-types">Variable and Equation types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#special-values">Special values</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#migration-from-1-x-2-x">Migration from 1.x / 2.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v2-0-0-breaking-changes">v2.0.0 breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v3-0-0-breaking-changes">v3.0.0 breaking changes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#configuration">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../overview.html#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#i-o-engine-engine">I/O engine (<code class="docutils literal notranslate"><span class="pre">engine</span></code>)</a></li>
 </ul>
 </li>
 </ul>
@@ -65,24 +82,27 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir_cache"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir_cache</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.source"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.source</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine"><code class="docutils literal notranslate"><span class="pre">Engine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine.GDXCC"><code class="docutils literal notranslate"><span class="pre">Engine.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Engine.GAMS_TRANSFER</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.EngineError"><code class="docutils literal notranslate"><span class="pre">EngineError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_aliases"><code class="docutils literal notranslate"><span class="pre">get_aliases()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
@@ -93,6 +113,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
@@ -107,6 +128,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol"><code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_set"><code class="docutils literal notranslate"><span class="pre">append_set()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_parameter"><code class="docutils literal notranslate"><span class="pre">append_parameter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_alias"><code class="docutils literal notranslate"><span class="pre">append_alias()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html">gdxpds.read_gdx</a><ul>
@@ -115,6 +137,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_aliases"><code class="docutils literal notranslate"><span class="pre">get_aliases()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 </ul>
 </li>
@@ -707,12 +730,14 @@
     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  gams.transfer usable: </span><span class="si">{</span><span class="s1">&#39;yes&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">_probe_gams_transfer</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;no&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_backend</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_engine</span>
 
-        <span class="n">default_backend</span> <span class="o">=</span> <span class="n">resolve_backend</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+        <span class="c1"># Thread `gams_dir` through so the reported default engine reflects the</span>
+        <span class="c1"># directory being inspected (not the cached default-discovered one).</span>
+        <span class="n">default_engine</span> <span class="o">=</span> <span class="n">resolve_engine</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
     <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">default_backend</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(unresolved: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">)&quot;</span>
-    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Default backend: </span><span class="si">{</span><span class="n">default_backend</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">default_engine</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(unresolved: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Default engine: </span><span class="si">{</span><span class="n">default_engine</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">finder</span> <span class="o">=</span> <span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>

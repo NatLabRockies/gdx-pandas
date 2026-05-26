@@ -5,16 +5,18 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.gdx &mdash; gdx-pandas 2.1.0 documentation</title>
+  <title>gdxpds.gdx &mdash; gdx-pandas 3.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=20623aea"></script>
+      <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
@@ -47,13 +49,28 @@
               <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#backend-classes">Backend Classes</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#object-oriented-api">Object-Oriented API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#set-details">Set details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#set-membership-and-element-text">Set membership and element text</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#aliases">Aliases</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#parameter-variable-and-equation-details">Parameter, Variable, and Equation details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#variable-and-equation-types">Variable and Equation types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#special-values">Special values</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#migration-from-1-x-2-x">Migration from 1.x / 2.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v2-0-0-breaking-changes">v2.0.0 breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v3-0-0-breaking-changes">v3.0.0 breaking changes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#configuration">Configuration</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../overview.html#i-o-engine-backend">I/O engine (<code class="docutils literal notranslate"><span class="pre">backend</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#i-o-engine-engine">I/O engine (<code class="docutils literal notranslate"><span class="pre">engine</span></code>)</a></li>
 </ul>
 </li>
 </ul>
@@ -65,24 +82,27 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir_cache"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir_cache</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.source"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.source</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend"><code class="docutils literal notranslate"><span class="pre">Backend</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend.GDXCC"><code class="docutils literal notranslate"><span class="pre">Backend.GDXCC</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Backend.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Backend.GAMS_TRANSFER</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine"><code class="docutils literal notranslate"><span class="pre">Engine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine.GDXCC"><code class="docutils literal notranslate"><span class="pre">Engine.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Engine.GAMS_TRANSFER</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.BackendError"><code class="docutils literal notranslate"><span class="pre">BackendError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.EngineError"><code class="docutils literal notranslate"><span class="pre">EngineError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_aliases"><code class="docutils literal notranslate"><span class="pre">get_aliases()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
@@ -93,6 +113,7 @@
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
@@ -107,6 +128,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol"><code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_set"><code class="docutils literal notranslate"><span class="pre">append_set()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_parameter"><code class="docutils literal notranslate"><span class="pre">append_parameter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_alias"><code class="docutils literal notranslate"><span class="pre">append_alias()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html">gdxpds.read_gdx</a><ul>
@@ -115,6 +137,7 @@
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_aliases"><code class="docutils literal notranslate"><span class="pre">get_aliases()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
 </ul>
 </li>
@@ -177,7 +200,7 @@
              
   <h1>Source code for gdxpds.gdx</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">Backend functionality for reading and writing GDX files.</span>
+<span class="sd">Engine functionality for reading and writing GDX files.</span>
 <span class="sd">The GdxFile and GdxSymbol classes are full-featured interfaces</span>
 <span class="sd">for going between the GDX format and pandas DataFrames,</span>
 <span class="sd">including translation between GDX and numpy special values.</span>
@@ -191,13 +214,12 @@
 <span class="kn">import</span><span class="w"> </span><span class="nn">weakref</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">OrderedDict</span><span class="p">,</span> <span class="n">defaultdict</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">MutableSequence</span><span class="p">,</span> <span class="n">Sequence</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">ctypes</span><span class="w"> </span><span class="kn">import</span> <span class="n">c_bool</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">Enum</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._backend</span><span class="w"> </span><span class="kn">import</span> <span class="n">Backend</span><span class="p">,</span> <span class="n">make_backend</span><span class="p">,</span> <span class="n">resolve_backend</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">Engine</span><span class="p">,</span> <span class="n">make_engine</span><span class="p">,</span> <span class="n">resolve_engine</span>
 
 <span class="c1"># Re-exported from gdxpds.special for backward compatibility.</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.special</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -210,13 +232,6 @@
     <span class="n">is_np_sv</span><span class="p">,</span>  <span class="c1"># noqa: F401</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Error</span><span class="p">,</span> <span class="n">NeedsGamsDir</span>
-
-<span class="c1"># gdxcc bindings: modern (shipped inside gamsapi) is preferred; the standalone</span>
-<span class="c1"># legacy PyPI package is the fallback.</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">gams.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdx</span> <span class="k">as</span> <span class="n">gdxcc</span>
-<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="kn">import</span><span class="w"> </span><span class="nn">gdxcc</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -317,8 +332,29 @@
 <span class="sd">            msg that is passed in with a gdxErrorStr appended</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">H</span><span class="p">:</span>
+            <span class="c1"># Imported lazily: GdxError is only raised on the gdxcc path, where a</span>
+            <span class="c1"># binding is necessarily present. Keeping it out of module scope lets</span>
+            <span class="c1"># `import gdxpds` succeed with no binding installed.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">from</span><span class="w"> </span><span class="nn">gams.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdx</span> <span class="k">as</span> <span class="n">gdxcc</span>
+            <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+                <span class="kn">import</span><span class="w"> </span><span class="nn">gdxcc</span>
             <span class="n">msg</span> <span class="o">+=</span> <span class="s2">&quot;. &quot;</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxErrorStr</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxGetLastError</span><span class="p">(</span><span class="n">H</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;.&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="TransferError">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.TransferError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TransferError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when a ``gams.transfer`` read or write operation fails.</span>
+
+<span class="sd">    The gams.transfer counterpart to :class:`GdxError`. There is no GDX handle or</span>
+<span class="sd">    last-error registry behind gams.transfer, so the underlying exception is</span>
+<span class="sd">    carried by chaining (``raise TransferError(...) from e``) rather than a</span>
+<span class="sd">    handle-derived message. Subclass of :class:`Error`, so ``except Error`` still</span>
+<span class="sd">    catches it.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
 
 
 
@@ -354,7 +390,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">lazy_load</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">backend</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Backend</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">engine</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Engine</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initializes a GdxFile object by connecting to GAMS and creating a pointer.</span>
@@ -371,10 +407,11 @@
 <span class="sd">            accessed later after the corresponding calls to :py:meth:`GdxSymbol.load`.</span>
 <span class="sd">            If False, all data are automatically loaded and the full GDX file is</span>
 <span class="sd">            available in memory after the call to :py:meth:`read`.</span>
-<span class="sd">        backend : None or str or :py:class:`gdxpds.Backend`</span>
+<span class="sd">        engine : None or str or :py:class:`gdxpds.Engine`</span>
 <span class="sd">            Which I/O engine to use. ``None`` (default) resolves via the</span>
-<span class="sd">            ``GDXPDS_BACKEND`` env var, falling back to the default backend</span>
-<span class="sd">            (``gdxcc``). Pass ``&quot;gdxcc&quot;`` / ``Backend.GDXCC`` to pin it.</span>
+<span class="sd">            ``GDXPDS_ENGINE`` env var, then the default engine: ``gams.transfer``</span>
+<span class="sd">            when usable, otherwise ``gdxcc``. Pass ``&quot;gdxcc&quot;`` / ``Engine.GDXCC``</span>
+<span class="sd">            to pin the gdxcc engine.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">lazy_load</span> <span class="o">=</span> <span class="n">lazy_load</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="kc">None</span>
@@ -383,22 +420,25 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="c1"># Set before anything that can raise, so cleanup() is safe if create fails.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_kind</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_impl</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_kind</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="n">NeedsGamsDir</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>
-        <span class="c1"># Build the I/O engine. For the gdxcc backend this binds the GDX library</span>
-        <span class="c1"># and creates the handle, which the backend owns and frees in close().</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_kind</span> <span class="o">=</span> <span class="n">resolve_backend</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span> <span class="o">=</span> <span class="n">make_backend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend_kind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir_source</span><span class="p">)</span>
+        <span class="c1"># Build the I/O engine. For the gdxcc engine this binds the GDX library</span>
+        <span class="c1"># and creates the handle, which the engine owns and frees in close().</span>
+        <span class="c1"># `self.gams_dir` (resolved above) is threaded through to engine</span>
+        <span class="c1"># selection so the gams.transfer probe runs against the caller&#39;s</span>
+        <span class="c1"># actual install rather than the cached default-discovered one.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_kind</span> <span class="o">=</span> <span class="n">resolve_engine</span><span class="p">(</span><span class="n">engine</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_impl</span> <span class="o">=</span> <span class="n">make_engine</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_engine_kind</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir_source</span><span class="p">)</span>
 
         <span class="c1"># Free the engine&#39;s native resources exactly once, at the first of:</span>
         <span class="c1"># cleanup(), garbage collection, or interpreter exit. The callback is the</span>
-        <span class="c1"># backend&#39;s own close() -- a bound method of the backend, not self -- so</span>
+        <span class="c1"># engine&#39;s own close() -- a bound method of the engine, not self -- so</span>
         <span class="c1"># it never keeps this GdxFile alive (which would defeat GC-time</span>
         <span class="c1"># finalization) and stays valid at interpreter shutdown (close() uses</span>
         <span class="c1"># callables bound when the handle was created, not module-global lookups).</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span> <span class="o">=</span> <span class="n">weakref</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_engine_impl</span><span class="o">.</span><span class="n">close</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">universal_set</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="bp">self</span>
@@ -408,7 +448,7 @@
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.cleanup">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">cleanup</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span><span class="p">()</span>  <span class="c1"># runs backend.close() at most once</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_finalizer</span><span class="p">()</span>  <span class="c1"># runs engine.close() at most once</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -430,7 +470,7 @@
 <span class="sd">        -------</span>
 <span class="sd">        :py:class:`GdxFile`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_backend_kind</span><span class="p">)</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">GdxFile</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">lazy_load</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_engine_kind</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
             <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">symbol</span><span class="o">.</span><span class="n">clone</span><span class="p">())</span>
             <span class="n">result</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">result</span>
@@ -447,19 +487,6 @@
 <span class="sd">        bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">H</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        GDX object handle (gdxcc backend only; ``None`` for backends without one,</span>
-<span class="sd">        and after :py:meth:`cleanup`).</span>
-
-<span class="sd">        This is a gdxcc-specific escape hatch (e.g. for driving raw ``gdxcc``</span>
-<span class="sd">        calls). It is a candidate for deprecation/removal in v3.0.0, when the</span>
-<span class="sd">        default backend flips and ``None`` becomes the common return — see the</span>
-<span class="sd">        &quot;Known warts&quot; section of ``dev/ROADMAP.md``.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span><span class="o">.</span><span class="n">handle</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">filename</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -515,9 +542,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="s2">&quot;GdxFile.read can only be used if the GdxFile is .empty&quot;</span><span class="p">)</span>
 
-        <span class="c1"># The backend reads file + symbol metadata and builds the GdxSymbol</span>
+        <span class="c1"># The engine reads file + symbol metadata and builds the GdxSymbol</span>
         <span class="c1"># collection (records are not loaded here).</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span><span class="o">.</span><span class="n">open_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_impl</span><span class="o">.</span><span class="n">open_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
 
         <span class="c1"># read all symbols if not lazy_load</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lazy_load</span><span class="p">:</span>
@@ -527,23 +554,22 @@
 
 <div class="viewcode-block" id="GdxFile.load_all">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.load_all">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">load_all</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">load_set_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_all</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Eagerly load every symbol&#39;s records into its :py:attr:`GdxSymbol.dataframe`.</span>
 
-<span class="sd">        Already-loaded symbols are skipped. Pass ``load_set_text=True`` to surface</span>
-<span class="sd">        GAMS element text for Sets instead of the membership ``c_bool``.</span>
+<span class="sd">        Already-loaded symbols are skipped.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_impl</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GdxFile.load_symbols">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.load_symbols">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">load_symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="o">*</span><span class="p">,</span> <span class="n">load_set_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">names</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Eagerly load the records of the named symbols (a subset of the file).</span>
 
-<span class="sd">        Resolves each name to its :py:class:`GdxSymbol` and loads via the backend</span>
+<span class="sd">        Resolves each name to its :py:class:`GdxSymbol` and loads via the engine</span>
 <span class="sd">        (gams.transfer issues a single targeted read; gdxcc loops per symbol).</span>
 <span class="sd">        Raises :class:`SymbolNotFoundError` for an unknown name; already-loaded</span>
 <span class="sd">        symbols are skipped.</span>
@@ -553,21 +579,23 @@
             <span class="k">if</span> <span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">SymbolNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No symbol named </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="si">!r}</span><span class="s2">.&quot;</span><span class="p">)</span>
             <span class="n">symbols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span><span class="o">.</span><span class="n">load_symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbols</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_impl</span><span class="o">.</span><span class="n">load_symbols</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbols</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="GdxFile.reorder_for_strict_domains">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxFile.reorder_for_strict_domains">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">reorder_for_strict_domains</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Reorder ``self._symbols`` in place so every symbol with a strict (``GdxSymbol``-ref)</span>
-<span class="sd">        ``domain`` follows all of its parents. Stable topological sort: symbols that don&#39;t</span>
-<span class="sd">        reference each other keep their current relative order. No-ops on cycles (logs a warning</span>
-<span class="sd">        and leaves the original order untouched).</span>
+<span class="sd">        Reorder ``self._symbols`` in place so every symbol follows the symbols it depends</span>
+<span class="sd">        on: each strict (``GdxSymbol``-ref) ``domain`` parent, and the parent Set of each</span>
+<span class="sd">        :py:attr:`GamsDataType.Alias`. Stable topological sort: symbols that don&#39;t reference</span>
+<span class="sd">        each other keep their current relative order. No-ops on cycles (logs a warning and</span>
+<span class="sd">        leaves the original order untouched).</span>
 
-<span class="sd">        Strict-domain writes require the parent&#39;s ``gdxDataWriteDone`` to have completed before</span>
-<span class="sd">        the child&#39;s write starts. Calling this before :py:meth:`write` is the easy way to satisfy</span>
-<span class="sd">        that constraint when symbols were appended in an unordered way.</span>
+<span class="sd">        Strict-domain and alias writes require the parent&#39;s ``gdxDataWriteDone`` (or, for an</span>
+<span class="sd">        alias, the parent&#39;s registration) to have completed before the dependent symbol is</span>
+<span class="sd">        written. Calling this before :py:meth:`write` is the easy way to satisfy that</span>
+<span class="sd">        constraint when symbols were appended in an unordered way.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_symbols</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">parents_of</span> <span class="o">=</span> <span class="p">{}</span>
@@ -578,6 +606,9 @@
                     <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">d</span> <span class="ow">is</span> <span class="n">s</span><span class="p">:</span>
                         <span class="k">continue</span>
                     <span class="n">ps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="c1"># An alias must be written after the Set it aliases.</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">alias_of_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">s</span><span class="o">.</span><span class="n">alias_of_name</span> <span class="o">!=</span> <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="n">ps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">alias_of_name</span><span class="p">)</span>
             <span class="n">parents_of</span><span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ps</span>
 
         <span class="n">ordered</span><span class="p">,</span> <span class="n">cycle</span> <span class="o">=</span> <span class="n">_stable_topological_sort</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">parents_of</span><span class="p">)</span>
@@ -604,7 +635,7 @@
 <span class="sd">        ----------</span>
 <span class="sd">        filename : pathlib.Path or str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_backend_impl</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_engine_impl</span><span class="o">.</span><span class="n">write_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -752,42 +783,47 @@
 
 
 
+<span class="c1"># GAMS GDX type codes, hardcoded so `import gdxpds` needs no binding at module</span>
+<span class="c1"># load. These mirror the gdxcc ``GMS_*`` constants; ``test_gms_constants_match_gdxcc``</span>
+<span class="c1"># verifies the match whenever a binding is installed.</span>
 <div class="viewcode-block" id="GamsDataType">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsDataType">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GamsDataType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="n">Set</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_SET</span>
-    <span class="n">Parameter</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_PAR</span>
-    <span class="n">Variable</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_VAR</span>
-    <span class="n">Equation</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_EQU</span>
-    <span class="n">Alias</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_DT_ALIAS</span></div>
+    <span class="n">Set</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># GMS_DT_SET</span>
+    <span class="n">Parameter</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># GMS_DT_PAR</span>
+    <span class="n">Variable</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># GMS_DT_VAR</span>
+    <span class="n">Equation</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># GMS_DT_EQU</span>
+    <span class="n">Alias</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># GMS_DT_ALIAS</span></div>
 
 
 
 <div class="viewcode-block" id="GamsVariableType">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsVariableType">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GamsVariableType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="n">Unknown</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_UNKNOWN</span>
-    <span class="n">Binary</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_BINARY</span>
-    <span class="n">Integer</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_INTEGER</span>
-    <span class="n">Positive</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_POSITIVE</span>
-    <span class="n">Negative</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_NEGATIVE</span>
-    <span class="n">Free</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_FREE</span>
-    <span class="n">SOS1</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_SOS1</span>
-    <span class="n">SOS2</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_SOS2</span>
-    <span class="n">Semicont</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_SEMICONT</span>
-    <span class="n">Semiint</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VARTYPE_SEMIINT</span></div>
+    <span class="n">Unknown</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># GMS_VARTYPE_UNKNOWN</span>
+    <span class="n">Binary</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># GMS_VARTYPE_BINARY</span>
+    <span class="n">Integer</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># GMS_VARTYPE_INTEGER</span>
+    <span class="n">Positive</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># GMS_VARTYPE_POSITIVE</span>
+    <span class="n">Negative</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># GMS_VARTYPE_NEGATIVE</span>
+    <span class="n">Free</span> <span class="o">=</span> <span class="mi">5</span>  <span class="c1"># GMS_VARTYPE_FREE</span>
+    <span class="n">SOS1</span> <span class="o">=</span> <span class="mi">6</span>  <span class="c1"># GMS_VARTYPE_SOS1</span>
+    <span class="n">SOS2</span> <span class="o">=</span> <span class="mi">7</span>  <span class="c1"># GMS_VARTYPE_SOS2</span>
+    <span class="n">Semicont</span> <span class="o">=</span> <span class="mi">8</span>  <span class="c1"># GMS_VARTYPE_SEMICONT</span>
+    <span class="n">Semiint</span> <span class="o">=</span> <span class="mi">9</span>  <span class="c1"># GMS_VARTYPE_SEMIINT</span></div>
 
 
 
+<span class="c1"># Offset by 53 so the values don&#39;t collide with GamsVariableType&#39;s; the GMS_EQUTYPE_*</span>
+<span class="c1"># codes themselves are 0..5.</span>
 <div class="viewcode-block" id="GamsEquationType">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsEquationType">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GamsEquationType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="n">Equality</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_E</span>
-    <span class="n">GreaterThan</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_G</span>
-    <span class="n">LessThan</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_L</span>
-    <span class="n">NothingEnforced</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_N</span>
-    <span class="n">External</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_X</span>
-    <span class="n">Conic</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_EQUTYPE_C</span></div>
+    <span class="n">Equality</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="mi">0</span>  <span class="c1"># GMS_EQUTYPE_E</span>
+    <span class="n">GreaterThan</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="mi">1</span>  <span class="c1"># GMS_EQUTYPE_G</span>
+    <span class="n">LessThan</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="mi">2</span>  <span class="c1"># GMS_EQUTYPE_L</span>
+    <span class="n">NothingEnforced</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="mi">3</span>  <span class="c1"># GMS_EQUTYPE_N</span>
+    <span class="n">External</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="mi">4</span>  <span class="c1"># GMS_EQUTYPE_X</span>
+    <span class="n">Conic</span> <span class="o">=</span> <span class="mi">53</span> <span class="o">+</span> <span class="mi">5</span>  <span class="c1"># GMS_EQUTYPE_C</span></div>
 
 
 
@@ -816,11 +852,11 @@
 <div class="viewcode-block" id="GamsValueType">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GamsValueType">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">GamsValueType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
-    <span class="n">Level</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_LEVEL</span>  <span class="c1"># .l</span>
-    <span class="n">Marginal</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_MARGINAL</span>  <span class="c1"># .m</span>
-    <span class="n">Lower</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_LOWER</span>  <span class="c1"># .lo</span>
-    <span class="n">Upper</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_UPPER</span>  <span class="c1"># .ub</span>
-    <span class="n">Scale</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_VAL_SCALE</span>  <span class="c1"># .scale</span>
+    <span class="n">Level</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># GMS_VAL_LEVEL, .l</span>
+    <span class="n">Marginal</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1"># GMS_VAL_MARGINAL, .m</span>
+    <span class="n">Lower</span> <span class="o">=</span> <span class="mi">2</span>  <span class="c1"># GMS_VAL_LOWER, .lo</span>
+    <span class="n">Upper</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># GMS_VAL_UPPER, .ub</span>
+    <span class="n">Scale</span> <span class="o">=</span> <span class="mi">4</span>  <span class="c1"># GMS_VAL_SCALE, .scale</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">_missing_</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
@@ -886,6 +922,7 @@
         <span class="n">variable_type</span><span class="p">:</span> <span class="n">GamsVariableType</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">equation_type</span><span class="p">:</span> <span class="n">GamsEquationType</span> <span class="o">|</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">domain</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GdxSymbol</span> <span class="o">|</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">alias_of</span><span class="p">:</span> <span class="n">GdxSymbol</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        In-memory representation of a GAMS GDX Symbol</span>
@@ -916,6 +953,10 @@
 <span class="sd">            :c:func:`gdxSymbolSetDomain` writes (subject to the parent existing in the file at</span>
 <span class="sd">            write time; otherwise the symbol falls back to relaxed). Plain strings are not</span>
 <span class="sd">            accepted here; use ``dims`` for string-only domains.</span>
+<span class="sd">        alias_of : None or :py:class:`GdxSymbol`</span>
+<span class="sd">            Only for ``data_type == GamsDataType.Alias``: the parent Set this alias refers to,</span>
+<span class="sd">            as a :py:class:`GdxSymbol` reference. The parent must exist in the same file at</span>
+<span class="sd">            write time (an alias has no relaxed fallback). See :py:attr:`alias_of`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">description</span> <span class="o">=</span> <span class="n">description</span>
@@ -929,23 +970,27 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_domain</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_strict_on_disk</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Alias target: the parent Set, as a GdxSymbol ref (_alias_of) plus its</span>
+        <span class="c1"># name (_alias_of_name), the latter surviving when the ref can&#39;t yet be</span>
+        <span class="c1"># resolved (forward reference) or after a clone into another file.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of_name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Record count per GAMS; meaningful only before load (afterwards</span>
-        <span class="c1"># num_records uses the dataframe). The backend&#39;s open_read overwrites</span>
+        <span class="c1"># num_records uses the dataframe). The engine&#39;s open_read overwrites</span>
         <span class="c1"># this for symbols read from a file.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_num_records</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">=</span> <span class="n">dims</span>
         <span class="k">if</span> <span class="n">domain</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">domain</span> <span class="o">=</span> <span class="n">domain</span>
+        <span class="k">if</span> <span class="n">alias_of</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">alias_of</span> <span class="o">=</span> <span class="n">alias_of</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_file</span> <span class="o">=</span> <span class="n">file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_index</span> <span class="o">=</span> <span class="n">index</span>
 
-        <span class="c1"># adding this flag to implement ability to load set text instead of boolean values</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_vals</span> <span class="o">=</span> <span class="kc">True</span>
-
         <span class="c1"># A symbol constructed without a file is being built for writing and is</span>
         <span class="c1"># ready to use immediately. A symbol constructed with a file is being</span>
-        <span class="c1"># read: the backend&#39;s open_read populates its extended metadata (record</span>
+        <span class="c1"># read: the engine&#39;s open_read populates its extended metadata (record</span>
         <span class="c1"># count, variable/equation subtype, description, domain) and it stays</span>
         <span class="c1"># unloaded until its records are pulled.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -956,7 +1001,14 @@
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.clone">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">clone</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GdxSymbol</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a copy of this :py:class:`GdxSymbol`</span>
+<span class="sd">        Create a copy of this :py:class:`GdxSymbol`.</span>
+
+<span class="sd">        The clone is independent of any :py:class:`GdxFile` -- its ``file`` is</span>
+<span class="sd">        ``None`` and it has no ``index``. Append it to a destination</span>
+<span class="sd">        :py:class:`GdxFile` (e.g. via ``dest.append(cloned)``) before writing;</span>
+<span class="sd">        for an Alias, also call ``resolve_alias_of()`` so the parent name is</span>
+<span class="sd">        rebound to a same-file ref. :py:meth:`GdxFile.clone` does this wiring</span>
+<span class="sd">        for every symbol it copies.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -969,6 +1021,11 @@
         <span class="c1"># Pass _domain directly to the constructor: the domain setter copies the list, so the</span>
         <span class="c1"># clone has its own slot list pointing at the same parent GdxSymbols. Write-time name</span>
         <span class="c1"># lookup resolves against whatever file the clone ends up in.</span>
+        <span class="c1">#</span>
+        <span class="c1"># For aliases, intentionally do NOT carry the live `alias_of` GdxSymbol ref --</span>
+        <span class="c1"># it would still point at the *original* file&#39;s parent, which is wrong once the</span>
+        <span class="c1"># clone is inserted elsewhere. Preserve only `alias_of_name`; the destination</span>
+        <span class="c1"># file resolves it against its own symbols at write time.</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">GdxSymbol</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="p">,</span>
@@ -978,7 +1035,12 @@
             <span class="n">equation_type</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">equation_type</span><span class="p">,</span>
             <span class="n">domain</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_domain</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="n">result</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">_alias_of_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">alias_of_name</span>
+        <span class="c1"># An Alias has no records of its own -- its `.dataframe` is a view onto its</span>
+        <span class="c1"># parent (see the dataframe getter). The view resolves after the clone is</span>
+        <span class="c1"># inserted into a destination file and `resolve_alias_of()` rebinds the parent.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">!=</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">:</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span>
         <span class="k">assert</span> <span class="n">result</span><span class="o">.</span><span class="n">loaded</span>
         <span class="k">return</span> <span class="n">result</span></div>
 
@@ -1141,7 +1203,9 @@
         <span class="n">value_col</span> <span class="o">=</span> <span class="n">GamsValueType</span><span class="p">(</span><span class="n">value_col_name</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">):</span>
             <span class="k">assert</span> <span class="n">value_col</span> <span class="o">==</span> <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Level</span>
-            <span class="k">return</span> <span class="n">c_bool</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># A Set/Alias value is its GAMS element text; &quot;&quot; means a member with</span>
+            <span class="c1"># no text. Membership itself is conveyed by row presence.</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Variable</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span>
             <span class="p">(</span><span class="n">value_col</span> <span class="o">==</span> <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Lower</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">value_col</span> <span class="o">==</span> <span class="n">GamsValueType</span><span class="o">.</span><span class="n">Upper</span><span class="p">)</span>
         <span class="p">):</span>
@@ -1411,6 +1475,97 @@
         <span class="k">return</span> <span class="kc">True</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alias_of</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For an :py:attr:`GamsDataType.Alias`, the parent symbol it refers to, as a</span>
+<span class="sd">        :py:class:`GdxSymbol` reference; ``None`` for any other symbol type and for</span>
+<span class="sd">        an alias whose parent could not be resolved against its file.</span>
+
+<span class="sd">        The parent is typically a Set, but an Alias is also accepted (GDX itself</span>
+<span class="sd">        supports chained aliases; the ``gdxcc`` engine preserves the chain on</span>
+<span class="sd">        write, while ``gams_transfer`` flattens it to point at the root Set).</span>
+
+<span class="sd">        Unlike :py:attr:`domain`, an alias has no relaxed fallback: the parent must</span>
+<span class="sd">        exist in the same file when the alias is written, or the write raises</span>
+<span class="sd">        :py:class:`DomainError`.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        None or :py:class:`GdxSymbol`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span>
+
+    <span class="nd">@alias_of</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alias_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of_name</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">!=</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;alias_of may only be set on an Alias symbol; &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">GdxSymbol</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                <span class="s2">&quot;alias_of must be a GdxSymbol reference (the parent Set) or None. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Was passed </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">data_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;alias_of parent must be a Set (or another Alias); &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is a </span><span class="si">{</span><span class="n">value</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of_name</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">alias_of_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Name of the parent Set this alias refers to (or ``None``). Survives when</span>
+<span class="sd">        the :py:attr:`alias_of` reference is not yet resolved or after a clone</span>
+<span class="sd">        into another file; the write path resolves the parent by this name.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of_name</span>
+
+<div class="viewcode-block" id="GdxSymbol.resolve_alias_of">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.resolve_alias_of">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">resolve_alias_of</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Populate :py:attr:`alias_of` with a live :py:class:`GdxSymbol` reference by</span>
+<span class="sd">        looking :py:attr:`alias_of_name` up in ``self.file``. Idempotent; no-ops when</span>
+<span class="sd">        already resolved, when there is no file, or when no parent name is recorded.</span>
+
+<span class="sd">        Mirrors :py:meth:`resolve_domain` for the forward-reference / post-read case</span>
+<span class="sd">        (an alias whose parent has a higher GDX index than the alias itself). The</span>
+<span class="sd">        universe set (``&#39;*&#39;``) resolves to the file&#39;s ``universal_set``.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            True if ``alias_of`` was populated as a result of this call.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of_name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_symbols</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_symbols</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">universal_set</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">name</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">universal_set</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">universal_set</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;resolve_alias_of: alias </span><span class="si">%r</span><span class="s2"> references parent </span><span class="si">%r</span><span class="s2"> which is not in &quot;</span>
+            <span class="s2">&quot;this file; leaving it unresolved.&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">name</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">num_dims</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Number of dimensions over which this symbol is defined</span>
@@ -1426,14 +1581,27 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Data table for this symbol. Dim columns are followed by value columns, left to right.</span>
 
+<span class="sd">        For an :py:attr:`GamsDataType.Alias` with a resolved :py:attr:`alias_of`, the</span>
+<span class="sd">        returned frame is the parent&#39;s own ``dataframe`` (a live view, not a copy) --</span>
+<span class="sd">        an alias has no records of its own. Mutate the parent to change what an alias</span>
+<span class="sd">        reads; direct assignment to an alias&#39;s ``dataframe`` raises.</span>
+
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        pd.DataFrame</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span><span class="o">.</span><span class="n">dataframe</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span>
 
     <span class="nd">@dataframe</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Cannot assign to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2">.dataframe: an Alias has no records &quot;</span>
+                <span class="s2">&quot;of its own -- its dataframe is a read-only view of its parent &quot;</span>
+                <span class="s2">&quot;(alias_of). Mutate the parent&#39;s dataframe instead.&quot;</span>
+            <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># get data in common format and start dealing with dimensions</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
@@ -1513,8 +1681,9 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_init_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">([],</span> <span class="n">columns</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dims</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">):</span>
+            <span class="c1"># A Set/Alias value column holds element-text strings (&quot;&quot; = no text).</span>
             <span class="n">colname</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="n">replace_df_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span> <span class="n">colname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">c_bool</span><span class="p">))</span>
+            <span class="n">replace_df_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span> <span class="n">colname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">))</span>
         <span class="k">return</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_append_default_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">):</span>
@@ -1525,15 +1694,12 @@
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_fixup_set_value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Tricky to get boolean set values to come through right.</span>
-<span class="sd">        isinstance(True,Number) == True and float(True) = 1, but</span>
-<span class="sd">        isinstance(c_bool(True),Number) == False, and this keeps the default</span>
-<span class="sd">        value of 0.0.</span>
-
-<span class="sd">        Could just test for isinstance(,bool), but this fix has the added</span>
-<span class="sd">        advantage of speaking the GDX bindings data type language, and also</span>
-<span class="sd">        fills in any missing values, so users no longer need to actually specify</span>
-<span class="sd">        self.dataframe[&#39;Value&#39;] = True.</span>
+<span class="sd">        Normalize a Set/Alias value column to its canonical element-text form: one</span>
+<span class="sd">        string per row, where ``&quot;&quot;`` denotes a member with no text. Membership is</span>
+<span class="sd">        conveyed by row presence, so any non-string value -- a boolean or ``c_bool``</span>
+<span class="sd">        membership flag, a missing value, etc. -- maps to ``&quot;&quot;``; existing strings</span>
+<span class="sd">        are kept verbatim. This lets callers build a Set from dimension columns</span>
+<span class="sd">        alone, from booleans, or from text, and get a consistent representation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">)</span>
 
@@ -1541,17 +1707,11 @@
         <span class="k">assert</span> <span class="n">colname</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">value_col_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Unexpected final column </span><span class="si">{</span><span class="n">colname</span><span class="si">!r}</span><span class="s2"> in Set dataframe&quot;</span>
         <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">any</span><span class="p">():</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Filling null values in </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2"> with True. To be &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;filled:</span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">isnull</span><span class="p">()]</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-            <span class="n">replace_df_column</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span> <span class="n">colname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_vals</span><span class="p">:</span>
-            <span class="n">replace_df_column</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span> <span class="n">colname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">c_bool</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-            <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_fixup_set_vals</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">replace_df_column</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span>
+            <span class="n">colname</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">[</span><span class="n">colname</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">v</span><span class="p">:</span> <span class="n">v</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
         <span class="k">return</span>
 
     <span class="nd">@property</span>
@@ -1581,26 +1741,27 @@
 
 <div class="viewcode-block" id="GdxSymbol.load">
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.load">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_set_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Loads this :py:class:`GdxSymbol` from its :py:attr:`file`, thereby popluating</span>
 <span class="sd">        :py:attr:`dataframe`.</span>
 
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        load_set_text : bool</span>
-<span class="sd">            If True (default is False) and this symbol is a :class:`GamsDataType.Set &lt;GamsDataType&gt;`,</span>
-<span class="sd">            loads the GDX Text field into the :py:attr:`dataframe` rather than a `c_bool`.</span>
+<span class="sd">        For an Alias, the parent&#39;s records are what the alias&#39;s ``dataframe`` view</span>
+<span class="sd">        surfaces, so the parent is loaded first (if not already).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Nothing to do. Symbol already loaded.&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot load </span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="si">}</span><span class="s2"> because there is no file pointer&quot;</span><span class="p">)</span>
-        <span class="c1"># The backend reads the records and populates this symbol&#39;s dataframe.</span>
-        <span class="c1"># The &quot;no symbol index&quot; guard now lives in the gdxcc backend, which is</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># The alias has no records of its own; ensure the parent (which owns</span>
+            <span class="c1"># the data the alias&#39;s view will surface) is loaded too.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_alias_of</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+        <span class="c1"># The engine reads the records and populates this symbol&#39;s dataframe.</span>
+        <span class="c1"># The &quot;no symbol index&quot; guard now lives in the gdxcc engine, which is</span>
         <span class="c1"># the path that needs it.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_backend_impl</span><span class="o">.</span><span class="n">load_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">load_set_text</span><span class="o">=</span><span class="n">load_set_text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_engine_impl</span><span class="o">.</span><span class="n">load_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="k">return</span></div>
 
 
@@ -1608,9 +1769,12 @@
 <a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.GdxSymbol.unload">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">unload</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Drops this :py:class:`GdxSymbol`&#39;s :py:attr:`dataframe`</span>
+<span class="sd">        Drops this :py:class:`GdxSymbol`&#39;s :py:attr:`dataframe`. For an Alias the</span>
+<span class="sd">        dataframe is a view onto the parent&#39;s, so unload only flips the loaded</span>
+<span class="sd">        flag (the parent&#39;s data is untouched).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_type</span> <span class="o">!=</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_loaded</span> <span class="o">=</span> <span class="kc">False</span></div>
 
 
@@ -1622,7 +1786,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">Error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot write </span><span class="si">{</span><span class="bp">self</span><span class="si">!r}</span><span class="s2"> because there is no file pointer&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_backend_impl</span><span class="o">.</span><span class="n">write_symbol</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">_engine_impl</span><span class="o">.</span><span class="n">write_symbol</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span> <span class="n">name_positions</span><span class="o">=</span><span class="n">name_positions</span>
         <span class="p">)</span></div>
 </div>
@@ -1779,6 +1943,60 @@
     <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dataframe</span> <span class="o">=</span> <span class="n">tmp</span>
     <span class="c1"># debug descripton of what happened</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added parameter </span><span class="si">{</span><span class="n">param_name</span><span class="si">!r}</span><span class="s2"> to </span><span class="si">{</span><span class="n">gdx_file</span><span class="si">!r}</span><span class="s2"> using processed data:</span><span class="se">\n</span><span class="si">{</span><span class="n">tmp</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+
+
+
+<div class="viewcode-block" id="append_alias">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.gdx.html#gdxpds.append_alias">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">append_alias</span><span class="p">(</span>
+    <span class="n">gdx_file</span><span class="p">:</span> <span class="n">GdxFile</span><span class="p">,</span>
+    <span class="n">alias_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">parent</span><span class="p">:</span> <span class="n">GdxSymbol</span> <span class="o">|</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GdxSymbol</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convenience function that appends ``alias_name`` to ``gdx_file`` as a</span>
+<span class="sd">    :class:`GamsDataType.Alias &lt;GamsDataType&gt;` of ``parent``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gdx_file : :class:`GdxFile`</span>
+<span class="sd">        file to which the new alias is to be added</span>
+<span class="sd">    alias_name : str</span>
+<span class="sd">        name of the alias to be added</span>
+<span class="sd">    parent : :class:`GdxSymbol` or str</span>
+<span class="sd">        the parent symbol the alias refers to, as a :class:`GdxSymbol` reference or</span>
+<span class="sd">        the name of a symbol already in ``gdx_file``. The parent is typically a Set</span>
+<span class="sd">        but an Alias is also accepted (GDX supports chained aliases; the gdxcc</span>
+<span class="sd">        engine preserves the chain on write, gams_transfer flattens it to the</span>
+<span class="sd">        root Set). An unknown name, a non-:class:`GdxSymbol` parent, or a parent</span>
+<span class="sd">        that is neither a Set nor an Alias raises :class:`DomainError` (an alias</span>
+<span class="sd">        has no relaxed fallback).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    :class:`GdxSymbol`</span>
+<span class="sd">        The freshly appended alias symbol.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">alias_name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;append_alias: alias_name must be a str; got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">alias_name</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">parent</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gdx_file</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;append_alias: parent </span><span class="si">{</span><span class="n">parent</span><span class="si">!r}</span><span class="s2"> is not in the file&quot;</span><span class="p">)</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">gdx_file</span><span class="p">[</span><span class="n">parent</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">GdxSymbol</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;append_alias: parent must be a GdxSymbol or a symbol name; &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;got </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+    <span class="k">if</span> <span class="n">parent</span><span class="o">.</span><span class="n">data_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;append_alias: parent </span><span class="si">{</span><span class="n">parent</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is a </span><span class="si">{</span><span class="n">parent</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">; &quot;</span>
+            <span class="s2">&quot;must be a Set or Alias&quot;</span>
+        <span class="p">)</span>
+    <span class="n">gdx_file</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">GdxSymbol</span><span class="p">(</span><span class="n">alias_name</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">,</span> <span class="n">dims</span><span class="o">=</span><span class="n">parent</span><span class="o">.</span><span class="n">dims</span><span class="p">,</span> <span class="n">alias_of</span><span class="o">=</span><span class="n">parent</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">gdx_file</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 </pre></div>
