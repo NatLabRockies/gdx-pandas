@@ -40,9 +40,7 @@ def main():
         f.universal_set.write()
 
         # Set t = {a, b, c} (registers the UELs).
-        if not gdxcc.gdxDataWriteStrStart(
-            H, "t", "a set", 1, gdxpds.gdx.GamsDataType.Set.value, 0
-        ):
+        if not gdxcc.gdxDataWriteStrStart(H, "t", "a set", 1, gdxpds.gdx.GamsDataType.Set.value, 0):
             raise gdxpds.gdx.GdxError(H, "Could not start writing data for symbol t")
         gdxcc.gdxSymbolSetDomainX(H, 1, ["*"])
         values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
