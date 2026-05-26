@@ -6,13 +6,13 @@ There are two main ways to use gdxpds. The first use case is the one that was in
 
 ## Direct Conversion
 
-The two primary points of reference for the direct conversion utilities are GDX files on disk and Python dicts of `{symbol_name: pandas.DataFrame}`, where each `pandas.DataFrame` contains data for a single set, parameter, equation, variable, or alias. The shape of the value columns depends on the symbol kind:
+The two primary points of reference for the direct conversion utilities are GDX files on disk and Python dicts of `{symbol_name: pandas.DataFrame}`, where each `pandas.DataFrame` contains data for a single set, parameter, equation, variable, or alias. The shape of the value columns depends on the symbol {py:data}`gdxpds.gdx.GamsDataType`:
 
-- **Sets and Aliases** have a single `Value` column whose entries are the GAMS *element text* — a string, with `""` denoting a member that has no text. Membership is conveyed by **row presence**: every row is a member. On write, the value column can be omitted, given as booleans (any truthy/falsy value means "member, no text"), or given as text strings.
-- **Parameters** have a single `Value` column of `float`s; the GAMS specials `NA`, `UNDEF`, `+Inf` / `-Inf`, and `EPS` map to `numpy.nan`, `None`, `numpy.inf` / `-numpy.inf`, and `numpy.finfo(float).eps` (see [Special values](#special-values)).
+- **Sets and Aliases** have a single `Value` column whose entries are the GAMS *element text* string, with `""` denoting a member that has no text. Membership is conveyed by **row presence**: every row is a member. On write, the value column can be omitted, given as booleans (any value whether `True` or `False` means "member, no text"), or given as text strings.
+- **Parameters** have a single `Value` column of type `float`; the GAMS specials `NA`, `UNDEF`, `+Inf` / `-Inf`, and `EPS` map to `numpy.nan`, `None`, `numpy.inf` / `-numpy.inf`, and `numpy.finfo(float).eps` (see [Special values](#special-values)).
 - **Variables and Equations** have five value columns — level, marginal, lower, upper, scale — as enumerated in {py:class}`gdxpds.gdx.GamsValueType`; see {py:data}`gdxpds.gdx.GAMS_VALUE_COLS_MAP`.
 
-Aliases reuse their parent's records (read like the Set they alias) and their parent relationship is carried separately; see [Aliases](#aliases) and the `aliases=` example below.
+Aliases reuse their parent's records (on read they look like the Set they alias) and their parent relationship is carried separately; see [Aliases](#aliases) and the `aliases=` example below.
 
 The basic interface to convert from GDX to DataFrames is {py:func}`gdxpds.to_dataframes`:
 
@@ -55,7 +55,7 @@ import pandas as pd
 
 dataframes = {
     'a':     pd.DataFrame([['a1', True], ['a2', True], ['a3', True]], columns=['a', 'Value']),
-    'sub_a': pd.DataFrame([['a1', True], ['a3', True]],                columns=['a', 'Value']),
+    'sub_a': pd.DataFrame([['a1', True], ['a3', True]],               columns=['a', 'Value']),
 }
 gdxpds.to_gdx(dataframes, 'data.gdx', domains={'sub_a': ['a']})
 
@@ -67,7 +67,7 @@ print(gdxpds.get_subset_relationships('data.gdx'))
 # {'a': ['a'], 'sub_a': ['a']}
 ```
 
-The `domains=` keys are child symbol names; each value is the list of parent Set names (or `None` for the wildcard `'*'`), one entry per dimension. `to_gdx` topologically sorts the input so each parent is written before its children. The Direct Conversion API is **string-based** — parents are named by string. For an object-reference-based API (live links to parent `GdxSymbol`s, useful when mutating or composing files in Python), see [Subset (Domain) Relationships](#subset-domain-relationships) under [Object-Oriented API](#object-oriented-api).
+The `domains=` keys are child symbol names; each value is the list of parent Set names (or `None` for the wildcard `'*'`), one entry per dimension. `to_gdx` topologically sorts the input so each parent is written before its children. The Direct Conversion API is **string-based** — parents are named by string. For an object-reference-based API (live links to parent `GdxSymbol`'s, useful when mutating or composing files in Python), see [Subset (Domain) Relationships](#subset-domain-relationships) under [Object-Oriented API](#object-oriented-api).
 
 Aliases work the same way: pass an `aliases=` mapping (alias name → parent Set name) to {py:func}`gdxpds.to_gdx`, and read the relationships back with {py:func}`gdxpds.get_aliases`:
 
@@ -91,7 +91,7 @@ csv_to_gdx --help
 
 ## Object-Oriented API
 
-The basic functionalities described above can also be achieved with direct use of the {py:class}`gdxpds.gdx.GdxFile` / {py:class}`gdxpds.gdx.GdxSymbol` object model in {py:mod}`gdxpds.gdx`. To duplicate the GDX read functionality shown above one would write:
+The functionality described above can also be acccessed with direct use of the {py:class}`gdxpds.gdx.GdxFile` / {py:class}`gdxpds.gdx.GdxSymbol` object model in {py:mod}`gdxpds.gdx`. To duplicate the GDX read functionality shown above one would write:
 
 ```python
 import gdxpds
@@ -123,7 +123,7 @@ with gdxpds.gdx.GdxFile() as f:  # lazy_load defaults to True
     f['param_12'].unload()
 ```
 
-And enables more transparent creation of new GDX files. The example below also exercises the v3.0.0 first-class features — element text on Sets, a subset (strict domain), an alias, and GDX `UNDEF` (`None`) — to show how they slot into the same flow. Each of these is documented in its own subsection below.
+and enables more transparent creation of new GDX files. The example below exercises a number of features, including some that are documented in more detail in the subsections that follow.
 
 ```python
 from itertools import product
@@ -194,14 +194,14 @@ with GdxFile() as gdx:
 
 The key classes and functions for the object-oriented API are:
 
-- {py:class}`gdxpds.gdx.GdxFile`
-- {py:class}`gdxpds.gdx.GdxSymbol`
-- {py:class}`gdxpds.gdx.GamsDataType`, {py:class}`gdxpds.gdx.GamsDomainType`, {py:class}`gdxpds.gdx.GamsVariableType`, {py:class}`gdxpds.gdx.GamsEquationType`
-- {py:func}`gdxpds.gdx.append_set`
-- {py:func}`gdxpds.gdx.append_alias`
+- {py:class}`gdxpds.gdx.GdxFile`, {py:class}`gdxpds.gdx.GdxSymbol`, {py:class}`gdxpds.gdx.GamsDomainType`
+- {py:class}`gdxpds.gdx.GamsDataType`, {py:class}`gdxpds.gdx.GamsVariableType`, {py:class}`gdxpds.gdx.GamsEquationType`
+- {py:func}`gdxpds.gdx.append_set`, {py:func}`gdxpds.gdx.append_alias`
 - {py:func}`gdxpds.gdx.append_parameter`
 
+:::{note}
 Starting with Version 1.1.0, gdxpds does not allow the *number* of dimensions on a `GdxSymbol` to change once it has been firmly established (as evidenced by `GdxSymbol.num_dims > 0` or `GdxSymbol.num_records > 0`). The dimension *names* (`GdxSymbol.dims`) may still be reassigned in place — the DataFrame columns are renamed automatically — and `GdxSymbol.dataframe` may be set using only the dimensional columns, with `GdxSymbol` filling in the remaining columns with default values.
+:::
 
 ### Set details
 

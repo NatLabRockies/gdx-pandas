@@ -4,7 +4,7 @@ engines across the in-tree fixtures (sub-3 KB up to ~1.9 MB).
 These are not pass/fail performance gates -- timings are machine-dependent. Each
 test records its measurements; conftest's ``pytest_terminal_summary`` renders a
 size-sorted table plus a clear-winner / switchover note at the end of the run.
-The only assertion is that both engines actually ran (a engine that errors on a
+The only assertion is that both engines actually ran (an engine that errors on a
 fixture fails here rather than silently dropping out of the comparison).
 
 Skipped when gams.transfer is unavailable.

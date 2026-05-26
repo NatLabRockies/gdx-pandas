@@ -172,8 +172,8 @@ def get_data_types(
 
     Returns
     -------
-    dict of str to :py:class:GamsDataType`
-        Map of symbol names to the corresponding :py:class:GamsDataType`
+    dict of str to :py:class:`GamsDataType`
+        Map of symbol names to the corresponding :py:class:`GamsDataType`
     """
     return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, engine=engine).data_types
 

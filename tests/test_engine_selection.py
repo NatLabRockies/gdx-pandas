@@ -127,7 +127,7 @@ def test_to_dataframes_symbols_empty_and_unknown(data_dir):
         to_dataframes(gdx_file, symbols=["definitely_not_a_symbol"])
 
 
-# Every read entry point that gained a engine= kwarg, exercised so a bogus
+# Every read entry point that gained an engine= kwarg, exercised so a bogus
 # value reaches resolve_engine (proving the kwarg threads all the way through).
 @pytest.mark.parametrize(
     "call",
