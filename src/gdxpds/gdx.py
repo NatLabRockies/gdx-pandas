@@ -727,7 +727,14 @@ class GdxSymbol:
 
     def clone(self) -> GdxSymbol:
         """
-        Create a copy of this :py:class:`GdxSymbol`
+        Create a copy of this :py:class:`GdxSymbol`.
+
+        The clone is independent of any :py:class:`GdxFile` -- its ``file`` is
+        ``None`` and it has no ``index``. Append it to a destination
+        :py:class:`GdxFile` (e.g. via ``dest.append(cloned)``) before writing;
+        for an Alias, also call ``resolve_alias_of()`` so the parent name is
+        rebound to a same-file ref. :py:meth:`GdxFile.clone` does this wiring
+        for every symbol it copies.
 
         Returns
         -------

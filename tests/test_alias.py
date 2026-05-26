@@ -89,16 +89,16 @@ def test_universe_alias_reads_and_roundtrips(data_dir, tmp_path):
     # resolved to the file's universal_set, and round-trips on both engines.
     src = os.path.join(data_dir, "universe_alias_fixture.gdx")
     engines = ["gdxcc"] + (["gams_transfer"] if gdxpds.HAVE_GAMS_TRANSFER else [])
-    for be in engines:
-        with GdxFile(lazy_load=False, engine=be) as f:
+    for engine in engines:
+        with GdxFile(lazy_load=False, engine=engine) as f:
             f.read(src)
             u = f["u"]
             assert u.data_type == GamsDataType.Alias
             assert u.alias_of is f.universal_set
             assert u.alias_of.name == "*"
-            out = str(tmp_path / f"rt_{be}.gdx")
+            out = str(tmp_path / f"rt_{engine}.gdx")
             f.clone().write(out)
-        with GdxFile(lazy_load=False, engine=be) as g:
+        with GdxFile(lazy_load=False, engine=engine) as g:
             g.read(out)
             assert g["u"].data_type == GamsDataType.Alias
             assert g["u"].alias_of is g.universal_set
@@ -199,14 +199,14 @@ def test_alias_of_alias_roundtrip_both_engines(run_dir):
     # End-to-end behavior: both engines accept alias-of-alias on write and read
     # it back resolved to a same-file symbol. They differ in what reaches disk.
     engines = ["gdxcc"] + (["gams_transfer"] if gdxpds.HAVE_GAMS_TRANSFER else [])
-    for be in engines:
-        out = os.path.join(run_dir, f"aoa_{be}.gdx")
-        with GdxFile(engine=be) as f:
+    for engine in engines:
+        out = os.path.join(run_dir, f"aoa_{engine}.gdx")
+        with GdxFile(engine=engine) as f:
             t = append_set(f, "t", pd.DataFrame({"i": ["a", "b", "c"]}))
             at = append_alias(f, "at", t)
             append_alias(f, "aat", at)  # alias of an alias
             f.write(out)
-        with GdxFile(lazy_load=False, engine=be) as g:
+        with GdxFile(lazy_load=False, engine=engine) as g:
             g.read(out)
             assert g["aat"].data_type == GamsDataType.Alias
             assert g["aat"].alias_of is not None
@@ -214,7 +214,7 @@ def test_alias_of_alias_roundtrip_both_engines(run_dir):
             # to the root Set (aat -> t). Either way `alias_of` resolves to a
             # same-file ref. This pair of asserts locks in the asymmetry so a
             # engine-level behavior change is caught instead of silently absorbed.
-            expected_parent = "at" if be == "gdxcc" else "t"
+            expected_parent = "at" if engine == "gdxcc" else "t"
             assert g["aat"].alias_of_name == expected_parent
             assert g["aat"].alias_of is g[expected_parent]
 
@@ -247,14 +247,14 @@ def test_alias_chain_disk_shape_differs_between_engines(run_dir):
                     return parent_name
         raise AssertionError("aat not found in GDX")
 
-    for be, expected in [("gdxcc", "at"), ("gams_transfer", "t")]:
-        out = os.path.join(run_dir, f"aoa_disk_{be}.gdx")
-        with GdxFile(engine=be) as f:
+    for engine, expected in [("gdxcc", "at"), ("gams_transfer", "t")]:
+        out = os.path.join(run_dir, f"aoa_disk_{engine}.gdx")
+        with GdxFile(engine=engine) as f:
             t = append_set(f, "t", pd.DataFrame({"i": ["a", "b", "c"]}))
             at = append_alias(f, "at", t)
             append_alias(f, "aat", at)
             f.write(out)
         assert aat_parent_name_on_disk(out) == expected, (
-            f"engine {be!r}: expected on-disk `aat` parent={expected!r}, "
+            f"engine {engine!r}: expected on-disk `aat` parent={expected!r}, "
             f"got {aat_parent_name_on_disk(out)!r}"
         )
