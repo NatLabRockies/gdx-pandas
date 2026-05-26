@@ -168,7 +168,7 @@ def test_set_element_text_to_dataframes(data_dir):
 def test_alias_reads_like_its_set(data_dir):
     """An Alias reads like the Set it aliases -- the same elements and element
     text -- while keeping its Alias data type and recording its parent in
-    aliased_with. Cross-engine equality is covered by test_engine_parity. See
+    alias_of. Cross-engine equality is covered by test_engine_parity. See
     dev/build_alias_fixture.py."""
     gdx_file = os.path.join(data_dir, "alias_fixture.gdx")
     assert get_data_types(gdx_file)["at"] == gdxpds.gdx.GamsDataType.Alias
@@ -180,7 +180,7 @@ def test_alias_reads_like_its_set(data_dir):
     assert at["*"].tolist() == t["*"].tolist()
     assert at["Value"].tolist() == t["Value"].tolist()
 
-    # aliased_with resolves to the parent Set GdxSymbol.
+    # alias_of resolves to the parent Set GdxSymbol.
     with gdxpds.gdx.GdxFile(lazy_load=False) as f:
         f.read(gdx_file)
-        assert f["at"].aliased_with is f["t"]
+        assert f["at"].alias_of is f["t"]

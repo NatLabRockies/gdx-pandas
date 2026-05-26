@@ -293,7 +293,7 @@ If you prefer the simpler API that works with dicts of DataFrames, see [the `dom
 GAMS lets one Set be an *alias* of another — `alias(t, at)` makes `at` another name for set `t`. `gdxpds` surfaces the relationship on `GdxSymbol`:
 
 - `GdxSymbol.data_type` is {py:attr}`gdxpds.gdx.GamsDataType.Alias`, and the symbol reads like the Set it aliases (same elements, same element text).
-- `GdxSymbol.aliased_with` is the parent Set as a `GdxSymbol` reference (or `None` for non-aliases). Unlike a relaxed domain, an alias has no fallback: its parent must exist in the file when it is written, or the write raises {py:class}`gdxpds.DomainError`.
+- `GdxSymbol.alias_of` is the parent Set as a `GdxSymbol` reference (or `None` for non-aliases). Unlike a relaxed domain, an alias has no fallback: its parent must exist in the file when it is written, or the write raises {py:class}`gdxpds.DomainError`.
 
 **Viewing on read:**
 
@@ -303,10 +303,10 @@ with gdxpds.gdx.GdxFile(lazy_load=False) as gdx:
     gdx.read('data.gdx')
     at = gdx['at']
     print(at.data_type)                 # GamsDataType.Alias
-    print(at.aliased_with is gdx['t'])  # True — points at the parent Set
+    print(at.alias_of is gdx['t'])  # True — points at the parent Set
 ```
 
-**Setting on write.** Build the parent Set, then the alias — via {py:func}`gdxpds.gdx.append_alias` or a `GdxSymbol` with `aliased_with`:
+**Setting on write.** Build the parent Set, then the alias — via {py:func}`gdxpds.gdx.append_alias` or a `GdxSymbol` with `alias_of`:
 
 ```python
 import gdxpds.gdx
@@ -327,9 +327,9 @@ print(gdxpds.get_aliases('data.gdx'))   # {'at': 't'}
 ```
 
 :::{note}
-Aliases of a *named Set* (the common case) are fully supported on both engines. A **universe alias** — an alias of the universe set `*` (`aliased_with` resolves to the file's `universal_set`) — reads without error and round-trips within a single engine, but the engines disagree on its membership (`gdxcc` includes the `*` element, `gams.transfer` does not), so it is not cross-engine identical.
+Aliases of a *named Set* (the common case) are fully supported on both engines. A **universe alias** — an alias of the universe set `*` (`alias_of` resolves to the file's `universal_set`) — reads without error and round-trips within a single engine, but the engines disagree on its membership (`gdxcc` includes the `*` element, `gams.transfer` does not), so it is not cross-engine identical.
 
-**Chained aliases (alias of an alias)** are also supported: GDX itself permits a chain (`aat -> at -> t`), and both engines accept it on write and resolve `aliased_with` to a same-file symbol on read. The two engines differ on what reaches disk: the `gdxcc` engine preserves the chain (`aat -> at`), while `gams_transfer` flattens to the root (`aat -> t`). Either form reads back identically through `gdxpds`.
+**Chained aliases (alias of an alias)** are also supported: GDX itself permits a chain (`aat -> at -> t`), and both engines accept it on write and resolve `alias_of` to a same-file symbol on read. The two engines differ on what reaches disk: the `gdxcc` engine preserves the chain (`aat -> at`), while `gams_transfer` flattens to the root (`aat -> t`). Either form reads back identically through `gdxpds`.
 :::
 
 ### Parameter, Variable, and Equation details

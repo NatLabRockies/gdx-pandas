@@ -369,8 +369,8 @@ class GdxFile(MutableSequence, NeedsGamsDir):
                         continue
                     ps.add(d.name)
             # An alias must be written after the Set it aliases.
-            if s.aliased_with_name is not None and s.aliased_with_name != s.name:
-                ps.add(s.aliased_with_name)
+            if s.alias_of_name is not None and s.alias_of_name != s.name:
+                ps.add(s.alias_of_name)
             parents_of[s.name] = ps
 
         ordered, cycle = _stable_topological_sort(names, parents_of)
@@ -650,7 +650,7 @@ class GdxSymbol:
         variable_type: GamsVariableType | int | None = None,
         equation_type: GamsEquationType | int | None = None,
         domain: Sequence[GdxSymbol | None] | None = None,
-        aliased_with: GdxSymbol | None = None,
+        alias_of: GdxSymbol | None = None,
     ) -> None:
         """
         In-memory representation of a GAMS GDX Symbol
@@ -681,10 +681,10 @@ class GdxSymbol:
             :c:func:`gdxSymbolSetDomain` writes (subject to the parent existing in the file at
             write time; otherwise the symbol falls back to relaxed). Plain strings are not
             accepted here; use ``dims`` for string-only domains.
-        aliased_with : None or :py:class:`GdxSymbol`
+        alias_of : None or :py:class:`GdxSymbol`
             Only for ``data_type == GamsDataType.Alias``: the parent Set this alias refers to,
             as a :py:class:`GdxSymbol` reference. The parent must exist in the same file at
-            write time (an alias has no relaxed fallback). See :py:attr:`aliased_with`.
+            write time (an alias has no relaxed fallback). See :py:attr:`alias_of`.
         """
         self._name = name
         self.description = description
@@ -698,11 +698,11 @@ class GdxSymbol:
         self._dims = None
         self._domain = None
         self._strict_on_disk = False
-        # Alias target: the parent Set, as a GdxSymbol ref (_aliased_with) plus its
-        # name (_aliased_with_name), the latter surviving when the ref can't yet be
+        # Alias target: the parent Set, as a GdxSymbol ref (_alias_of) plus its
+        # name (_alias_of_name), the latter surviving when the ref can't yet be
         # resolved (forward reference) or after a clone into another file.
-        self._aliased_with = None
-        self._aliased_with_name = None
+        self._alias_of = None
+        self._alias_of_name = None
         # Record count per GAMS; meaningful only before load (afterwards
         # num_records uses the dataframe). The engine's open_read overwrites
         # this for symbols read from a file.
@@ -710,8 +710,8 @@ class GdxSymbol:
         self.dims = dims
         if domain is not None:
             self.domain = domain
-        if aliased_with is not None:
-            self.aliased_with = aliased_with
+        if alias_of is not None:
+            self.alias_of = alias_of
         assert self._dataframe is not None
         self._file = file
         self._index = index
@@ -741,9 +741,9 @@ class GdxSymbol:
         # clone has its own slot list pointing at the same parent GdxSymbols. Write-time name
         # lookup resolves against whatever file the clone ends up in.
         #
-        # For aliases, intentionally do NOT carry the live `aliased_with` GdxSymbol ref --
+        # For aliases, intentionally do NOT carry the live `alias_of` GdxSymbol ref --
         # it would still point at the *original* file's parent, which is wrong once the
-        # clone is inserted elsewhere. Preserve only `aliased_with_name`; the destination
+        # clone is inserted elsewhere. Preserve only `alias_of_name`; the destination
         # file resolves it against its own symbols at write time.
         result = GdxSymbol(
             self.name,
@@ -754,7 +754,7 @@ class GdxSymbol:
             equation_type=self.equation_type,
             domain=self._domain,
         )
-        result._aliased_with_name = self.aliased_with_name
+        result._alias_of_name = self.alias_of_name
         result.dataframe = copy.deepcopy(self.dataframe)
         assert result.loaded
         return result
@@ -1183,7 +1183,7 @@ class GdxSymbol:
         return True
 
     @property
-    def aliased_with(self):
+    def alias_of(self):
         """
         For an :py:attr:`GamsDataType.Alias`, the parent symbol it refers to, as a
         :py:class:`GdxSymbol` reference; ``None`` for any other symbol type and for
@@ -1201,45 +1201,45 @@ class GdxSymbol:
         -------
         None or :py:class:`GdxSymbol`
         """
-        return self._aliased_with
+        return self._alias_of
 
-    @aliased_with.setter
-    def aliased_with(self, value):
+    @alias_of.setter
+    def alias_of(self, value):
         if value is None:
-            self._aliased_with = None
-            self._aliased_with_name = None
+            self._alias_of = None
+            self._alias_of_name = None
             return
         if self.data_type != GamsDataType.Alias:
             raise DomainError(
-                f"aliased_with may only be set on an Alias symbol; "
+                f"alias_of may only be set on an Alias symbol; "
                 f"{self.name!r} is a {self.data_type.name}."
             )
         if not isinstance(value, GdxSymbol):
             raise DomainError(
-                "aliased_with must be a GdxSymbol reference (the parent Set) or None. "
+                "alias_of must be a GdxSymbol reference (the parent Set) or None. "
                 f"Was passed {value!r} of type {type(value)}."
             )
         if value.data_type not in (GamsDataType.Set, GamsDataType.Alias):
             raise DomainError(
-                f"aliased_with parent must be a Set (or another Alias); "
+                f"alias_of parent must be a Set (or another Alias); "
                 f"{value.name!r} is a {value.data_type.name}."
             )
-        self._aliased_with = value
-        self._aliased_with_name = value.name
+        self._alias_of = value
+        self._alias_of_name = value.name
 
     @property
-    def aliased_with_name(self):
+    def alias_of_name(self):
         """Name of the parent Set this alias refers to (or ``None``). Survives when
-        the :py:attr:`aliased_with` reference is not yet resolved or after a clone
+        the :py:attr:`alias_of` reference is not yet resolved or after a clone
         into another file; the write path resolves the parent by this name."""
-        if self._aliased_with is not None:
-            return self._aliased_with.name
-        return self._aliased_with_name
+        if self._alias_of is not None:
+            return self._alias_of.name
+        return self._alias_of_name
 
-    def resolve_aliased_with(self):
+    def resolve_alias_of(self):
         """
-        Populate :py:attr:`aliased_with` with a live :py:class:`GdxSymbol` reference by
-        looking :py:attr:`aliased_with_name` up in ``self.file``. Idempotent; no-ops when
+        Populate :py:attr:`alias_of` with a live :py:class:`GdxSymbol` reference by
+        looking :py:attr:`alias_of_name` up in ``self.file``. Idempotent; no-ops when
         already resolved, when there is no file, or when no parent name is recorded.
 
         Mirrors :py:meth:`resolve_domain` for the forward-reference / post-read case
@@ -1249,21 +1249,21 @@ class GdxSymbol:
         Returns
         -------
         bool
-            True if ``aliased_with`` was populated as a result of this call.
+            True if ``alias_of`` was populated as a result of this call.
         """
-        if self._aliased_with is not None:
+        if self._alias_of is not None:
             return False
-        if self.file is None or self._aliased_with_name is None:
+        if self.file is None or self._alias_of_name is None:
             return False
-        name = self._aliased_with_name
+        name = self._alias_of_name
         if name in self.file._symbols:
-            self._aliased_with = self.file._symbols[name]
+            self._alias_of = self.file._symbols[name]
             return True
         if self.file.universal_set is not None and name == self.file.universal_set.name:
-            self._aliased_with = self.file.universal_set
+            self._alias_of = self.file.universal_set
             return True
         logger.warning(
-            "resolve_aliased_with: alias %r references parent %r which is not in "
+            "resolve_alias_of: alias %r references parent %r which is not in "
             "this file; leaving it unresolved.",
             self.name,
             name,
@@ -1660,7 +1660,5 @@ def append_alias(
             f"append_alias: parent {parent.name!r} is a {parent.data_type.name}; "
             "must be a Set or Alias"
         )
-    gdx_file.append(
-        GdxSymbol(alias_name, GamsDataType.Alias, dims=parent.dims, aliased_with=parent)
-    )
+    gdx_file.append(GdxSymbol(alias_name, GamsDataType.Alias, dims=parent.dims, alias_of=parent))
     return gdx_file[-1]

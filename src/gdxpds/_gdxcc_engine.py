@@ -114,7 +114,7 @@ class GdxccEngine(GdxEngine):
         # No-op for well-formed files -- each in-line attempt already succeeded.
         for symbol in gdx_file:
             symbol.resolve_domain()
-            symbol.resolve_aliased_with()
+            symbol.resolve_alias_of()
 
     def _make_symbol(self, gdx_file: GdxFile, name: str, data_type, dims, index: int) -> GdxSymbol:
         """Construct a GdxSymbol and populate its extended gdxcc metadata."""
@@ -134,8 +134,8 @@ class GdxccEngine(GdxEngine):
             # resolve it to a same-file ref (open_read self-heals forward refs).
             pret, parent_name, _pdims, _pdtype = gdxcc.gdxSymbolInfo(H, userinfo)
             if pret == 1:
-                symbol._aliased_with_name = parent_name
-                symbol.resolve_aliased_with()
+                symbol._alias_of_name = parent_name
+                symbol.resolve_alias_of()
         symbol.description = description
         if index > 0:
             ret, gdx_domain = gdxcc.gdxSymbolGetDomainX(H, index)
@@ -264,10 +264,15 @@ class GdxccEngine(GdxEngine):
         if symbol.data_type == GamsDataType.Alias:
             # An alias carries no records of its own; it is registered against its
             # parent Set, which must already be written (no relaxed fallback).
-            parent = symbol.aliased_with_name
+            # gdxAddAlias accepts the universe set "*" as a parent without any
+            # special-cased call, so a universe alias goes through the same path
+            # as a named-Set alias (cf. the gt.Alias / gt.UniverseAlias dispatch
+            # in the gams.transfer engine, which is needed because that library
+            # has separate types for the two cases).
+            parent = symbol.alias_of_name
             if parent is None:
                 raise DomainError(
-                    f"Cannot write alias {symbol.name!r}: no parent Set (aliased_with) is set."
+                    f"Cannot write alias {symbol.name!r}: no parent Set (alias_of) is set."
                 )
             if not gdxcc.gdxAddAlias(H, parent, symbol.name):
                 raise GdxError(

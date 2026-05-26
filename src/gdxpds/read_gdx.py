@@ -258,8 +258,8 @@ def get_aliases(
     gdx = GdxFile(gams_dir=gams_dir, lazy_load=True, engine=engine)
     gdx.read(gdx_file)
     for symbol in gdx:
-        if symbol.data_type == GamsDataType.Alias and symbol.aliased_with_name is not None:
-            result[symbol.name] = symbol.aliased_with_name
+        if symbol.data_type == GamsDataType.Alias and symbol.alias_of_name is not None:
+            result[symbol.name] = symbol.alias_of_name
     return result
 
 

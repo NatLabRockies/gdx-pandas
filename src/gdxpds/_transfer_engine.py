@@ -209,10 +209,10 @@ class TransferEngine(GdxEngine):
         if data_type == GamsDataType.Alias:
             # An alias carries no records of its own; it points at its parent Set,
             # which must already be in the container (no relaxed fallback).
-            parent = symbol.aliased_with_name
+            parent = symbol.alias_of_name
             if parent is None:
                 raise DomainError(
-                    f"Cannot write alias {symbol.name!r}: no parent Set (aliased_with) is set."
+                    f"Cannot write alias {symbol.name!r}: no parent Set (alias_of) is set."
                 )
             universe = (
                 symbol.file.universal_set.name
@@ -302,7 +302,7 @@ class TransferEngine(GdxEngine):
         # the dependent symbol).
         for symbol in gdx_file:
             symbol.resolve_domain()
-            symbol.resolve_aliased_with()
+            symbol.resolve_alias_of()
 
     def _make_symbol(self, gdx_file: GdxFile, name: str, gt_sym, index: int) -> GdxSymbol:
         data_type = _data_type_of(gt_sym)
@@ -319,8 +319,8 @@ class TransferEngine(GdxEngine):
             parent = getattr(gt_sym, "alias_with", None)
             parent_name = parent if isinstance(parent, str) else getattr(parent, "name", None)
             if parent_name is not None:
-                symbol._aliased_with_name = parent_name
-                symbol.resolve_aliased_with()
+                symbol._alias_of_name = parent_name
+                symbol.resolve_alias_of()
         # A non-wildcard domain entry (a Set reference) means a strict/regular
         # domain; mark it and resolve names to same-file GdxSymbol refs.
         if any(not isinstance(d, str) for d in gt_sym.domain):
@@ -345,7 +345,7 @@ class TransferEngine(GdxEngine):
             read_names = {s.name for s in targets}
             universe = gdx_file.universal_set.name if gdx_file.universal_set is not None else "*"
             for s in targets:
-                parent = s.aliased_with_name
+                parent = s.alias_of_name
                 if s.data_type == GamsDataType.Alias and parent and parent != universe:
                     read_names.add(parent)
             container = self._read_records(gdx_file, list(read_names)) if targets else None

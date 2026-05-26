@@ -1,4 +1,4 @@
-"""Alias data-model and write-API behavior: the aliased_with reference, the
+"""Alias data-model and write-API behavior: the alias_of reference, the
 append_alias / to_gdx(aliases=) builders, and the no-relaxed-fallback rule that
 an unknown or non-Set parent raises DomainError."""
 
@@ -18,16 +18,16 @@ from gdxpds.gdx import (
 )
 
 
-def test_aliased_with_setter_rejects_string():
+def test_alias_of_setter_rejects_string():
     # Mirrors domain.setter: a parent must be a GdxSymbol reference, not a name.
     with pytest.raises(DomainError):
-        GdxSymbol("at", GamsDataType.Alias, aliased_with="t")
+        GdxSymbol("at", GamsDataType.Alias, alias_of="t")
 
 
-def test_non_alias_has_no_aliased_with():
+def test_non_alias_has_no_alias_of():
     s = GdxSymbol("s", GamsDataType.Set, dims=["i"])
-    assert s.aliased_with is None
-    assert s.aliased_with_name is None
+    assert s.alias_of is None
+    assert s.alias_of_name is None
 
 
 def test_append_alias_builds_alias(run_dir):
@@ -36,13 +36,13 @@ def test_append_alias_builds_alias(run_dir):
         parent = append_set(gdx, "t", pd.DataFrame({"i": ["a", "b", "c"]}))
         at = append_alias(gdx, "at", parent)
         assert at.data_type == GamsDataType.Alias
-        assert at.aliased_with is parent
+        assert at.alias_of is parent
         gdx.write(out)
 
     with GdxFile(lazy_load=False) as gdx:
         gdx.read(out)
         assert gdx["at"].data_type == GamsDataType.Alias
-        assert gdx["at"].aliased_with is gdx["t"]
+        assert gdx["at"].alias_of is gdx["t"]
 
 
 def test_append_alias_by_name(run_dir):
@@ -50,7 +50,7 @@ def test_append_alias_by_name(run_dir):
     with GdxFile() as gdx:
         append_set(gdx, "t", pd.DataFrame({"i": ["a", "b"]}))
         at = append_alias(gdx, "at", "t")  # parent given by name
-        assert at.aliased_with is gdx["t"]
+        assert at.alias_of is gdx["t"]
         gdx.write(out)
 
 
@@ -85,7 +85,7 @@ def test_to_gdx_aliases_non_set_parent_raises():
 
 
 def test_universe_alias_reads_and_roundtrips(data_dir, tmp_path):
-    # A universe alias (alias of '*', not a named Set) reads with aliased_with
+    # A universe alias (alias of '*', not a named Set) reads with alias_of
     # resolved to the file's universal_set, and round-trips on both engines.
     src = os.path.join(data_dir, "universe_alias_fixture.gdx")
     engines = ["gdxcc"] + (["gams_transfer"] if gdxpds.HAVE_GAMS_TRANSFER else [])
@@ -94,14 +94,14 @@ def test_universe_alias_reads_and_roundtrips(data_dir, tmp_path):
             f.read(src)
             u = f["u"]
             assert u.data_type == GamsDataType.Alias
-            assert u.aliased_with is f.universal_set
-            assert u.aliased_with.name == "*"
+            assert u.alias_of is f.universal_set
+            assert u.alias_of.name == "*"
             out = str(tmp_path / f"rt_{be}.gdx")
             f.clone().write(out)
         with GdxFile(lazy_load=False, engine=be) as g:
             g.read(out)
             assert g["u"].data_type == GamsDataType.Alias
-            assert g["u"].aliased_with is g.universal_set
+            assert g["u"].alias_of is g.universal_set
 
 
 def test_to_gdx_aliases_name_collision_raises():
@@ -141,30 +141,30 @@ def test_get_aliases_empty_when_no_aliases(run_dir):
     assert gdxpds.get_aliases(out) == {}
 
 
-def test_aliased_with_setter_rejects_on_non_alias_symbol():
-    # Fail fast on the data model: aliased_with only makes sense on an Alias.
+def test_alias_of_setter_rejects_on_non_alias_symbol():
+    # Fail fast on the data model: alias_of only makes sense on an Alias.
     s = GdxSymbol("s", GamsDataType.Set, dims=["i"])
     parent = GdxSymbol("t", GamsDataType.Set, dims=["i"])
     with pytest.raises(DomainError):
-        s.aliased_with = parent
+        s.alias_of = parent
 
 
-def test_aliased_with_setter_rejects_non_set_parent():
+def test_alias_of_setter_rejects_non_set_parent():
     # Fail fast on the data model: parent must be a Set or another Alias.
     a = GdxSymbol("at", GamsDataType.Alias, dims=["i"])
     p = GdxSymbol("p", GamsDataType.Parameter, dims=["i"])
     with pytest.raises(DomainError):
-        a.aliased_with = p
+        a.alias_of = p
 
 
-def test_aliased_with_setter_accepts_alias_parent():
+def test_alias_of_setter_accepts_alias_parent():
     # Chained aliases (alias of an alias) are allowed by both engines; the gdxcc
     # engine preserves the chain on write, gams_transfer flattens it to the root.
     parent_set = GdxSymbol("t", GamsDataType.Set, dims=["i"])
-    a1 = GdxSymbol("at", GamsDataType.Alias, dims=["i"], aliased_with=parent_set)
-    a2 = GdxSymbol("aat", GamsDataType.Alias, dims=["i"], aliased_with=a1)
-    assert a2.aliased_with is a1
-    assert a2.aliased_with_name == "at"
+    a1 = GdxSymbol("at", GamsDataType.Alias, dims=["i"], alias_of=parent_set)
+    a2 = GdxSymbol("aat", GamsDataType.Alias, dims=["i"], alias_of=a1)
+    assert a2.alias_of is a1
+    assert a2.alias_of_name == "at"
 
 
 def test_to_gdx_aliases_rejects_non_str_key():
@@ -184,14 +184,14 @@ def test_clone_alias_drops_live_parent_ref(run_dir):
         append_alias(src, "at", "t")
         cloned_at = src["at"].clone()
         # The clone retains the parent name but not a live ref to src["t"].
-        assert cloned_at.aliased_with is None
-        assert cloned_at.aliased_with_name == "t"
+        assert cloned_at.alias_of is None
+        assert cloned_at.alias_of_name == "t"
         # And it can be inserted into a fresh file and resolved there.
         with GdxFile() as dest:
             append_set(dest, "t", pd.DataFrame({"i": ["x", "y"]}))
             dest.append(cloned_at)
-            cloned_at.resolve_aliased_with()
-            assert cloned_at.aliased_with is dest["t"]
+            cloned_at.resolve_alias_of()
+            assert cloned_at.alias_of is dest["t"]
             dest.write(out)
 
 
@@ -209,14 +209,14 @@ def test_alias_of_alias_roundtrip_both_engines(run_dir):
         with GdxFile(lazy_load=False, engine=be) as g:
             g.read(out)
             assert g["aat"].data_type == GamsDataType.Alias
-            assert g["aat"].aliased_with is not None
+            assert g["aat"].alias_of is not None
             # gdxcc preserves the chain on disk (aat -> at); gams_transfer flattens
-            # to the root Set (aat -> t). Either way `aliased_with` resolves to a
+            # to the root Set (aat -> t). Either way `alias_of` resolves to a
             # same-file ref. This pair of asserts locks in the asymmetry so a
             # engine-level behavior change is caught instead of silently absorbed.
             expected_parent = "at" if be == "gdxcc" else "t"
-            assert g["aat"].aliased_with_name == expected_parent
-            assert g["aat"].aliased_with is g[expected_parent]
+            assert g["aat"].alias_of_name == expected_parent
+            assert g["aat"].alias_of is g[expected_parent]
 
 
 @pytest.mark.skipif(not gdxpds.HAVE_GAMS_TRANSFER, reason="gams.transfer not available")

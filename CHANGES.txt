@@ -6,7 +6,7 @@ v3.0.0, 05/25/26 -- BREAKING: the default I/O engine is now gams.transfer when i
                     conveyed by row presence. The load_set_text argument is removed: text
                     is always read, and any non-empty text is always written
                     aliases are now fully supported: they read with a populated
-                    GdxSymbol.aliased_with (the parent Set), round-trip through both
+                    GdxSymbol.alias_of (the parent Set), round-trip through both
                     engines, and can be created via to_gdx(aliases={alias: parent}) or
                     gdxpds.gdx.append_alias()
                     BREAKING: GDX UNDEF (Python None) is now preserved on write by both

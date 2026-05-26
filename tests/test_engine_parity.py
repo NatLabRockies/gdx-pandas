@@ -194,7 +194,7 @@ def test_write_parity_set_text(tmp_path):
 @pytest.mark.parametrize("engine", ["gdxcc", "gams_transfer"])
 def test_write_alias_roundtrip(data_dir, tmp_path, engine):
     # Read an alias-bearing GDX and write it back via each engine; the alias's
-    # type, parent (aliased_with), and elements must survive.
+    # type, parent (alias_of), and elements must survive.
     f = GdxFile(lazy_load=False, engine=engine)
     f.read(os.path.join(data_dir, "alias_fixture.gdx"))
     assert any(s.data_type == GamsDataType.Alias for s in f)
@@ -204,7 +204,7 @@ def test_write_alias_roundtrip(data_dir, tmp_path, engine):
         g.read(out)
         at = g["at"]
         assert at.data_type == GamsDataType.Alias
-        assert at.aliased_with is g["t"]
+        assert at.alias_of is g["t"]
         assert at.dataframe.iloc[:, 0].tolist() == g["t"].dataframe.iloc[:, 0].tolist()
 
 
@@ -217,4 +217,4 @@ def test_write_alias_via_to_gdx(tmp_path, engine):
     with GdxFile(lazy_load=False, engine=engine) as g:
         g.read(out)
         assert g["at"].data_type == GamsDataType.Alias
-        assert g["at"].aliased_with is g["t"]
+        assert g["at"].alias_of is g["t"]
