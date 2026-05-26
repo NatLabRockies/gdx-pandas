@@ -208,7 +208,10 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         NeedsGamsDir.__init__(self, gams_dir=gams_dir)
         # Build the I/O engine. For the gdxcc engine this binds the GDX library
         # and creates the handle, which the engine owns and frees in close().
-        self._engine_kind = resolve_engine(engine)
+        # `self.gams_dir` (resolved above) is threaded through to engine
+        # selection so the gams.transfer probe runs against the caller's
+        # actual install rather than the cached default-discovered one.
+        self._engine_kind = resolve_engine(engine, gams_dir=self.gams_dir)
         self._engine_impl = make_engine(self._engine_kind, self.gams_dir, self.gams_dir_source)
 
         # Free the engine's native resources exactly once, at the first of:

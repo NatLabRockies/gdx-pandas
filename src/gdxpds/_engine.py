@@ -156,7 +156,10 @@ class GdxEngine(abc.ABC):
         """Release any native resources (run-once, idempotent)."""
 
 
-def resolve_engine(explicit: str | Engine | None) -> Engine:
+def resolve_engine(
+    explicit: str | Engine | None,
+    gams_dir: str | os.PathLike[str] | None = None,
+) -> Engine:
     """Resolve which engine to use.
 
     Order: ``explicit`` value → ``GDXPDS_ENGINE`` env var → :data:`DEFAULT_ENGINE`.
@@ -167,6 +170,12 @@ def resolve_engine(explicit: str | Engine | None) -> Engine:
     back to ``GDXCC`` when gams.transfer is not usable, so gdxcc-only environments
     are unaffected. An *explicit* ``GAMS_TRANSFER`` request that can't be satisfied
     raises instead of falling back.
+
+    ``gams_dir`` is threaded through to :func:`~gdxpds.tools._probe_gams_transfer`,
+    so engine selection reflects the GAMS install the caller will actually use
+    (the default-discovered install can differ from an explicit ``gams_dir=`` on
+    :class:`~gdxpds.gdx.GdxFile` / :func:`~gdxpds.to_gdx` / :func:`~gdxpds.to_dataframes`).
+    With ``gams_dir=None`` the probe uses the cached default-discovered directory.
     """
     # _probe_gams_transfer is the single source of truth for "is gams.transfer
     # usable here?". Resolve `engine` first (default / env / explicit), then call
@@ -186,7 +195,7 @@ def resolve_engine(explicit: str | Engine | None) -> Engine:
     if engine is Engine.GAMS_TRANSFER:
         from gdxpds.tools import _probe_gams_transfer
 
-        if not _probe_gams_transfer():
+        if not _probe_gams_transfer(gams_dir):
             if explicit_request:
                 raise EngineError(
                     "Engine 'gams_transfer' requested but gams.transfer is not "

@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=77", "wheel"]
-build-engine = "setuptools.build_meta"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "gdxpds"

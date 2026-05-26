@@ -44,6 +44,27 @@ VENVS=(
     ".venv-no-gams"
 )
 
+# Map each .venv-gams-* to the GAMS_DIR its activate script will pin (via
+# `module load gams/X.Y.Z`). Discovered by sourcing the activate in a subshell
+# and echoing GAMS_DIR -- this way the cross-GAMS engine-resolution check
+# below (run from inside one venv) gets the *other* venvs' real GAMS dirs.
+declare -A VENV_GAMS_DIR
+discover_venv_gams_dirs () {
+    for v in "${VENVS[@]}"; do
+        if [ "$v" = ".venv-no-gams" ]; then
+            continue
+        fi
+        if [ ! -f "$REPO_ROOT/$v/bin/activate" ]; then
+            continue
+        fi
+        local gd
+        gd=$(bash -c "set +u; source '$REPO_ROOT/$v/bin/activate' >/dev/null 2>&1; printf '%s' \"\${GAMS_DIR:-}\"")
+        if [ -n "$gd" ]; then
+            VENV_GAMS_DIR[$v]="$gd"
+        fi
+    done
+}
+
 run_one_venv () {
     local venv="$1"
     local log="$LOG_DIR/${venv#.}.log"
@@ -92,6 +113,31 @@ run_one_venv () {
     echo "gdxpds test exit: $gdxpds_rc" | tee -a "$log"
     echo | tee -a "$log"
 
+    # Cross-GAMS engine-resolution check: confirm resolve_engine() threads
+    # the explicit `gams_dir` through to the gams.transfer probe, rather than
+    # relying on the cached default-discovered install. Skipped for
+    # .venv-no-gams (no gdxpds module loadable). Other venvs' GAMS dirs (if
+    # discovered) are passed as args; the script also runs a /tmp control to
+    # guarantee detection even when the other dirs happen to agree.
+    local engine_cross_rc=0
+    if [ "$venv" != ".venv-no-gams" ]; then
+        echo "--- engine cross-gams check ---" | tee -a "$log"
+        local other_dirs=()
+        for v in "${VENVS[@]}"; do
+            if [ "$v" = "$venv" ]; then
+                continue
+            fi
+            local gd="${VENV_GAMS_DIR[$v]:-}"
+            if [ -n "$gd" ]; then
+                other_dirs+=("$gd")
+            fi
+        done
+        python "$REPO_ROOT/dev/check_resolve_engine_cross_gams.py" "${other_dirs[@]}" >>"$log" 2>&1
+        engine_cross_rc=$?
+        echo "engine cross-gams check exit: $engine_cross_rc" | tee -a "$log"
+        echo | tee -a "$log"
+    fi
+
     local wheel_rc=0
     if [ "$venv" = ".venv-no-gams" ]; then
         echo "--- pip wheel (no-bindings build smoke) ---" | tee -a "$log"
@@ -115,10 +161,11 @@ run_one_venv () {
             verdict="UNEXPECTED (pytest=$pytest_rc, info=$info_rc, gdxpds=$gdxpds_rc, wheel=$wheel_rc)"
         fi
     else
-        if [ "$pytest_rc" -eq 0 ] && [ "$info_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ]; then
+        if [ "$pytest_rc" -eq 0 ] && [ "$info_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ] \
+           && [ "$engine_cross_rc" -eq 0 ]; then
             verdict="PASS"
         else
-            verdict="FAIL (pytest=$pytest_rc, info=$info_rc, gdxpds=$gdxpds_rc)"
+            verdict="FAIL (pytest=$pytest_rc, info=$info_rc, gdxpds=$gdxpds_rc, engine_cross=$engine_cross_rc)"
         fi
     fi
     echo "verdict: $verdict" | tee -a "$log"
@@ -181,6 +228,9 @@ run_lint () {
 set -u
 LINT_RC=0
 run_lint
+# Discover each venv's GAMS_DIR up front -- used by run_one_venv to pass
+# *other* venvs' GAMS dirs to the cross-GAMS engine-resolution check.
+discover_venv_gams_dirs
 for venv in "${VENVS[@]}"; do
     run_one_venv "$venv"
 done
