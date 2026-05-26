@@ -1,17 +1,17 @@
-"""Generate tests/data/alias_fixture.gdx.
+"""Generate tests/data/universe_alias_fixture.gdx.
 
-A 1D parent Set plus an Alias of it, used by the engine read-parity tests.
-Built with the raw gdxcc bindings (gdxAddAlias) so the read tests stay independent
-of gdxpds's own alias-write path, the same low-level approach used in
-build_set_text_fixture.py. Committed to the repo; only re-run this if the schema changes.
+A 1D Set plus a *universe* alias (an alias of the universe set ``*``, as opposed
+to a named Set). Built with the raw gdxcc bindings (gdxAddAlias against ``"*"``)
+so the read tests stay independent of gdxpds's own write path. Committed to the
+repo; only re-run this if the schema changes.
 
 Usage (from repo root, with the venv active and $env:GAMS_DIR set):
 
-    python dev\\build_alias_fixture.py
+    python dev\\build_universe_alias_fixture.py
 
 Schema:
-  Set   t  : 1D, elements a / b / c
-  Alias at : alias of t
+  Set   t : 1D, elements a / b / c
+  Alias u : alias of the universe set '*'
 """
 
 import os
@@ -24,7 +24,7 @@ except ImportError:
     import gdxcc
 
 OUT_PATH = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "tests", "data", "alias_fixture.gdx")
+    os.path.join(os.path.dirname(__file__), "..", "tests", "data", "universe_alias_fixture.gdx")
 )
 
 ELEMENTS = ["a", "b", "c"]
@@ -32,18 +32,15 @@ ELEMENTS = ["a", "b", "c"]
 
 def main():
     # Pin the gdxcc engine: this script drives raw gdxcc calls through the GDX
-    # handle, which the gams.transfer engine does not have (so GDXPDS_ENGINE
-    # must not be allowed to redirect us).
+    # handle, which the gams.transfer engine does not have.
     with gdxpds.gdx.GdxFile(engine="gdxcc") as f:
         H = f._engine_impl.handle
         if not gdxcc.gdxOpenWrite(H, OUT_PATH, "gdxpds"):
             raise gdxpds.gdx.GdxError(H, f"Could not open {OUT_PATH!r} for writing")
         f.universal_set.write()
 
-        # Parent set t = {a, b, c}.
-        if not gdxcc.gdxDataWriteStrStart(
-            H, "t", "parent set", 1, gdxpds.gdx.GamsDataType.Set.value, 0
-        ):
+        # Set t = {a, b, c} (registers the UELs).
+        if not gdxcc.gdxDataWriteStrStart(H, "t", "a set", 1, gdxpds.gdx.GamsDataType.Set.value, 0):
             raise gdxpds.gdx.GdxError(H, "Could not start writing data for symbol t")
         gdxcc.gdxSymbolSetDomainX(H, 1, ["*"])
         values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
@@ -52,9 +49,9 @@ def main():
             gdxcc.gdxDataWriteStr(H, [elem], values)
         gdxcc.gdxDataWriteDone(H)
 
-        # Alias at -> t.
-        if not gdxcc.gdxAddAlias(H, "t", "at"):
-            raise gdxpds.gdx.GdxError(H, "Could not add alias at -> t")
+        # Universe alias u -> '*'.
+        if not gdxcc.gdxAddAlias(H, "*", "u"):
+            raise gdxpds.gdx.GdxError(H, "Could not add universe alias u -> '*'")
 
         gdxcc.gdxClose(H)
 

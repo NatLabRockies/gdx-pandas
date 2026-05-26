@@ -34,8 +34,8 @@ OUT_PATH = os.path.abspath(
 
 def main():
     # Pin the gdxcc oracle so the committed fixture is written deterministically
-    # regardless of any ambient GDXPDS_BACKEND.
-    with gdxpds.gdx.GdxFile(backend="gdxcc") as gdx:
+    # regardless of any ambient GDXPDS_ENGINE.
+    with gdxpds.gdx.GdxFile(engine="gdxcc") as gdx:
         gdx.append(gdxpds.gdx.GdxSymbol("t", gdxpds.gdx.GamsDataType.Set, dims=["t"]))
         gdx[-1].dataframe = pd.DataFrame(
             [["a", True], ["b", True], ["c", True]], columns=["t", "Value"]

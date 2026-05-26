@@ -21,21 +21,21 @@ def clean_up(request):
     return not request.config.getoption("--no-clean-up")
 
 
-# Rows appended by tests/test_backend_timing.py; rendered once after the run by
+# Rows appended by tests/test_engine_timing.py; rendered once after the run by
 # pytest_terminal_summary below. Each row: dict(fixture, size_kb, op, gdxcc,
 # gams_transfer, ratio) where ratio = gdxcc / gams_transfer (>1 = transfer faster).
-_BACKEND_TIMINGS = []
+_ENGINE_TIMINGS = []
 
 
 @pytest.fixture(scope="session")
-def backend_timings():
-    return _BACKEND_TIMINGS
+def engine_timings():
+    return _ENGINE_TIMINGS
 
 
 def _crossover_note(rows, op):
     """Describe the gdxcc<->gams_transfer winner across sizes for one op.
 
-    Rows are sorted by size; returns "clear winner" text if one backend wins at
+    Rows are sorted by size; returns "clear winner" text if one engine wins at
     every size, else the size band where gams_transfer overtakes gdxcc.
     """
     op_rows = sorted((r for r in rows if r["op"] == op), key=lambda r: r["size_kb"])
@@ -63,11 +63,11 @@ def _crossover_note(rows, op):
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
-    rows = _BACKEND_TIMINGS
+    rows = _ENGINE_TIMINGS
     if not rows:
         return
     tr = terminalreporter
-    tr.write_sep("=", "backend timing (gdxcc vs gams_transfer)")
+    tr.write_sep("=", "engine timing (gdxcc vs gams_transfer)")
     tr.write_line(
         "min seconds over repeated runs; ratio = gdxcc / gams_transfer (>1 = transfer faster)"
     )
@@ -124,7 +124,10 @@ def roundtrip_one_gdx(data_dir, run_dir):
 
     def _roundtrip(filename, dirname):
         gdx_file = os.path.join(data_dir, filename)
-        with gdxpds.gdx.GdxFile() as gdx:
+        # Pin gdxcc for the in-process metadata checks below: only gdxcc reports a
+        # symbol's num_records before its data are loaded. (The CLI conversions
+        # invoked via subprocess still use the default engine.)
+        with gdxpds.gdx.GdxFile(engine="gdxcc") as gdx:
             gdx.read(gdx_file)
             num_records = {}
             total_records = 0
@@ -148,7 +151,7 @@ def roundtrip_one_gdx(data_dir, run_dir):
         roundtripped_gdx = os.path.join(out_dir, "output.gdx")
         subprocess.run(["csv_to_gdx", "-i", txt_file, "-o", roundtripped_gdx], check=True)
 
-        with gdxpds.gdx.GdxFile(lazy_load=True) as gdx:
+        with gdxpds.gdx.GdxFile(lazy_load=True, engine="gdxcc") as gdx:
             gdx.read(roundtripped_gdx)
             for symbol_name, records in num_records.items():
                 if records > 0:

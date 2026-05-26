@@ -121,11 +121,11 @@ def test_gdxfile_cleanup_is_idempotent():
     # no-ops. weakref.finalize.alive is the observable proxy for "not yet freed",
     # so asserting the True -> False transition proves cleanup ran exactly once
     # (a bare "did not crash" check would also pass on a silent double-free).
-    f = gdxpds.gdx.GdxFile()
+    f = gdxpds.gdx.GdxFile(engine="gdxcc")
     assert f._finalizer.alive  # handle live, not yet freed
     f.cleanup()
     assert not f._finalizer.alive  # freed, exactly once
-    assert f.H is None  # handle delegated to the backend; None after close
+    assert f._engine_impl.handle is None  # gdxcc handle freed/cleared on close
     f.cleanup()  # second call: safe no-op
     assert not f._finalizer.alive
     del f
@@ -133,9 +133,19 @@ def test_gdxfile_cleanup_is_idempotent():
 
 
 @requires_gams
+def test_gdxfile_H_removed():
+    # GdxFile.H is gone in v3.0.0; the raw gdxcc handle is reached via the engine.
+    f = gdxpds.gdx.GdxFile(engine="gdxcc")
+    assert not hasattr(f, "H")
+    assert f._engine_impl.handle is not None  # the documented escape hatch
+    f.cleanup()
+    assert f._engine_impl.handle is None
+
+
+@requires_gams
 def test_gdxfile_context_manager_frees_on_exit():
     # The with-block must free the handle exactly once, at __exit__.
-    with gdxpds.gdx.GdxFile() as f:
+    with gdxpds.gdx.GdxFile(engine="gdxcc") as f:
         assert f._finalizer.alive
     assert not f._finalizer.alive
 
@@ -145,7 +155,7 @@ def test_gdxfile_freed_on_garbage_collection():
     # Core of the no-__del__ design: an un-cleaned GdxFile sits in a reference
     # cycle (universal_set._file = self), so it is reclaimed by *cyclic* GC; the
     # weakref.finalize must still fire then and free the handle.
-    f = gdxpds.gdx.GdxFile()
+    f = gdxpds.gdx.GdxFile(engine="gdxcc")
     fin = f._finalizer  # holds a weak ref to f, so it does not keep f alive
     assert fin.alive
     del f
@@ -161,8 +171,8 @@ def test_many_gdxfiles_exit_cleanly():
     code = (
         "import gc, gdxpds.gdx\n"
         "for _ in range(50):\n"
-        "    g = gdxpds.gdx.GdxFile(); g.cleanup()\n"
-        "fs = [gdxpds.gdx.GdxFile() for _ in range(50)]\n"
+        "    g = gdxpds.gdx.GdxFile(engine='gdxcc'); g.cleanup()\n"
+        "fs = [gdxpds.gdx.GdxFile(engine='gdxcc') for _ in range(50)]\n"
         "del fs; gc.collect()\n"
     )
     result = subprocess.run([sys.executable, "-c", code], capture_output=True, text=True)
@@ -175,7 +185,7 @@ def test_invalid_gams_dir_fails_cleanly():
     # real GAMS install. Runs in a fresh interpreter so binding state is pristine.
     env = {**os.environ, "GAMS_DIR": NOT_GAMS_DIR}
     result = subprocess.run(
-        [sys.executable, "-c", "import gdxpds.gdx; gdxpds.gdx.GdxFile()"],
+        [sys.executable, "-c", "import gdxpds.gdx; gdxpds.gdx.GdxFile(engine='gdxcc')"],
         capture_output=True,
         text=True,
         env=env,

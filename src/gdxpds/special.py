@@ -1,10 +1,7 @@
 import logging
 
-try:
-    from gams.core import gdx as gdxcc
-except ImportError:
-    import gdxcc
 import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -38,10 +35,18 @@ def convert_gdx_to_np_svs(df, num_dims):
     # create clean copy of df
     tmp = df.copy()
 
-    # apply the map to the value columns and merge with the dimensional information
-    tmp = (tmp.iloc[:, :num_dims]).merge(
-        tmp.iloc[:, num_dims:].replace(GDX_TO_NP_SVS), left_index=True, right_index=True
-    )
+    # apply the map to the value columns and merge with the dimensional information.
+    # GDX_TO_NP_SVS maps GDX UNDEF (1e300) -> None; pandas 2.x's default `replace`
+    # silently downcasts None back to NaN when the source column is float, which
+    # would collapse the UNDEF/NA distinction. The option-context opts into the
+    # 3.x behavior locally: object dtype is preserved when None remains in the
+    # column, and untouched columns keep their float dtype.
+    if hasattr(pd.options, "future") and hasattr(pd.options.future, "no_silent_downcasting"):
+        with pd.option_context("future.no_silent_downcasting", True):
+            replaced = tmp.iloc[:, num_dims:].replace(GDX_TO_NP_SVS)
+    else:
+        replaced = tmp.iloc[:, num_dims:].replace(GDX_TO_NP_SVS)
+    tmp = (tmp.iloc[:, :num_dims]).merge(replaced, left_index=True, right_index=True)
     return tmp
 
 
@@ -208,6 +213,13 @@ def load_specials(gams_dir_finder):
     Needs to be called after gdxcc is loaded. Populates the module attributes
     SPECIAL_VALUES, GDX_TO_NP_SVS, and NP_TO_GDX_SVS.
 
+    The GDX magic floats for NA/EPS/+Inf/-Inf/UNDEF are properties of the loaded
+    GAMS shared library and exposed only by the SWIG-bound ``gdxcc`` API
+    (``gdxGetSpecialValues``); ``gams.transfer`` does not surface them. The
+    constants populated here are then used by both engines on read/write, so
+    this function always uses the gdxcc bindings regardless of which engine the
+    caller selected for I/O.
+
     Parameters
     ----------
     gams_dir_finder : :class:`gdxpds.tools.GamsDirFinder`
@@ -215,6 +227,13 @@ def load_specials(gams_dir_finder):
     global SPECIAL_VALUES
     global GDX_TO_NP_SVS
     global NP_TO_GDX_SVS
+
+    # Imported lazily so `import gdxpds` succeeds with no binding installed; this
+    # function only runs once a GDX op has located GAMS.
+    try:
+        from gams.core import gdx as gdxcc
+    except ImportError:
+        import gdxcc
 
     from gdxpds.tools import _GdxHandle, _require_gams_installation
 

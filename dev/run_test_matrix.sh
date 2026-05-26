@@ -1,25 +1,33 @@
 #!/usr/bin/env bash
-# Run pytest + `gdxpds test` across the GAMS matrix described in dev/README.md.
+# Run lint + pytest + `gdxpds test` across the GAMS matrix described in dev/README.md.
 #
 # Invoke from an interactive bash shell (needs the `module` function):
 #     bash dev/run_test_matrix.sh
 #
-# For each existing .venv-* below, this script:
+# Up front, once, the script runs:
+#   - `ruff check .` and `ruff format --check .` across the whole repo,
+#     matching the scope of the pre-commit hooks (which CI runs on PRs).
+#     A clean local matrix run is therefore enough to predict pre-commit CI.
+#
+# Then, for each existing .venv-* below, the script:
 #   1) sources its bin/activate (which should `module load gams/<ver>` and
 #      pin GAMS_DIR per the patches in dev/README.md);
 #   2) runs `pytest tests`;
-#   3) runs `gdxpds test`;
-#   4) in .venv-no-gams only, additionally runs `pip wheel --no-deps .` to
+#   3) runs `gdxpds info` (binding-free diagnostic, must succeed in every venv
+#      including .venv-no-gams since v3.0.0 made the import binding-free);
+#   4) runs `gdxpds test`;
+#   5) in .venv-no-gams only, additionally runs `pip wheel --no-deps .` to
 #      confirm the wheel still builds without GAMS bindings (guards the
 #      static-attr `version` read in pyproject.toml);
-#   5) deactivates.
+#   6) deactivates.
 #
-# Per-venv logs go to dev/test_matrix_logs/<venv>.log; a top-level
-# summary is printed to stdout and saved to dev/test_matrix_logs/summary.txt.
+# Per-venv logs go to dev/test_matrix_logs/<venv>.log; the lint phase logs to
+# dev/test_matrix_logs/lint.log. A top-level summary is printed to stdout and
+# saved to dev/test_matrix_logs/summary.txt.
 #
 # For .venv-no-gams, pytest and gdxpds test are expected to FAIL cleanly
-# (non-zero exit, no segfault, useful error message) and the wheel build
-# is expected to SUCCEED. The script flips its verdict accordingly.
+# (non-zero exit, no segfault, useful error message); `gdxpds info` and the
+# wheel build are expected to SUCCEED. The script flips its verdict accordingly.
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
@@ -35,6 +43,27 @@ VENVS=(
     ".venv-gams-51"
     ".venv-no-gams"
 )
+
+# Map each .venv-gams-* to the GAMS_DIR its activate script will pin (via
+# `module load gams/X.Y.Z`). Discovered by sourcing the activate in a subshell
+# and echoing GAMS_DIR -- this way the cross-GAMS engine-resolution check
+# below (run from inside one venv) gets the *other* venvs' real GAMS dirs.
+declare -A VENV_GAMS_DIR
+discover_venv_gams_dirs () {
+    for v in "${VENVS[@]}"; do
+        if [ "$v" = ".venv-no-gams" ]; then
+            continue
+        fi
+        if [ ! -f "$REPO_ROOT/$v/bin/activate" ]; then
+            continue
+        fi
+        local gd
+        gd=$(bash -c "set +u; source '$REPO_ROOT/$v/bin/activate' >/dev/null 2>&1; printf '%s' \"\${GAMS_DIR:-}\"")
+        if [ -n "$gd" ]; then
+            VENV_GAMS_DIR[$v]="$gd"
+        fi
+    done
+}
 
 run_one_venv () {
     local venv="$1"
@@ -68,11 +97,46 @@ run_one_venv () {
     echo "pytest exit: $pytest_rc" | tee -a "$log"
     echo | tee -a "$log"
 
+    # `gdxpds info` is the binding-free diagnostic introduced in v3.0.0: it
+    # imports gdxpds without needing GAMS, reports what bindings are visible,
+    # and is contracted to never raise (return code 0 even when nothing is
+    # installed). Run it everywhere -- including .venv-no-gams.
+    echo "--- gdxpds info ---" | tee -a "$log"
+    gdxpds info >>"$log" 2>&1
+    local info_rc=$?
+    echo "gdxpds info exit: $info_rc" | tee -a "$log"
+    echo | tee -a "$log"
+
     echo "--- gdxpds test ---" | tee -a "$log"
     gdxpds test >>"$log" 2>&1
     local gdxpds_rc=$?
     echo "gdxpds test exit: $gdxpds_rc" | tee -a "$log"
     echo | tee -a "$log"
+
+    # Cross-GAMS engine-resolution check: confirm resolve_engine() threads
+    # the explicit `gams_dir` through to the gams.transfer probe, rather than
+    # relying on the cached default-discovered install. Skipped for
+    # .venv-no-gams (no gdxpds module loadable). Other venvs' GAMS dirs (if
+    # discovered) are passed as args; the script also runs a /tmp control to
+    # guarantee detection even when the other dirs happen to agree.
+    local engine_cross_rc=0
+    if [ "$venv" != ".venv-no-gams" ]; then
+        echo "--- engine cross-gams check ---" | tee -a "$log"
+        local other_dirs=()
+        for v in "${VENVS[@]}"; do
+            if [ "$v" = "$venv" ]; then
+                continue
+            fi
+            local gd="${VENV_GAMS_DIR[$v]:-}"
+            if [ -n "$gd" ]; then
+                other_dirs+=("$gd")
+            fi
+        done
+        python "$REPO_ROOT/dev/check_resolve_engine_cross_gams.py" "${other_dirs[@]}" >>"$log" 2>&1
+        engine_cross_rc=$?
+        echo "engine cross-gams check exit: $engine_cross_rc" | tee -a "$log"
+        echo | tee -a "$log"
+    fi
 
     local wheel_rc=0
     if [ "$venv" = ".venv-no-gams" ]; then
@@ -90,16 +154,18 @@ run_one_venv () {
 
     local verdict
     if [ "$venv" = ".venv-no-gams" ]; then
-        if [ "$pytest_rc" -ne 0 ] && [ "$gdxpds_rc" -ne 0 ] && [ "$wheel_rc" -eq 0 ]; then
-            verdict="OK (pytest/gdxpds failed as expected; wheel built without bindings)"
+        if [ "$pytest_rc" -ne 0 ] && [ "$gdxpds_rc" -ne 0 ] \
+           && [ "$info_rc" -eq 0 ] && [ "$wheel_rc" -eq 0 ]; then
+            verdict="OK (info+wheel succeed; pytest/gdxpds fail as expected)"
         else
-            verdict="UNEXPECTED (pytest=$pytest_rc, gdxpds=$gdxpds_rc, wheel=$wheel_rc)"
+            verdict="UNEXPECTED (pytest=$pytest_rc, info=$info_rc, gdxpds=$gdxpds_rc, wheel=$wheel_rc)"
         fi
     else
-        if [ "$pytest_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ]; then
+        if [ "$pytest_rc" -eq 0 ] && [ "$info_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ] \
+           && [ "$engine_cross_rc" -eq 0 ]; then
             verdict="PASS"
         else
-            verdict="FAIL (pytest=$pytest_rc, gdxpds=$gdxpds_rc)"
+            verdict="FAIL (pytest=$pytest_rc, info=$info_rc, gdxpds=$gdxpds_rc, engine_cross=$engine_cross_rc)"
         fi
     fi
     echo "verdict: $verdict" | tee -a "$log"
@@ -111,7 +177,60 @@ run_one_venv () {
     set -u
 }
 
+run_lint () {
+    # Whole-repo lint pass matching pre-commit (the source of truth that CI
+    # runs against PRs). Uses --check modes so the script asserts the tree is
+    # already clean rather than mutating files. Resolves a ruff binary from
+    # PATH or .venv-no-gams; if none is found, the lint phase is SKIPPED with
+    # a clear message but does not fail the matrix.
+    local log="$LOG_DIR/lint.log"
+    : > "$log"
+    echo "=== lint ===" | tee -a "$log"
+
+    local ruff=""
+    if [ -x "$REPO_ROOT/.venv-no-gams/bin/ruff" ]; then
+        ruff="$REPO_ROOT/.venv-no-gams/bin/ruff"
+    elif command -v ruff >/dev/null 2>&1; then
+        ruff="$(command -v ruff)"
+    fi
+
+    if [ -z "$ruff" ]; then
+        local verdict="SKIPPED (no ruff: install via .venv-no-gams or PATH)"
+        echo "$verdict" | tee -a "$log"
+        printf "%-20s  %s  (log: %s)\n" "lint" "$verdict" "$log" >> "$SUMMARY"
+        LINT_RC=0
+        return
+    fi
+
+    echo "ruff: $ruff" | tee -a "$log"
+    echo "--- ruff check . ---" | tee -a "$log"
+    "$ruff" check . >>"$log" 2>&1
+    local check_rc=$?
+    echo "ruff check exit: $check_rc" | tee -a "$log"
+
+    echo "--- ruff format --check . ---" | tee -a "$log"
+    "$ruff" format --check . >>"$log" 2>&1
+    local fmt_rc=$?
+    echo "ruff format --check exit: $fmt_rc" | tee -a "$log"
+
+    local verdict
+    if [ "$check_rc" -eq 0 ] && [ "$fmt_rc" -eq 0 ]; then
+        verdict="PASS"
+        LINT_RC=0
+    else
+        verdict="FAIL (check=$check_rc, format=$fmt_rc)"
+        LINT_RC=1
+    fi
+    echo "verdict: $verdict" | tee -a "$log"
+    printf "%-20s  %s  (log: %s)\n" "lint" "$verdict" "$log" >> "$SUMMARY"
+}
+
 set -u
+LINT_RC=0
+run_lint
+# Discover each venv's GAMS_DIR up front -- used by run_one_venv to pass
+# *other* venvs' GAMS dirs to the cross-GAMS engine-resolution check.
+discover_venv_gams_dirs
 for venv in "${VENVS[@]}"; do
     run_one_venv "$venv"
 done

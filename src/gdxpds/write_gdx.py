@@ -15,21 +15,23 @@ from gdxpds.gdx import (
     GdxFile,
     GdxSymbol,
     _stable_topological_sort,
+    append_alias,
 )
 from gdxpds.tools import Error
 
 if TYPE_CHECKING:
-    from gdxpds._backend import Backend
+    from gdxpds._engine import Engine
 
 logger = logging.getLogger(__name__)
 
 
 class Translator:
-    def __init__(self, dataframes, gams_dir=None, domains=None, backend=None):
+    def __init__(self, dataframes, gams_dir=None, domains=None, engine=None, aliases=None):
         self.dataframes = dataframes
         self.__domains = domains
+        self.__aliases = aliases
         self.__gams_dir = gams_dir
-        self.__backend = backend
+        self.__engine = engine
         self.__gdx = None
 
     def __exit__(self, *args):
@@ -82,7 +84,8 @@ class Translator:
     def gdx(self):
         if self.__gdx is None:
             domains = self.__domains
-            gdx_file = GdxFile(gams_dir=self.__gams_dir, backend=self.__backend)
+            aliases = self.__aliases
+            gdx_file = GdxFile(gams_dir=self.__gams_dir, engine=self.__engine)
             dataframes = (
                 self.__topo_sort_dataframes(self.dataframes, domains)
                 if domains is not None
@@ -93,6 +96,10 @@ class Translator:
                 self.__add_symbol_to_gdx(symbol_name, df)
             if domains is not None:
                 self.__wire_domains(domains, gdx_file)
+            # Aliases are materialized last: their parent Sets are regular
+            # dataframes, already created above, so the alias follows its parent.
+            if aliases:
+                self.__add_aliases(aliases, gdx_file)
         return self.__gdx
 
     def save_gdx(self, path, gams_dir=None):
@@ -166,6 +173,35 @@ class Translator:
                 )
             child.domain = [None if p is None else gdx_file[p] for p in parents]
 
+    @staticmethod
+    def __add_aliases(aliases, gdx_file):
+        """Materialize each ``aliases`` entry (alias name -> parent symbol name) as
+        an :class:`GamsDataType.Alias <GamsDataType>` of an already-built parent.
+        The parent is typically a Set, but an Alias is accepted (chained aliases;
+        see :func:`append_alias`). Raises :class:`DomainError` for a non-str alias
+        key, a non-str parent value, an unknown parent, a parent that is neither
+        a Set nor an Alias, or a name collision with an existing symbol."""
+        for alias_name, parent_name in aliases.items():
+            if not isinstance(alias_name, str):
+                raise DomainError(
+                    "to_gdx: aliases keys must be alias names (str); got a "
+                    f"{type(alias_name).__name__} key ({alias_name!r})"
+                )
+            if not isinstance(parent_name, str):
+                raise DomainError(
+                    f"to_gdx: aliases[{alias_name!r}] must be a parent symbol name (str); "
+                    f"got {type(parent_name).__name__}"
+                )
+            if alias_name in gdx_file:
+                raise DomainError(
+                    f"to_gdx: alias name {alias_name!r} collides with an existing symbol"
+                )
+            if parent_name not in gdx_file:
+                raise DomainError(
+                    f"to_gdx: aliases[{alias_name!r}] references unknown parent {parent_name!r}"
+                )
+            append_alias(gdx_file, alias_name, gdx_file[parent_name])
+
     def __infer_data_type(self, symbol_name, df):
         """
         Returns
@@ -209,7 +245,8 @@ def to_gdx(
     path: str | os.PathLike[str] | None = None,
     gams_dir: str | os.PathLike[str] | None = None,
     domains: Mapping[str, Sequence[str | None]] | None = None,
-    backend: str | Backend | None = None,
+    engine: str | Engine | None = None,
+    aliases: Mapping[str, str] | None = None,
 ) -> GdxFile:
     """
     Creates a :py:class:`gdxpds.gdx.GdxFile` from dataframes and optionally writes it to path
@@ -219,8 +256,9 @@ def to_gdx(
     dataframes : dict of str to pd.DataFrame
         symbol name to pd.DataFrame dict to be compiled into a single gdx file. Each DataFrame
         is assumed to represent a single set or parameter. The last column must be the parameter's
-        value, or the set's listing of True/False, and must be labeled as (case insensitive)
-        'value'.
+        value, or the set's element text, and must be labeled as (case insensitive) 'value'. For
+        a Set, membership is conveyed by row presence; the value column may be element text (a
+        string, ``""`` for no text), booleans, or omitted.
     path : None or pathlib.Path or str
         If provided, the gdx file will be written to this path
     gams_dir : None or pathlib.Path or str
@@ -233,15 +271,21 @@ def to_gdx(
         input (unknown parent name, wrong type, wrong length, cyclic references) raises
         :class:`DomainError`.
 
-    backend : None or str or :py:class:`gdxpds.Backend`
-        Which I/O engine to use for the write (default resolves via
-        ``GDXPDS_BACKEND``, falling back to ``gdxcc``).
+    engine : None or str or :py:class:`gdxpds.Engine`
+        Which I/O engine to use for the write (default resolves via ``GDXPDS_ENGINE``,
+        then the default engine: ``gams.transfer`` when usable, otherwise ``gdxcc``).
+    aliases : None or dict of str to str
+        Optional aliases, string-based. Each entry maps a new alias name to the name of an
+        existing parent Set in ``dataframes``. An unknown parent, a parent that is not a Set,
+        or a name collision raises :class:`DomainError`.
 
     Returns
     -------
     :py:class:`gdxpds.gdx.GdxFile`
     """
-    translator = Translator(dataframes, gams_dir=gams_dir, domains=domains, backend=backend)
+    translator = Translator(
+        dataframes, gams_dir=gams_dir, domains=domains, engine=engine, aliases=aliases
+    )
     gdx = translator.gdx
     if path is not None:
         gdx.write(path)

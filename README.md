@@ -42,11 +42,11 @@ https://github.com/NatLabRockies/gdx-pandas/releases.
 
 ### Configure
 
-gdxpds needs to know **where GAMS is**, and optionally **which I/O engine** to use. Set either once via an environment variable, or per call with the `gams_dir=` / `backend=` keywords (also `--gams_dir` / `--backend` on the CLIs):
+gdxpds needs to know **where GAMS is**, and optionally **which I/O engine** to use. Set either once via an environment variable, or per call with the `gams_dir=` / `engine=` keywords (also `--gams_dir` / `--engine` on the CLIs):
 
 ```bash
 export GAMS_DIR=/path/to/gams        # otherwise auto-discovered
-export GDXPDS_BACKEND=gams_transfer  # default: gdxcc; gams_transfer is much faster on large files (needs gamsapi)
+export GDXPDS_ENGINE=gdxcc          # default: gams_transfer when usable (much faster on large files), else gdxcc
 ```
 
 See *Configuration* in the [documentation](https://NatLabRockies.github.io/gdx-pandas) for the full keyword / environment-variable / CLI matrix and the speed trade-offs.
@@ -65,12 +65,31 @@ For a quick environment check without running the full round-trip, use
 which discovery branch produced it), and any import-time load error. Useful
 for bug reports. `gdxpds --version` prints just the version.
 
-Expected output:
+Expected output for `gdxpds info`, which is also printed at the top of the `gdxpds test` output:
+
+```
+gdxpds info
+-----------
+gdxpds:        <version>
+Python:        <python version> (<platform>)
+Bindings:
+  gams.core.gdx: [gamsapi <version> | not importable]
+  gdxcc: [gdxcc <version> | not importable]
+  gams.transfer: [gamsapi <version> | not importable]
+  selected:    [gams.core.gdx | gdxcc]
+  bound dir:   <your GAMS directory>
+  gams.transfer usable: [yes | no]
+Default engine: [gams_transfer | gdxcc]
+GAMS_DIR:      <your GAMS directory>
+  source:      [GAMS_DIR env var | GAMSDIR env var | <discovered location> | explicit override | cached]
+```
+
+Example `gdxpds test` output that follows the `info` preamble:
 
 ```
 Verifying gdxpds installation...
   [OK]   GAMS install found at <your GAMS directory>
-  [OK]   GDX bindings loaded: gams.core.gdx (gamsapi)
+  [OK]   GDX bindings loaded: gams.core.gdx
   [OK]   Read embedded sample.gdx (...)
   [OK]   Round-trip write->read preserves all symbols
   [OK]   Special values (+Inf, -Inf, NaN) survive round-trip
