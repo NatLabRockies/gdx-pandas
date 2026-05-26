@@ -1,0 +1,472 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gdxpds._engine &mdash; gdx-pandas 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            gdx-pandas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    <div id="gdxpds-version-selector" hidden></div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#object-oriented-api">Object-Oriented API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#set-details">Set details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#set-membership-and-element-text">Set membership and element text</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#aliases">Aliases</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#parameter-variable-and-equation-details">Parameter, Variable, and Equation details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#variable-and-equation-types">Variable and Equation types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#special-values">Special values</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#migration-from-1-x-2-x">Migration from 1.x / 2.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v2-0-0-breaking-changes">v2.0.0 breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v3-0-0-breaking-changes">v3.0.0 breaking changes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#i-o-engine-engine">I/O engine (<code class="docutils literal notranslate"><span class="pre">engine</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../_autosummary/gdxpds.html">gdxpds</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir_cache"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir_cache</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.source"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine"><code class="docutils literal notranslate"><span class="pre">Engine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine.GDXCC"><code class="docutils literal notranslate"><span class="pre">Engine.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Engine.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.EngineError"><code class="docutils literal notranslate"><span class="pre">EngineError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_aliases"><code class="docutils literal notranslate"><span class="pre">get_aliases()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.gdx_to_csv.html">gdxpds.cli.gdx_to_csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.main.html">gdxpds.cli.main</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType"><code class="docutils literal notranslate"><span class="pre">GamsDomainType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS"><code class="docutils literal notranslate"><span class="pre">GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol"><code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_set"><code class="docutils literal notranslate"><span class="pre">append_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_parameter"><code class="docutils literal notranslate"><span class="pre">append_parameter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_alias"><code class="docutils literal notranslate"><span class="pre">append_alias()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html">gdxpds.read_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_aliases"><code class="docutils literal notranslate"><span class="pre">get_aliases()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.special.html">gdxpds.special</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.NUMPY_SPECIAL_VALUES"><code class="docutils literal notranslate"><span class="pre">NUMPY_SPECIAL_VALUES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.convert_gdx_to_np_svs"><code class="docutils literal notranslate"><span class="pre">convert_gdx_to_np_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.is_np_eps"><code class="docutils literal notranslate"><span class="pre">is_np_eps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.is_np_sv"><code class="docutils literal notranslate"><span class="pre">is_np_sv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.convert_np_to_gdx_svs"><code class="docutils literal notranslate"><span class="pre">convert_np_to_gdx_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.pd_isnan"><code class="docutils literal notranslate"><span class="pre">pd_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.pd_val_equal"><code class="docutils literal notranslate"><span class="pre">pd_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.gdx_isnan"><code class="docutils literal notranslate"><span class="pre">gdx_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.gdx_val_equal"><code class="docutils literal notranslate"><span class="pre">gdx_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.load_specials"><code class="docutils literal notranslate"><span class="pre">load_specials()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html">gdxpds.tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.NeedsGamsDir"><code class="docutils literal notranslate"><span class="pre">NeedsGamsDir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html">gdxpds.write_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.write_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.write_gdx.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">gdx-pandas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gdxpds._engine</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gdxpds._engine</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Engine selection and the ``GdxEngine`` interface.</span>
+
+<span class="sd">gdxpds moves data between GDX files and pandas DataFrames through a selectable</span>
+<span class="sd">I/O engine. This module owns the engine-agnostic pieces:</span>
+
+<span class="sd">- :class:`Engine`, the engine enum, with :data:`DEFAULT_ENGINE`;</span>
+<span class="sd">- :func:`resolve_engine` (explicit arg / ``GDXPDS_ENGINE`` env var / default)</span>
+<span class="sd">  and :func:`make_engine`, which builds the chosen engine; and</span>
+<span class="sd">- :class:`GdxEngine`, the ABC each engine implements; see its docstring for the</span>
+<span class="sd">  read / write / handle / teardown contract.</span>
+
+<span class="sd">The concrete engines live in :mod:`gdxpds._gdxcc_engine` (the legacy and default</span>
+<span class="sd">engine) and :mod:`gdxpds._transfer_engine`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">abc</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">enum</span><span class="w"> </span><span class="kn">import</span> <span class="n">StrEnum</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">assert_never</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Error</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.gdx</span><span class="w"> </span><span class="kn">import</span> <span class="n">GdxFile</span><span class="p">,</span> <span class="n">GdxSymbol</span>
+
+
+<div class="viewcode-block" id="EngineError">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.html#gdxpds.EngineError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EngineError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised for an invalid or unavailable engine selection.</span>
+
+<span class="sd">    Subclass of :class:`~gdxpds.tools.Error`, so ``except Error`` still catches</span>
+<span class="sd">    it.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="Engine">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.html#gdxpds.Engine">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Engine</span><span class="p">(</span><span class="n">StrEnum</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Selectable engine for GDX &lt;-&gt; DataFrame I/O.</span>
+
+<span class="sd">    A :class:`~enum.StrEnum` so callers may pass either the member</span>
+<span class="sd">    (``Engine.GDXCC``) or its string value (``&quot;gdxcc&quot;``), and so the</span>
+<span class="sd">    ``GDXPDS_ENGINE`` env var maps straight onto it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">GDXCC</span> <span class="o">=</span> <span class="s2">&quot;gdxcc&quot;</span>
+    <span class="n">GAMS_TRANSFER</span> <span class="o">=</span> <span class="s2">&quot;gams_transfer&quot;</span></div>
+
+
+
+<span class="c1">#: The engine used when none is explicitly requested: gams.transfer when it is</span>
+<span class="c1">#: usable, otherwise gdxcc (the fallback resolved in :func:`resolve_engine`).</span>
+<span class="n">DEFAULT_ENGINE</span> <span class="o">=</span> <span class="n">Engine</span><span class="o">.</span><span class="n">GAMS_TRANSFER</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">GdxEngine</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABC</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Interface implemented by each GDX I/O engine.</span>
+
+<span class="sd">    Abstract methods: :meth:`open_read` (metadata), :meth:`load_symbols`</span>
+<span class="sd">    (records), :meth:`write_file`, and :meth:`close`. The :meth:`load_file` (all</span>
+<span class="sd">    symbols) and :meth:`load_symbol` (one symbol) conveniences are defined in</span>
+<span class="sd">    terms of :meth:`load_symbols`; :meth:`write_symbol` and :attr:`handle` have</span>
+<span class="sd">    default implementations that engines override only if applicable.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">open_read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdx_file</span><span class="p">:</span> <span class="n">GdxFile</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Open ``filename`` for reading and populate ``gdx_file``&#39;s metadata.</span>
+
+<span class="sd">        Sets ``gdx_file``&#39;s ``_filename`` and, where the engine exposes them, its</span>
+<span class="sd">        ``_version``/``_producer`` (the gams.transfer engine leaves those</span>
+<span class="sd">        ``None``); builds its ``universal_set`` and the ``GdxSymbol`` collection</span>
+<span class="sd">        (with extended per-symbol metadata and resolved domains), but does</span>
+<span class="sd">        **not** load records.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_symbols</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">gdx_file</span><span class="p">:</span> <span class="n">GdxFile</span><span class="p">,</span>
+        <span class="n">symbols</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GdxSymbol</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load records into the given ``symbols`` of ``gdx_file``.</span>
+
+<span class="sd">        ``symbols is None`` loads every symbol; otherwise only the given</span>
+<span class="sd">        :class:`~gdxpds.gdx.GdxSymbol` objects (the data model owns name lookup,</span>
+<span class="sd">        so callers pass objects, not names). Already-loaded symbols are skipped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdx_file</span><span class="p">:</span> <span class="n">GdxFile</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Eagerly load every symbol&#39;s records.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_symbols</span><span class="p">(</span><span class="n">gdx_file</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">load_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">symbol</span><span class="p">:</span> <span class="n">GdxSymbol</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Load the records of a single symbol.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">load_symbols</span><span class="p">(</span><span class="n">symbol</span><span class="o">.</span><span class="n">file</span><span class="p">,</span> <span class="p">[</span><span class="n">symbol</span><span class="p">])</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_expand_alias_targets</span><span class="p">(</span><span class="n">symbols</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">GdxSymbol</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">GdxSymbol</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return ``symbols`` extended with the transitive ``alias_of`` parents</span>
+<span class="sd">        of any aliases in the input, preserving order and de-duplicating.</span>
+
+<span class="sd">        An Alias has no records of its own -- its ``dataframe`` is a view onto</span>
+<span class="sd">        its parent&#39;s (see :class:`~gdxpds.gdx.GdxSymbol.dataframe`) -- so an</span>
+<span class="sd">        engine asked to load an alias must also load the parent (and the</span>
+<span class="sd">        parent&#39;s parent, for chained aliases). Engines call this from their</span>
+<span class="sd">        ``load_symbols`` to build the actual target list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Late import: gdx.py imports this module, so a top-level import would cycle.</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.gdx</span><span class="w"> </span><span class="kn">import</span> <span class="n">GamsDataType</span>
+
+        <span class="n">result</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">symbols</span><span class="p">)</span>
+        <span class="n">seen</span> <span class="o">=</span> <span class="p">{</span><span class="nb">id</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">result</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
+            <span class="n">cur</span> <span class="o">=</span> <span class="n">s</span>
+            <span class="k">while</span> <span class="n">cur</span><span class="o">.</span><span class="n">data_type</span> <span class="o">==</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span> <span class="ow">and</span> <span class="n">cur</span><span class="o">.</span><span class="n">_alias_of</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">cur</span> <span class="o">=</span> <span class="n">cur</span><span class="o">.</span><span class="n">_alias_of</span>
+                <span class="k">if</span> <span class="nb">id</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
+                    <span class="k">break</span>
+                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">cur</span><span class="p">))</span>
+                <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cur</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">handle</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">object</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Native engine handle, if any.</span>
+
+<span class="sd">        The gdxcc engine returns its GDX pointer; engines without one (e.g.</span>
+<span class="sd">        gams.transfer) return ``None``. Reached as ``gdx_file._engine_impl.handle``</span>
+<span class="sd">        for the rare case of driving raw ``gdxcc`` calls.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdx_file</span><span class="p">:</span> <span class="n">GdxFile</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write every (loaded) symbol of ``gdx_file`` out to ``filename``.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_symbol</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">gdx_file</span><span class="p">:</span> <span class="n">GdxFile</span><span class="p">,</span>
+        <span class="n">symbol</span><span class="p">:</span> <span class="n">GdxSymbol</span><span class="p">,</span>
+        <span class="n">index</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name_positions</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Write a single symbol (single-symbol path).</span>
+
+<span class="sd">        Only engines with a per-symbol write API implement this; others raise.</span>
+<span class="sd">        Whole-file writes should go through :meth:`write_file`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> does not support per-symbol writes; &quot;</span>
+            <span class="s2">&quot;use GdxFile.write() / gdxpds.to_gdx().&quot;</span>
+        <span class="p">)</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Release any native resources (run-once, idempotent).&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">resolve_engine</span><span class="p">(</span>
+    <span class="n">explicit</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Engine</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Engine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Resolve which engine to use.</span>
+
+<span class="sd">    Order: ``explicit`` value → ``GDXPDS_ENGINE`` env var → :data:`DEFAULT_ENGINE`.</span>
+<span class="sd">    Strings are normalized to :class:`Engine` members. An unrecognized value</span>
+<span class="sd">    raises :class:`EngineError`.</span>
+
+<span class="sd">    The default (no explicit arg / env var) prefers ``GAMS_TRANSFER`` but falls</span>
+<span class="sd">    back to ``GDXCC`` when gams.transfer is not usable, so gdxcc-only environments</span>
+<span class="sd">    are unaffected. An *explicit* ``GAMS_TRANSFER`` request that can&#39;t be satisfied</span>
+<span class="sd">    raises instead of falling back.</span>
+
+<span class="sd">    ``gams_dir`` is threaded through to :func:`~gdxpds.tools._probe_gams_transfer`,</span>
+<span class="sd">    so engine selection reflects the GAMS install the caller will actually use</span>
+<span class="sd">    (the default-discovered install can differ from an explicit ``gams_dir=`` on</span>
+<span class="sd">    :class:`~gdxpds.gdx.GdxFile` / :func:`~gdxpds.to_gdx` / :func:`~gdxpds.to_dataframes`).</span>
+<span class="sd">    With ``gams_dir=None`` the probe uses the cached default-discovered directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># _probe_gams_transfer is the single source of truth for &quot;is gams.transfer</span>
+    <span class="c1"># usable here?&quot;. Resolve `engine` first (default / env / explicit), then call</span>
+    <span class="c1"># it at most once -- and only if the resolved engine is GAMS_TRANSFER.</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="n">explicit</span> <span class="k">if</span> <span class="n">explicit</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GDXPDS_ENGINE&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">raw</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">raw</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+        <span class="n">engine</span> <span class="o">=</span> <span class="n">DEFAULT_ENGINE</span>
+        <span class="n">explicit_request</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">engine</span> <span class="o">=</span> <span class="n">Engine</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">valid</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">Engine</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">EngineError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown engine </span><span class="si">{</span><span class="n">raw</span><span class="si">!r}</span><span class="s2">. Valid engines: </span><span class="si">{</span><span class="n">valid</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">explicit_request</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">if</span> <span class="n">engine</span> <span class="ow">is</span> <span class="n">Engine</span><span class="o">.</span><span class="n">GAMS_TRANSFER</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">_probe_gams_transfer</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">_probe_gams_transfer</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">explicit_request</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">EngineError</span><span class="p">(</span>
+                    <span class="s2">&quot;Engine &#39;gams_transfer&#39; requested but gams.transfer is not &quot;</span>
+                    <span class="s2">&quot;usable here (not installed, or its gamsapi build cannot load &quot;</span>
+                    <span class="s2">&quot;the active GAMS libraries). Install a gamsapi matching your &quot;</span>
+                    <span class="s2">&quot;GAMS version.&quot;</span>
+                <span class="p">)</span>
+            <span class="c1"># Quiet fallback: default-selected gams.transfer isn&#39;t usable, so</span>
+            <span class="c1"># gdxcc-only environments stay unaffected by the new default.</span>
+            <span class="k">return</span> <span class="n">Engine</span><span class="o">.</span><span class="n">GDXCC</span>
+    <span class="k">return</span> <span class="n">engine</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">make_engine</span><span class="p">(</span>
+    <span class="n">kind</span><span class="p">:</span> <span class="n">Engine</span> <span class="o">=</span> <span class="n">DEFAULT_ENGINE</span><span class="p">,</span>
+    <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">gams_dir_source</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GdxEngine</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct the concrete engine for ``kind``.</span>
+
+<span class="sd">    The implementation module is imported lazily so importing :mod:`gdxpds.gdx`</span>
+<span class="sd">    does not pull in every engine.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="n">Engine</span><span class="o">.</span><span class="n">GDXCC</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._gdxcc_engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">GdxccEngine</span>
+
+        <span class="k">return</span> <span class="n">GdxccEngine</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gams_dir_source</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">kind</span> <span class="o">==</span> <span class="n">Engine</span><span class="o">.</span><span class="n">GAMS_TRANSFER</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._transfer_engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransferEngine</span>
+
+        <span class="k">return</span> <span class="n">TransferEngine</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gams_dir_source</span><span class="p">)</span>
+    <span class="c1"># Exhaustive over Engine; guards against a future member added without a</span>
+    <span class="c1"># branch here. User-facing validation of bad values lives in resolve_engine.</span>
+    <span class="n">assert_never</span><span class="p">(</span><span class="n">kind</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, The Alliance for Energy Innovation, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <script src="../../_static/versions.js"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+﻿gdxpds
+======
+
+.. automodule:: gdxpds
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+
+.. rubric:: Submodules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   cli
+   gdx
+   read_gdx
+   special
+   tools
+   write_gdx
+

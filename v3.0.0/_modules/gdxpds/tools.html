@@ -1,0 +1,789 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>gdxpds.tools &mdash; gdx-pandas 3.0.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/design-tabs.js?v=f930bc37"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link href="../../_static/style.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+    
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            gdx-pandas
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+    <div id="gdxpds-version-selector" hidden></div>
+
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../overview.html">Overview</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#direct-conversion">Direct Conversion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#object-oriented-api">Object-Oriented API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#set-details">Set details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#set-membership-and-element-text">Set membership and element text</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#aliases">Aliases</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#parameter-variable-and-equation-details">Parameter, Variable, and Equation details</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#variable-and-equation-types">Variable and Equation types</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#special-values">Special values</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#migration-from-1-x-2-x">Migration from 1.x / 2.x</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v2-0-0-breaking-changes">v2.0.0 breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v3-0-0-breaking-changes">v3.0.0 breaking changes</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#configuration">Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#gams-install-location-gams-dir">GAMS install location (<code class="docutils literal notranslate"><span class="pre">gams_dir</span></code>)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#i-o-engine-engine">I/O engine (<code class="docutils literal notranslate"><span class="pre">engine</span></code>)</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../_autosummary/gdxpds.html">gdxpds</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir_cache"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir_cache</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.source"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.source</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.GamsDirFinder.gams_dir"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder.gams_dir</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine"><code class="docutils literal notranslate"><span class="pre">Engine</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine.GDXCC"><code class="docutils literal notranslate"><span class="pre">Engine.GDXCC</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.Engine.GAMS_TRANSFER"><code class="docutils literal notranslate"><span class="pre">Engine.GAMS_TRANSFER</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.EngineError"><code class="docutils literal notranslate"><span class="pre">EngineError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.get_aliases"><code class="docutils literal notranslate"><span class="pre">get_aliases()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.html#gdxpds.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.cli.html">gdxpds.cli</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.csv_to_gdx.html">gdxpds.cli.csv_to_gdx</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.gdx_to_csv.html">gdxpds.cli.gdx_to_csv</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.cli.main.html">gdxpds.cli.main</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html">gdxpds.gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.replace_df_column"><code class="docutils literal notranslate"><span class="pre">replace_df_column()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxError"><code class="docutils literal notranslate"><span class="pre">GdxError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.TransferError"><code class="docutils literal notranslate"><span class="pre">TransferError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.DomainError"><code class="docutils literal notranslate"><span class="pre">DomainError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.SymbolNotFoundError"><code class="docutils literal notranslate"><span class="pre">SymbolNotFoundError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxFile"><code class="docutils literal notranslate"><span class="pre">GdxFile</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType"><code class="docutils literal notranslate"><span class="pre">GamsDataType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsVariableType"><code class="docutils literal notranslate"><span class="pre">GamsVariableType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsEquationType"><code class="docutils literal notranslate"><span class="pre">GamsEquationType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDomainType"><code class="docutils literal notranslate"><span class="pre">GamsDomainType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType"><code class="docutils literal notranslate"><span class="pre">GamsValueType</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_COLS_MAP</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_DEFAULTS"><code class="docutils literal notranslate"><span class="pre">GAMS_VALUE_DEFAULTS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS"><code class="docutils literal notranslate"><span class="pre">GAMS_VARIABLE_DEFAULT_LOWER_UPPER_BOUNDS</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.GdxSymbol"><code class="docutils literal notranslate"><span class="pre">GdxSymbol</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_set"><code class="docutils literal notranslate"><span class="pre">append_set()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_parameter"><code class="docutils literal notranslate"><span class="pre">append_parameter()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.gdx.html#gdxpds.gdx.append_alias"><code class="docutils literal notranslate"><span class="pre">append_alias()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html">gdxpds.read_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframes"><code class="docutils literal notranslate"><span class="pre">to_dataframes()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.list_symbols"><code class="docutils literal notranslate"><span class="pre">list_symbols()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_data_types"><code class="docutils literal notranslate"><span class="pre">get_data_types()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_subset_relationships"><code class="docutils literal notranslate"><span class="pre">get_subset_relationships()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.get_aliases"><code class="docutils literal notranslate"><span class="pre">get_aliases()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.read_gdx.html#gdxpds.read_gdx.to_dataframe"><code class="docutils literal notranslate"><span class="pre">to_dataframe()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.special.html">gdxpds.special</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.NUMPY_SPECIAL_VALUES"><code class="docutils literal notranslate"><span class="pre">NUMPY_SPECIAL_VALUES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.convert_gdx_to_np_svs"><code class="docutils literal notranslate"><span class="pre">convert_gdx_to_np_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.is_np_eps"><code class="docutils literal notranslate"><span class="pre">is_np_eps()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.is_np_sv"><code class="docutils literal notranslate"><span class="pre">is_np_sv()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.convert_np_to_gdx_svs"><code class="docutils literal notranslate"><span class="pre">convert_np_to_gdx_svs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.pd_isnan"><code class="docutils literal notranslate"><span class="pre">pd_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.pd_val_equal"><code class="docutils literal notranslate"><span class="pre">pd_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.gdx_isnan"><code class="docutils literal notranslate"><span class="pre">gdx_isnan()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.gdx_val_equal"><code class="docutils literal notranslate"><span class="pre">gdx_val_equal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.special.html#gdxpds.special.load_specials"><code class="docutils literal notranslate"><span class="pre">load_specials()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html">gdxpds.tools</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.Error"><code class="docutils literal notranslate"><span class="pre">Error</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.GamsLoadError"><code class="docutils literal notranslate"><span class="pre">GamsLoadError</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.GamsDirFinder"><code class="docutils literal notranslate"><span class="pre">GamsDirFinder</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.NeedsGamsDir"><code class="docutils literal notranslate"><span class="pre">NeedsGamsDir</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.load_gdxcc"><code class="docutils literal notranslate"><span class="pre">load_gdxcc()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.tools.html#gdxpds.tools.info"><code class="docutils literal notranslate"><span class="pre">info()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html">gdxpds.write_gdx</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.write_gdx.Translator"><code class="docutils literal notranslate"><span class="pre">Translator</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../_autosummary/gdxpds.write_gdx.html#gdxpds.write_gdx.to_gdx"><code class="docutils literal notranslate"><span class="pre">to_gdx()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">gdx-pandas</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">gdxpds.tools</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for gdxpds.tools</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">__future__</span><span class="w"> </span><span class="kn">import</span> <span class="n">annotations</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">subp</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">sys</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Error">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.tools.html#gdxpds.Error">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Error</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base class for all Exceptions raised by this package.</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<div class="viewcode-block" id="GamsLoadError">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.tools.html#gdxpds.GamsLoadError">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GamsLoadError</span><span class="p">(</span><span class="n">Error</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised when gdxpds cannot bring up the GAMS shared library at the</span>
+<span class="sd">    resolved gams_dir (non-GAMS directory, gdxCreateD non-success return,</span>
+<span class="sd">    version skew, missing shared library, etc.).</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_require_gams_installation</span><span class="p">(</span><span class="n">finder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Verify the resolved GAMS directory actually contains GAMS.</span>
+
+<span class="sd">    Calling the SWIG-bound ``gdxCreateD`` against a directory that does not</span>
+<span class="sd">    contain the GAMS shared library can crash the Python process on Windows</span>
+<span class="sd">    (access violation). This pre-check raises :class:`GamsLoadError` first,</span>
+<span class="sd">    naming the discovery branch that produced the bad directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gams_exe</span> <span class="o">=</span> <span class="s2">&quot;gams.exe&quot;</span> <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span> <span class="k">else</span> <span class="s2">&quot;gams&quot;</span>
+    <span class="n">candidate</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">gams_exe</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">candidate</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">GamsLoadError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Resolved GAMS directory </span><span class="si">{</span><span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="si">!r}</span><span class="s2"> &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;[source: </span><span class="si">{</span><span class="n">finder</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">] does not contain </span><span class="si">{</span><span class="n">gams_exe</span><span class="si">!r}</span><span class="s2">; &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;this is not a GAMS installation.&quot;</span>
+        <span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_check_gdx_create_rc</span><span class="p">(</span><span class="n">H</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">gdxcc</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Raise :class:`GamsLoadError` if gdxCreateD failed.</span>
+
+<span class="sd">    ``rc`` may be a bare int (older bindings) or a ``[code, msg]`` 2-list</span>
+<span class="sd">    (modern ``gams.core.gdx``). Either way, ``code == 1`` is success.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rc</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">rc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">rc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">code</span> <span class="o">=</span> <span class="n">rc</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">code</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">msg</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gdxcc</span><span class="p">,</span> <span class="s2">&quot;gdxErrorStr&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gdxcc</span><span class="p">,</span> <span class="s2">&quot;gdxGetLastError&quot;</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxErrorStr</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxGetLastError</span><span class="p">(</span><span class="n">H</span><span class="p">))[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+    <span class="c1"># Deliberately no gdxFree(H): on a failed gdxCreateD the library was never</span>
+    <span class="c1"># loaded, so XFree is unbound and gdxFree(H) would segfault.</span>
+    <span class="k">raise</span> <span class="n">GamsLoadError</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;gdxCreateD failed (rc=</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">) for GAMS directory </span><span class="si">{</span><span class="n">gams_dir</span><span class="si">!r}</span><span class="s2"> &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;[source: </span><span class="si">{</span><span class="n">source</span><span class="si">}</span><span class="s2">]. gdxcc reported: </span><span class="si">{</span><span class="n">msg</span><span class="si">!r}</span><span class="s2">&quot;</span>
+    <span class="p">)</span>
+
+
+<span class="k">class</span><span class="w"> </span><span class="nc">_GdxHandle</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Own the new -&gt; create -&gt; (use) -&gt; free -&gt; delete lifecycle of one SWIG gdx handle.</span>
+
+<span class="sd">    The SWIG gdx handle has two separable resources: the wrapper struct from</span>
+<span class="sd">    ``new_gdxHandle_tp()`` (a plain ``calloc``) and the gdx object that</span>
+<span class="sd">    ``gdxCreateD`` builds inside it. They tear down differently:</span>
+
+<span class="sd">    - success: ``gdxFree`` (frees the object) then ``delete_gdxHandle_tp`` (frees the wrapper);</span>
+<span class="sd">    - failure: ``delete_gdxHandle_tp`` ONLY -- on a failed ``gdxCreateD`` the library never</span>
+<span class="sd">      loaded, so ``XFree`` is unbound and ``gdxFree`` would segfault.</span>
+
+<span class="sd">    ``close()`` is idempotent (run-once: a second ``gdxFree`` is a double free). There is no</span>
+<span class="sd">    ``__del__`` on purpose -- native cleanup never runs from a destructor (which would fire at</span>
+<span class="sd">    interpreter teardown after module state is partially gone). Short-lived handles use ``with``;</span>
+<span class="sd">    a long-lived owner (e.g. ``GdxFile``) keeps the instance and drives :meth:`close` from a</span>
+<span class="sd">    ``weakref.finalize`` callback -- safe because ``close`` is a bound method that does not</span>
+<span class="sd">    reference the owner and uses gdxcc callables bound at construction (not module globals).</span>
+
+<span class="sd">    ``gdxcc`` is passed in because :mod:`gdxpds.tools` does not import a binding at module level.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gdxcc</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">,</span> <span class="n">source</span><span class="p">):</span>
+        <span class="c1"># Bind the callables now so close() does not look them up through module</span>
+        <span class="c1"># globals during interpreter shutdown.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_free</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxFree</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">delete_gdxHandle_tp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_created</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">new_gdxHandle_tp</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rc</span> <span class="o">=</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">gdxCreateD</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">,</span> <span class="n">gdxcc</span><span class="o">.</span><span class="n">GMS_SSSIZE</span><span class="p">)</span>
+            <span class="n">_check_gdx_create_rc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="n">rc</span><span class="p">,</span> <span class="n">gdxcc</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">,</span> <span class="n">source</span><span class="p">)</span>  <span class="c1"># raises on failure</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_created</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">BaseException</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>  <span class="c1"># _created is False -&gt; delete-only, never gdxFree</span>
+            <span class="k">raise</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_closed</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">H</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">H</span><span class="p">,</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_created</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_free</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_delete</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">exc</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="GamsDirFinder">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.tools.html#gdxpds.GamsDirFinder">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GamsDirFinder</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for finding and accessing the system&#39;s GAMS directory.</span>
+
+<span class="sd">    The find function first looks for the &#39;GAMS_DIR&#39; environment variable. If</span>
+<span class="sd">    that is unsuccessful, it next uses &#39;which gams&#39; for POSIX systems, and the</span>
+<span class="sd">    default install location, &#39;C:/GAMS&#39;, for Windows systems. In the latter case</span>
+<span class="sd">    it prefers the largest version number.</span>
+
+<span class="sd">    You can always specify the GAMS directory directly, and this class will attempt</span>
+<span class="sd">    to clean up your input. (Even on Windows, the GAMS path must use &#39;/&#39; rather than</span>
+<span class="sd">    &#39;\&#39;.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gams_dir_cache</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span> <span class="o">=</span> <span class="n">gams_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Label describing which discovery branch produced ``gams_dir``.</span>
+
+<span class="sd">        Set whenever a non-None ``gams_dir`` is resolved. Useful for diagnosing</span>
+<span class="sd">        &quot;wrong GAMS directory got picked&quot; reports. ``None`` if no GAMS directory</span>
+<span class="sd">        could be resolved.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__source</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;The GAMS directory on this system.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Unable to locate your GAMS directory.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span>
+
+    <span class="nd">@gams_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># Accept any path-like (e.g. pathlib.Path) by coercing it to str first.</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">):</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clean_gams_dir</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="s2">&quot;explicit override&quot;</span>
+        <span class="k">elif</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Unexpected gams_dir type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">. Ignoring &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;input </span><span class="si">{</span><span class="n">value</span><span class="si">!r}</span><span class="s2"> because it is not a str or path-like.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__find_gams</span><span class="p">()</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__find_gams_root_in</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Search direct subdirectories of `parent` for a GAMS installation,</span>
+<span class="sd">        identified by the presence of gams.exe. If multiple are found, prefer</span>
+<span class="sd">        the one whose directory name parses as the largest version.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">parent</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">roots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">parent</span><span class="p">):</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="s2">&quot;gams.exe&quot;</span><span class="p">)):</span>
+                    <span class="n">roots</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">roots</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">roots</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">roots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">_parse</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">valid</span> <span class="o">=</span> <span class="p">[(</span><span class="n">p</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="p">((</span><span class="n">_parse</span><span class="p">(</span><span class="n">d</span><span class="p">),</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">roots</span><span class="p">)</span> <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">valid</span><span class="p">:</span>
+            <span class="n">pad</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">valid</span><span class="p">)</span>
+            <span class="n">padded</span> <span class="o">=</span> <span class="p">[(</span><span class="n">p</span> <span class="o">+</span> <span class="p">(</span><span class="mi">0</span><span class="p">,)</span> <span class="o">*</span> <span class="p">(</span><span class="n">pad</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)),</span> <span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">valid</span><span class="p">]</span>
+            <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">padded</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">roots</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__clean_gams_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cleans up the path string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">ret</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">None</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\\\\</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">ret</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">ret</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">__find_gams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        For all systems, the first place we examine is the GAMS_DIR environment</span>
+<span class="sd">        variable, and the second is GAMSDIR.</span>
+
+<span class="sd">        For Windows, the next step is to try &#39;where gams&#39;. Then we look in the</span>
+<span class="sd">        default install location (C:/GAMS), preferring win64 to win32 and the</span>
+<span class="sd">        most recent version.</span>
+
+<span class="sd">        For all others, the next step is &#39;which gams&#39;.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str or None</span>
+<span class="sd">            If not None, the return value is the found gams_dir</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># check for environment variable</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GAMS_DIR&quot;</span><span class="p">)</span>
+        <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clean_gams_dir</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="s2">&quot;GAMS_DIR env var&quot;</span>
+
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;GAMSDIR&quot;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clean_gams_dir</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="s2">&quot;GAMSDIR env var&quot;</span>
+
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>
+            <span class="c1"># windows systems</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">subp</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;where&quot;</span><span class="p">,</span> <span class="s2">&quot;gams&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clean_gams_dir</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="s2">&quot;where gams&quot;</span>
+
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>
+            <span class="c1"># search in default installation location. Modern GAMS (v42+)</span>
+            <span class="c1"># installs to C:\GAMS\&lt;version&gt;\; legacy installs went to</span>
+            <span class="c1"># C:\GAMS\win64\&lt;version&gt;\. A GAMS root is identified by the</span>
+            <span class="c1"># presence of gams.exe.</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__find_gams_root_in</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;C:\GAMS&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;C:\GAMS default-location walk (modern layout)&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__find_gams_root_in</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;C:\GAMS&quot;</span><span class="p">,</span> <span class="s2">&quot;win64&quot;</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;C:\GAMS\win64 default-location walk (legacy layout)&quot;</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clean_gams_dir</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;nt&quot;</span><span class="p">:</span>
+            <span class="c1"># posix systems</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">subp</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s2">&quot;which&quot;</span><span class="p">,</span> <span class="s2">&quot;gams&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">ret</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__clean_gams_dir</span><span class="p">(</span><span class="n">ret</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="s2">&quot;which gams&quot;</span>
+
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">GamsDirFinder</span><span class="o">.</span><span class="n">gams_dir_cache</span> <span class="o">=</span> <span class="n">ret</span>
+
+        <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Did not find GAMS directory. Using cached value </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">gams_dir_cache</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">ret</span> <span class="o">=</span> <span class="n">GamsDirFinder</span><span class="o">.</span><span class="n">gams_dir_cache</span>
+            <span class="k">if</span> <span class="n">ret</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__source</span> <span class="o">=</span> <span class="s2">&quot;cached&quot;</span>
+
+        <span class="k">return</span> <span class="n">ret</span></div>
+
+
+
+<div class="viewcode-block" id="NeedsGamsDir">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.tools.html#gdxpds.NeedsGamsDir">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">NeedsGamsDir</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Mix-in class that asserts that a GAMS directory is needed and provides the methods</span>
+<span class="sd">    required to find and access it.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gams_dir</span> <span class="o">=</span> <span class="n">gams_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The GAMS directory whose value has either been directly set or has been found using</span>
+<span class="sd">        the GamsDirFinder class.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span>
+
+    <span class="nd">@gams_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">finder</span> <span class="o">=</span> <span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir</span> <span class="o">=</span> <span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir_source</span> <span class="o">=</span> <span class="n">finder</span><span class="o">.</span><span class="n">source</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">gams_dir_source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Label for the discovery branch that produced :attr:`gams_dir`.</span>
+
+<span class="sd">        Mirrors :attr:`GamsDirFinder.source`; lets GAMS-load errors name where</span>
+<span class="sd">        the directory came from, consistently with the other handle-create sites.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__gams_dir_source</span></div>
+
+
+
+<span class="c1"># Process-global state for the bound GAMS library. Populated by the first</span>
+<span class="c1"># successful load_gdxcc() call; consumed by info() and the mismatch warning.</span>
+<span class="n">_bindings_source</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="n">_loaded_gams_dir</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="c1"># Cached result of probing for the optional gams.transfer fast-path engine.</span>
+<span class="n">_have_gams_transfer</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_probe_transfer_at</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Construct a ``gams.transfer`` Container at ``gams_dir`` and report success.</span>
+
+<span class="sd">    ``gams_dir`` is resolved through :class:`GamsDirFinder` (``None`` -&gt; default</span>
+<span class="sd">    discovery). Any failure (not installed, version-skewed, GAMS not found) reads</span>
+<span class="sd">    as &quot;not available&quot;. Uncached -- the caller decides whether to memoize.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">gams.transfer</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gt</span>
+
+        <span class="n">gt</span><span class="o">.</span><span class="n">Container</span><span class="p">(</span><span class="n">system_directory</span><span class="o">=</span><span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_probe_gams_transfer</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return True if the ``gams.transfer`` fast path is *usable* here.</span>
+
+<span class="sd">    Importable is necessary but not sufficient: a gamsapi whose build does not</span>
+<span class="sd">    match the active GAMS install imports fine but then fails to load its shared</span>
+<span class="sd">    libraries (e.g. ``gmdcclib``) when a Container is constructed. So this</span>
+<span class="sd">    actually constructs a Container against the resolved GAMS directory to</span>
+<span class="sd">    confirm the engine works.</span>
+
+<span class="sd">    With the default ``gams_dir=None`` the result is cached after the first call</span>
+<span class="sd">    (keyed to the default-discovered directory), so ``import gdxpds`` pays nothing</span>
+<span class="sd">    on systems that never touch the fast path and repeat checks are free. When an</span>
+<span class="sd">    explicit ``gams_dir`` is given (e.g. ``info(gams_dir=...)`` inspecting a</span>
+<span class="sd">    specific install) the probe runs fresh against that directory and neither</span>
+<span class="sd">    reads nor writes the cache, so it reports that directory and a transient</span>
+<span class="sd">    failure can&#39;t poison later default probes.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">gams_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_probe_transfer_at</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">)</span>
+    <span class="k">global</span> <span class="n">_have_gams_transfer</span>
+    <span class="k">if</span> <span class="n">_have_gams_transfer</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">_have_gams_transfer</span> <span class="o">=</span> <span class="n">_probe_transfer_at</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">_have_gams_transfer</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="c1"># PEP 562: expose HAVE_GAMS_TRANSFER lazily, computed on first access rather</span>
+    <span class="c1"># than at module import.</span>
+    <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;HAVE_GAMS_TRANSFER&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">_probe_gams_transfer</span><span class="p">()</span>
+    <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;module </span><span class="si">{</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> has no attribute </span><span class="si">{</span><span class="n">name</span><span class="si">!r}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="load_gdxcc">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.tools.html#gdxpds.load_gdxcc">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">load_gdxcc</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Bind the GAMS library and initialize special-value conversion tables.</span>
+
+<span class="sd">    Idempotent: safe to call repeatedly. The first successful call binds the</span>
+<span class="sd">    GDX shared library at the resolved ``gams_dir`` and populates the</span>
+<span class="sd">    module-level dicts in :mod:`gdxpds.special`. Subsequent calls early-return</span>
+<span class="sd">    without re-binding; if the resolved ``gams_dir`` differs from the</span>
+<span class="sd">    already-bound directory, a warning is emitted (one GAMS library bound per</span>
+<span class="sd">    process). Directory validation runs only on the first, binding call, so a</span>
+<span class="sd">    later call with an invalid ``gams_dir`` warns and returns rather than</span>
+<span class="sd">    raising (the passed directory is ignored once a library is bound).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gams_dir : None or str</span>
+<span class="sd">        If not None, directory containing the GAMS executable. If None, the</span>
+<span class="sd">        directory is resolved by :class:`GamsDirFinder` (env vars, PATH,</span>
+<span class="sd">        default-install walk).</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    GamsLoadError</span>
+<span class="sd">        If the resolved directory does not contain GAMS, or if ``gdxCreateD``</span>
+<span class="sd">        fails on the first bind.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_bindings_source</span><span class="p">,</span> <span class="n">_loaded_gams_dir</span>
+    <span class="n">finder</span> <span class="o">=</span> <span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_loaded_gams_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span> <span class="o">!=</span> <span class="n">_loaded_gams_dir</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;gams_dir=</span><span class="si">{</span><span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="si">!r}</span><span class="s2"> differs from the already-bound &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;directory </span><span class="si">{</span><span class="n">_loaded_gams_dir</span><span class="si">!r}</span><span class="s2">; the passed gams_dir is &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;ignored (one GAMS library bound per process).&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span>
+    <span class="n">_require_gams_installation</span><span class="p">(</span><span class="n">finder</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">gams.core</span><span class="w"> </span><span class="kn">import</span> <span class="n">gdx</span> <span class="k">as</span> <span class="n">gdxcc</span>
+
+        <span class="n">_bindings_source</span> <span class="o">=</span> <span class="s2">&quot;gams.core.gdx&quot;</span>
+    <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">gdxcc</span>
+
+        <span class="n">_bindings_source</span> <span class="o">=</span> <span class="s2">&quot;gdxcc&quot;</span>
+    <span class="k">with</span> <span class="n">_GdxHandle</span><span class="p">(</span><span class="n">gdxcc</span><span class="p">,</span> <span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="p">,</span> <span class="n">finder</span><span class="o">.</span><span class="n">source</span><span class="p">):</span>
+        <span class="k">pass</span>
+    <span class="c1"># Deferred to break the tools &lt;-&gt; special import cycle.</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.special</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_specials</span>
+
+    <span class="n">load_specials</span><span class="p">(</span><span class="n">finder</span><span class="p">)</span>
+    <span class="n">_loaded_gams_dir</span> <span class="o">=</span> <span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span></div>
+
+
+
+<div class="viewcode-block" id="info">
+<a class="viewcode-back" href="../../_autosummary/gdxpds.tools.html#gdxpds.info">[docs]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">info</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a human-readable environment report as a string.</span>
+
+<span class="sd">    Includes the gdxpds version, Python info, which GDX bindings are available</span>
+<span class="sd">    and which (if any) is currently bound, the resolved GAMS directory plus the</span>
+<span class="sd">    discovery branch that produced it, and any error from the active load</span>
+<span class="sd">    attempt.</span>
+
+<span class="sd">    Calls :func:`load_gdxcc` internally inside a try/except so install issues</span>
+<span class="sd">    surface in the report even before any GDX operation has run. The first</span>
+<span class="sd">    such call binds the library if it isn&#39;t already bound; subsequent calls</span>
+<span class="sd">    hit the idempotent fast-path.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    gams_dir : None or str</span>
+<span class="sd">        If ``None`` (default), the GAMS directory is resolved via a fresh</span>
+<span class="sd">        ``GamsDirFinder()`` probe -- the same discovery any subsequent gdxpds</span>
+<span class="sd">        operation would do. If a string, probes that directory instead.</span>
+
+<span class="sd">    This function never raises. Probe failures show up as ``&quot;(unknown)&quot;`` or</span>
+<span class="sd">    ``&quot;not importable&quot;`` in the corresponding field. The return value is a</span>
+<span class="sd">    string suitable for printing or pasting into a bug report.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">importlib</span>
+    <span class="kn">import</span><span class="w"> </span><span class="nn">importlib.metadata</span>
+
+    <span class="c1"># Deferred to break the tools &lt;-&gt; __init__ import cycle.</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds</span><span class="w"> </span><span class="kn">import</span> <span class="n">__version__</span>
+
+    <span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;gdxpds info&quot;</span><span class="p">,</span> <span class="s2">&quot;-----------&quot;</span><span class="p">]</span>
+
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;gdxpds:        </span><span class="si">{</span><span class="n">__version__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">py_version</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Python:        </span><span class="si">{</span><span class="n">py_version</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Bindings:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">module_path</span><span class="p">,</span> <span class="n">dist_name</span> <span class="ow">in</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;gams.core.gdx&quot;</span><span class="p">,</span> <span class="s2">&quot;gamsapi&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;gdxcc&quot;</span><span class="p">,</span> <span class="s2">&quot;gdxcc&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;gams.transfer&quot;</span><span class="p">,</span> <span class="s2">&quot;gamsapi&quot;</span><span class="p">),</span>
+    <span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">importlib</span><span class="o">.</span><span class="n">import_module</span><span class="p">(</span><span class="n">module_path</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">version</span><span class="p">(</span><span class="n">dist_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">importlib</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">PackageNotFoundError</span><span class="p">:</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="s2">&quot;(version unknown)&quot;</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">module_path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">dist_name</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">module_path</span><span class="si">}</span><span class="s2">: not importable&quot;</span><span class="p">)</span>
+
+    <span class="n">load_failure</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">load_gdxcc</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">load_failure</span> <span class="o">=</span> <span class="n">e</span>
+
+    <span class="n">selected</span> <span class="o">=</span> <span class="n">_bindings_source</span> <span class="ow">or</span> <span class="s2">&quot;(not yet selected)&quot;</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  selected:    </span><span class="si">{</span><span class="n">selected</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">bound</span> <span class="o">=</span> <span class="n">_loaded_gams_dir</span> <span class="ow">or</span> <span class="s2">&quot;(not yet bound)&quot;</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  bound dir:   </span><span class="si">{</span><span class="n">bound</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="c1"># Importable (above) is not the same as usable: a version-skewed gamsapi</span>
+    <span class="c1"># imports but cannot load the GAMS libraries. This reports actual usability</span>
+    <span class="c1"># for the directory being inspected (a fresh, uncached probe when gams_dir is</span>
+    <span class="c1"># given, so the report tracks the requested install rather than the default).</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  gams.transfer usable: </span><span class="si">{</span><span class="s1">&#39;yes&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">_probe_gams_transfer</span><span class="p">(</span><span class="n">gams_dir</span><span class="p">)</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;no&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds._engine</span><span class="w"> </span><span class="kn">import</span> <span class="n">resolve_engine</span>
+
+        <span class="c1"># Thread `gams_dir` through so the reported default engine reflects the</span>
+        <span class="c1"># directory being inspected (not the cached default-discovered one).</span>
+        <span class="n">default_engine</span> <span class="o">=</span> <span class="n">resolve_engine</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span><span class="o">.</span><span class="n">value</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">default_engine</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;(unresolved: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">)&quot;</span>
+    <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Default engine: </span><span class="si">{</span><span class="n">default_engine</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">finder</span> <span class="o">=</span> <span class="n">GamsDirFinder</span><span class="p">(</span><span class="n">gams_dir</span><span class="o">=</span><span class="n">gams_dir</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GAMS_DIR:      </span><span class="si">{</span><span class="n">finder</span><span class="o">.</span><span class="n">gams_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  source:      </span><span class="si">{</span><span class="n">finder</span><span class="o">.</span><span class="n">source</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;GAMS_DIR:      (not found)&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GAMS_DIR:      (probe failed: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">load_failure</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;load_gdxcc FAILED: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">load_failure</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">load_failure</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, The Alliance for Energy Innovation, LLC.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+     
+    <script src="../../_static/versions.js"></script>
+
+
+</body>
+</html>
