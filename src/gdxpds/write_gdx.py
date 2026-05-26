@@ -175,14 +175,21 @@ class Translator:
 
     @staticmethod
     def __add_aliases(aliases, gdx_file):
-        """Materialize each ``aliases`` entry (alias name -> parent Set name) as an
-        :class:`GamsDataType.Alias <GamsDataType>` of an already-built Set. Raises
-        :class:`DomainError` for a non-str parent, an unknown parent, a parent that
-        is not a Set, or a name collision with an existing symbol."""
+        """Materialize each ``aliases`` entry (alias name -> parent symbol name) as
+        an :class:`GamsDataType.Alias <GamsDataType>` of an already-built parent.
+        The parent is typically a Set, but an Alias is accepted (chained aliases;
+        see :func:`append_alias`). Raises :class:`DomainError` for a non-str alias
+        key, a non-str parent value, an unknown parent, a parent that is neither
+        a Set nor an Alias, or a name collision with an existing symbol."""
         for alias_name, parent_name in aliases.items():
+            if not isinstance(alias_name, str):
+                raise DomainError(
+                    "to_gdx: aliases keys must be alias names (str); got a "
+                    f"{type(alias_name).__name__} key ({alias_name!r})"
+                )
             if not isinstance(parent_name, str):
                 raise DomainError(
-                    f"to_gdx: aliases[{alias_name!r}] must be a parent Set name (str); "
+                    f"to_gdx: aliases[{alias_name!r}] must be a parent symbol name (str); "
                     f"got {type(parent_name).__name__}"
                 )
             if alias_name in gdx_file:

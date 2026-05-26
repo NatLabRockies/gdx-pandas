@@ -8,18 +8,20 @@
 #   1) sources its bin/activate (which should `module load gams/<ver>` and
 #      pin GAMS_DIR per the patches in dev/README.md);
 #   2) runs `pytest tests`;
-#   3) runs `gdxpds test`;
-#   4) in .venv-no-gams only, additionally runs `pip wheel --no-deps .` to
+#   3) runs `gdxpds info` (binding-free diagnostic, must succeed in every venv
+#      including .venv-no-gams since v3.0.0 made the import binding-free);
+#   4) runs `gdxpds test`;
+#   5) in .venv-no-gams only, additionally runs `pip wheel --no-deps .` to
 #      confirm the wheel still builds without GAMS bindings (guards the
 #      static-attr `version` read in pyproject.toml);
-#   5) deactivates.
+#   6) deactivates.
 #
 # Per-venv logs go to dev/test_matrix_logs/<venv>.log; a top-level
 # summary is printed to stdout and saved to dev/test_matrix_logs/summary.txt.
 #
 # For .venv-no-gams, pytest and gdxpds test are expected to FAIL cleanly
-# (non-zero exit, no segfault, useful error message) and the wheel build
-# is expected to SUCCEED. The script flips its verdict accordingly.
+# (non-zero exit, no segfault, useful error message); `gdxpds info` and the
+# wheel build are expected to SUCCEED. The script flips its verdict accordingly.
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT" || exit 1
@@ -68,6 +70,16 @@ run_one_venv () {
     echo "pytest exit: $pytest_rc" | tee -a "$log"
     echo | tee -a "$log"
 
+    # `gdxpds info` is the binding-free diagnostic introduced in v3.0.0: it
+    # imports gdxpds without needing GAMS, reports what bindings are visible,
+    # and is contracted to never raise (return code 0 even when nothing is
+    # installed). Run it everywhere -- including .venv-no-gams.
+    echo "--- gdxpds info ---" | tee -a "$log"
+    gdxpds info >>"$log" 2>&1
+    local info_rc=$?
+    echo "gdxpds info exit: $info_rc" | tee -a "$log"
+    echo | tee -a "$log"
+
     echo "--- gdxpds test ---" | tee -a "$log"
     gdxpds test >>"$log" 2>&1
     local gdxpds_rc=$?
@@ -90,16 +102,17 @@ run_one_venv () {
 
     local verdict
     if [ "$venv" = ".venv-no-gams" ]; then
-        if [ "$pytest_rc" -ne 0 ] && [ "$gdxpds_rc" -ne 0 ] && [ "$wheel_rc" -eq 0 ]; then
-            verdict="OK (pytest/gdxpds failed as expected; wheel built without bindings)"
+        if [ "$pytest_rc" -ne 0 ] && [ "$gdxpds_rc" -ne 0 ] \
+           && [ "$info_rc" -eq 0 ] && [ "$wheel_rc" -eq 0 ]; then
+            verdict="OK (info+wheel succeed; pytest/gdxpds fail as expected)"
         else
-            verdict="UNEXPECTED (pytest=$pytest_rc, gdxpds=$gdxpds_rc, wheel=$wheel_rc)"
+            verdict="UNEXPECTED (pytest=$pytest_rc, info=$info_rc, gdxpds=$gdxpds_rc, wheel=$wheel_rc)"
         fi
     else
-        if [ "$pytest_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ]; then
+        if [ "$pytest_rc" -eq 0 ] && [ "$info_rc" -eq 0 ] && [ "$gdxpds_rc" -eq 0 ]; then
             verdict="PASS"
         else
-            verdict="FAIL (pytest=$pytest_rc, gdxpds=$gdxpds_rc)"
+            verdict="FAIL (pytest=$pytest_rc, info=$info_rc, gdxpds=$gdxpds_rc)"
         fi
     fi
     echo "verdict: $verdict" | tee -a "$log"

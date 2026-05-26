@@ -1,6 +1,7 @@
 import logging
 
 import numpy as np
+import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -34,10 +35,15 @@ def convert_gdx_to_np_svs(df, num_dims):
     # create clean copy of df
     tmp = df.copy()
 
-    # apply the map to the value columns and merge with the dimensional information
-    tmp = (tmp.iloc[:, :num_dims]).merge(
-        tmp.iloc[:, num_dims:].replace(GDX_TO_NP_SVS), left_index=True, right_index=True
-    )
+    # apply the map to the value columns and merge with the dimensional information.
+    # GDX_TO_NP_SVS maps GDX UNDEF (1e300) -> None; pandas 2.x's default `replace`
+    # silently downcasts None back to NaN when the source column is float, which
+    # would collapse the UNDEF/NA distinction. The option-context opts into the
+    # 3.x behavior locally: object dtype is preserved when None remains in the
+    # column, and untouched columns keep their float dtype.
+    with pd.option_context("future.no_silent_downcasting", True):
+        replaced = tmp.iloc[:, num_dims:].replace(GDX_TO_NP_SVS)
+    tmp = (tmp.iloc[:, :num_dims]).merge(replaced, left_index=True, right_index=True)
     return tmp
 
 

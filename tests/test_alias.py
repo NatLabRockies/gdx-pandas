@@ -110,3 +110,78 @@ def test_to_gdx_aliases_name_collision_raises():
             {"t": pd.DataFrame({"i": ["a"], "Value": [""]})},
             aliases={"t": "t"},  # alias name collides with an existing symbol
         )
+
+
+def test_aliased_with_setter_rejects_on_non_alias_symbol():
+    # Fail fast on the data model: aliased_with only makes sense on an Alias.
+    s = GdxSymbol("s", GamsDataType.Set, dims=["i"])
+    parent = GdxSymbol("t", GamsDataType.Set, dims=["i"])
+    with pytest.raises(DomainError):
+        s.aliased_with = parent
+
+
+def test_aliased_with_setter_rejects_non_set_parent():
+    # Fail fast on the data model: parent must be a Set or another Alias.
+    a = GdxSymbol("at", GamsDataType.Alias, dims=["i"])
+    p = GdxSymbol("p", GamsDataType.Parameter, dims=["i"])
+    with pytest.raises(DomainError):
+        a.aliased_with = p
+
+
+def test_aliased_with_setter_accepts_alias_parent():
+    # Chained aliases (alias of an alias) are allowed by both backends; the gdxcc
+    # backend preserves the chain on write, gams_transfer flattens it to the root.
+    parent_set = GdxSymbol("t", GamsDataType.Set, dims=["i"])
+    a1 = GdxSymbol("at", GamsDataType.Alias, dims=["i"], aliased_with=parent_set)
+    a2 = GdxSymbol("aat", GamsDataType.Alias, dims=["i"], aliased_with=a1)
+    assert a2.aliased_with is a1
+    assert a2.aliased_with_name == "at"
+
+
+def test_to_gdx_aliases_rejects_non_str_key():
+    with pytest.raises(DomainError):
+        gdxpds.to_gdx(
+            {"t": pd.DataFrame({"i": ["a"], "Value": [""]})},
+            aliases={42: "t"},  # non-str alias name
+        )
+
+
+def test_clone_alias_drops_live_parent_ref(run_dir):
+    # Cloning an alias must not carry the live parent ref from the source file;
+    # only the parent name survives, and is re-resolved against the destination.
+    out = os.path.join(run_dir, "clone_alias.gdx")
+    with GdxFile() as src:
+        append_set(src, "t", pd.DataFrame({"i": ["a", "b", "c"]}))
+        append_alias(src, "at", "t")
+        cloned_at = src["at"].clone()
+        # The clone retains the parent name but not a live ref to src["t"].
+        assert cloned_at.aliased_with is None
+        assert cloned_at.aliased_with_name == "t"
+        # And it can be inserted into a fresh file and resolved there.
+        with GdxFile() as dest:
+            append_set(dest, "t", pd.DataFrame({"i": ["x", "y"]}))
+            dest.append(cloned_at)
+            cloned_at.resolve_aliased_with()
+            assert cloned_at.aliased_with is dest["t"]
+            dest.write(out)
+
+
+def test_alias_of_alias_roundtrip_both_backends(run_dir):
+    # End-to-end behavior: both backends accept alias-of-alias on write and read
+    # it back resolved to a same-file symbol. gdxcc preserves the chain on disk
+    # (aat -> at -> t); gams_transfer flattens to the root (aat -> t). Either is
+    # acceptable; the contract is that aliased_with always resolves to a same-file
+    # parent and aliased_with_name is the resolved parent's name.
+    backends = ["gdxcc"] + (["gams_transfer"] if gdxpds.HAVE_GAMS_TRANSFER else [])
+    for be in backends:
+        out = os.path.join(run_dir, f"aoa_{be}.gdx")
+        with GdxFile(backend=be) as f:
+            t = append_set(f, "t", pd.DataFrame({"i": ["a", "b", "c"]}))
+            at = append_alias(f, "at", t)
+            append_alias(f, "aat", at)  # alias of an alias
+            f.write(out)
+        with GdxFile(lazy_load=False, backend=be) as g:
+            g.read(out)
+            assert g["aat"].data_type == GamsDataType.Alias
+            assert g["aat"].aliased_with is not None
+            assert g["aat"].aliased_with_name in ("at", "t")

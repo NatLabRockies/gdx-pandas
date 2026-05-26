@@ -740,6 +740,11 @@ class GdxSymbol:
         # Pass _domain directly to the constructor: the domain setter copies the list, so the
         # clone has its own slot list pointing at the same parent GdxSymbols. Write-time name
         # lookup resolves against whatever file the clone ends up in.
+        #
+        # For aliases, intentionally do NOT carry the live `aliased_with` GdxSymbol ref --
+        # it would still point at the *original* file's parent, which is wrong once the
+        # clone is inserted elsewhere. Preserve only `aliased_with_name`; the destination
+        # file resolves it against its own symbols at write time.
         result = GdxSymbol(
             self.name,
             self.data_type,
@@ -748,10 +753,7 @@ class GdxSymbol:
             variable_type=self.variable_type,
             equation_type=self.equation_type,
             domain=self._domain,
-            aliased_with=self._aliased_with,
         )
-        # Preserve the parent name even when the ref couldn't be resolved; write-time
-        # lookup resolves it against whatever file the clone ends up in.
         result._aliased_with_name = self.aliased_with_name
         result.dataframe = copy.deepcopy(self.dataframe)
         assert result.loaded
@@ -1183,9 +1185,13 @@ class GdxSymbol:
     @property
     def aliased_with(self):
         """
-        For an :py:attr:`GamsDataType.Alias`, the parent Set it refers to, as a
+        For an :py:attr:`GamsDataType.Alias`, the parent symbol it refers to, as a
         :py:class:`GdxSymbol` reference; ``None`` for any other symbol type and for
         an alias whose parent could not be resolved against its file.
+
+        The parent is typically a Set, but an Alias is also accepted (GDX itself
+        supports chained aliases; the ``gdxcc`` backend preserves the chain on
+        write, while ``gams_transfer`` flattens it to point at the root Set).
 
         Unlike :py:attr:`domain`, an alias has no relaxed fallback: the parent must
         exist in the same file when the alias is written, or the write raises
@@ -1203,10 +1209,20 @@ class GdxSymbol:
             self._aliased_with = None
             self._aliased_with_name = None
             return
+        if self.data_type != GamsDataType.Alias:
+            raise DomainError(
+                f"aliased_with may only be set on an Alias symbol; "
+                f"{self.name!r} is a {self.data_type.name}."
+            )
         if not isinstance(value, GdxSymbol):
             raise DomainError(
                 "aliased_with must be a GdxSymbol reference (the parent Set) or None. "
                 f"Was passed {value!r} of type {type(value)}."
+            )
+        if value.data_type not in (GamsDataType.Set, GamsDataType.Alias):
+            raise DomainError(
+                f"aliased_with parent must be a Set (or another Alias); "
+                f"{value.name!r} is a {value.data_type.name}."
             )
         self._aliased_with = value
         self._aliased_with_name = value.name
@@ -1604,7 +1620,7 @@ def append_alias(
 ) -> GdxSymbol:
     """
     Convenience function that appends ``alias_name`` to ``gdx_file`` as a
-    :class:`GamsDataType.Alias <GamsDataType>` of ``parent`` (an existing Set).
+    :class:`GamsDataType.Alias <GamsDataType>` of ``parent``.
 
     Parameters
     ----------
@@ -1613,26 +1629,36 @@ def append_alias(
     alias_name : str
         name of the alias to be added
     parent : :class:`GdxSymbol` or str
-        the Set the alias refers to, as a :class:`GdxSymbol` reference or the name
-        of a Set already in ``gdx_file``. An unknown name, or a parent that is not
-        a Set, raises :class:`DomainError` (an alias has no relaxed fallback).
+        the parent symbol the alias refers to, as a :class:`GdxSymbol` reference or
+        the name of a symbol already in ``gdx_file``. The parent is typically a Set
+        but an Alias is also accepted (GDX supports chained aliases; the gdxcc
+        backend preserves the chain on write, gams_transfer flattens it to the
+        root Set). An unknown name, a non-:class:`GdxSymbol` parent, or a parent
+        that is neither a Set nor an Alias raises :class:`DomainError` (an alias
+        has no relaxed fallback).
 
     Returns
     -------
     :class:`GdxSymbol`
         The freshly appended alias symbol.
     """
+    if not isinstance(alias_name, str):
+        raise DomainError(
+            f"append_alias: alias_name must be a str; got {type(alias_name).__name__}"
+        )
     if isinstance(parent, str):
         if parent not in gdx_file:
-            raise DomainError(f"append_alias: parent Set {parent!r} is not in the file")
+            raise DomainError(f"append_alias: parent {parent!r} is not in the file")
         parent = gdx_file[parent]
     if not isinstance(parent, GdxSymbol):
         raise DomainError(
-            f"append_alias: parent must be a GdxSymbol or a Set name; got {type(parent).__name__}"
+            f"append_alias: parent must be a GdxSymbol or a symbol name; "
+            f"got {type(parent).__name__}"
         )
     if parent.data_type not in (GamsDataType.Set, GamsDataType.Alias):
         raise DomainError(
-            f"append_alias: parent {parent.name!r} is a {parent.data_type.name}, not a Set"
+            f"append_alias: parent {parent.name!r} is a {parent.data_type.name}; "
+            "must be a Set or Alias"
         )
     gdx_file.append(
         GdxSymbol(alias_name, GamsDataType.Alias, dims=parent.dims, aliased_with=parent)

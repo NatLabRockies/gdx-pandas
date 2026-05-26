@@ -301,6 +301,8 @@ gdxpds.to_gdx(dataframes, 'data.gdx', aliases={'at': 't'})
 
 :::{note}
 Aliases of a *named Set* (the common case) are fully supported on both engines. A **universe alias** — an alias of the universe set `*` (`aliased_with` resolves to the file's `universal_set`) — reads without error and round-trips within a single engine, but the engines disagree on its membership (`gdxcc` includes the `*` element, `gams.transfer` does not), so it is not cross-engine identical.
+
+**Chained aliases (alias of an alias)** are also supported: GDX itself permits a chain (`aat -> at -> t`), and both backends accept it on write and resolve `aliased_with` to a same-file symbol on read. The two engines differ on what reaches disk: the `gdxcc` backend preserves the chain (`aat -> at`), while `gams_transfer` flattens to the root (`aat -> t`). Either form reads back identically through `gdxpds`.
 :::
 
 ## Migration from 1.x / 2.x
