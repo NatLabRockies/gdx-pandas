@@ -45,6 +45,7 @@ extensions = [
     "sphinx.ext.githubpages",
     "sphinx.ext.napoleon",  # had numpydoc, but got lots of extraneous warnings
     "myst_parser",
+    "sphinx_design",  # tab-set / tab-item directives for OS-specific examples
 ]
 
 # autosummary :recursive: walks gdxpds.* at build time and writes per-symbol
@@ -64,8 +65,9 @@ myst_enable_extensions = [
     "deflist",
 ]
 
-# Auto-generate anchor IDs for h1-h3 so [text](#section) links work in .md sources.
-myst_heading_anchors = 3
+# Auto-generate anchor IDs for h1-h4 so [text](#section) links work in .md sources.
+# h4 anchors are needed for the nested subsections under Object-Oriented API.
+myst_heading_anchors = 4
 
 # The master toctree document.
 master_doc = "index"

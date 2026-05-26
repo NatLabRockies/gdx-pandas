@@ -1,10 +1,10 @@
 """Document the read/write speed difference between the gdxcc and gams_transfer
-backends across the in-tree fixtures (sub-3 KB up to ~1.9 MB).
+engines across the in-tree fixtures (sub-3 KB up to ~1.9 MB).
 
 These are not pass/fail performance gates -- timings are machine-dependent. Each
 test records its measurements; conftest's ``pytest_terminal_summary`` renders a
 size-sorted table plus a clear-winner / switchover note at the end of the run.
-The only assertion is that both backends actually ran (a backend that errors on a
+The only assertion is that both engines actually ran (a engine that errors on a
 fixture fails here rather than silently dropping out of the comparison).
 
 Skipped when gams.transfer is unavailable.
@@ -40,20 +40,20 @@ def _min_time(fn, repeats=_REPEATS):
 
 
 @pytest.mark.parametrize("fixture", FIXTURES)
-def test_backend_timing(data_dir, fixture, tmp_path, backend_timings):
+def test_engine_timing(data_dir, fixture, tmp_path, engine_timings):
     path = os.path.join(data_dir, fixture)
     size_kb = os.path.getsize(path) / 1024.0
 
     # Read (eager / bulk path -- the same one to_dataframes uses).
-    read_g = _min_time(lambda: to_dataframes(path, backend="gdxcc"))
-    read_t = _min_time(lambda: to_dataframes(path, backend="gams_transfer"))
+    read_g = _min_time(lambda: to_dataframes(path, engine="gdxcc"))
+    read_t = _min_time(lambda: to_dataframes(path, engine="gams_transfer"))
 
-    # Write: read once (untimed) to get DataFrames, then time each backend's write.
-    dfs = to_dataframes(path, backend="gdxcc")
-    write_g = _min_time(lambda: to_gdx(dfs, str(tmp_path / "g.gdx"), backend="gdxcc"))
-    write_t = _min_time(lambda: to_gdx(dfs, str(tmp_path / "t.gdx"), backend="gams_transfer"))
+    # Write: read once (untimed) to get DataFrames, then time each engine's write.
+    dfs = to_dataframes(path, engine="gdxcc")
+    write_g = _min_time(lambda: to_gdx(dfs, str(tmp_path / "g.gdx"), engine="gdxcc"))
+    write_t = _min_time(lambda: to_gdx(dfs, str(tmp_path / "t.gdx"), engine="gams_transfer"))
 
-    backend_timings.append(
+    engine_timings.append(
         {
             "fixture": fixture,
             "size_kb": size_kb,
@@ -63,7 +63,7 @@ def test_backend_timing(data_dir, fixture, tmp_path, backend_timings):
             "ratio": read_g / read_t,
         }
     )
-    backend_timings.append(
+    engine_timings.append(
         {
             "fixture": fixture,
             "size_kb": size_kb,
@@ -74,5 +74,5 @@ def test_backend_timing(data_dir, fixture, tmp_path, backend_timings):
         }
     )
 
-    # Sanity only: both backends ran for both ops (no timing threshold).
+    # Sanity only: both engines ran for both ops (no timing threshold).
     assert min(read_g, read_t, write_g, write_t) > 0

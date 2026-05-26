@@ -22,7 +22,7 @@ def test_read(data_dir):
 
 
 def test_read_none():
-    # The error type is backend-specific (GdxError vs TransferError), but both
+    # The error type is engine-specific (GdxError vs TransferError), but both
     # subclass gdxpds.Error and name the offending path.
     with pytest.raises(gdxpds.Error) as excinfo:
         to_dataframes(None)
@@ -168,7 +168,7 @@ def test_set_element_text_to_dataframes(data_dir):
 def test_alias_reads_like_its_set(data_dir):
     """An Alias reads like the Set it aliases -- the same elements and element
     text -- while keeping its Alias data type and recording its parent in
-    aliased_with. Cross-backend equality is covered by test_backend_parity. See
+    aliased_with. Cross-engine equality is covered by test_engine_parity. See
     dev/build_alias_fixture.py."""
     gdx_file = os.path.join(data_dir, "alias_fixture.gdx")
     assert get_data_types(gdx_file)["at"] == gdxpds.gdx.GamsDataType.Alias

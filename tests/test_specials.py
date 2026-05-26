@@ -26,8 +26,8 @@ def test_roundtrip_just_special_values(run_dir, roundtrip_one_gdx):
     if not os.path.exists(outdir):
         os.mkdir(outdir)
     # create gdx file containing all special values
-    with gdxpds.gdx.GdxFile(backend="gdxcc") as f:
-        H = f._backend_impl.handle  # raw gdxcc escape hatch (GdxFile.H removed)
+    with gdxpds.gdx.GdxFile(engine="gdxcc") as f:
+        H = f._engine_impl.handle  # raw gdxcc escape hatch (GdxFile.H removed)
         df = pd.DataFrame(
             [
                 ["sv" + str(i + 1), gdxpds.special.SPECIAL_VALUES[i]]

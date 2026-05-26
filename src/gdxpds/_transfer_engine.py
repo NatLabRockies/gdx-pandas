@@ -1,14 +1,14 @@
-"""gams.transfer implementation of :class:`gdxpds._backend.GdxBackend` (read + write).
+"""gams.transfer implementation of :class:`gdxpds._engine.GdxEngine` (read + write).
 
 Read: ``open_read`` builds the symbol metadata from a ``gams.transfer`` Container
 (records-free), and ``load_symbols`` reads records (bulk or targeted) and
 translates each symbol into the gdxpds DataFrame shape so the result matches the
-gdxcc backend. Write: ``write_file`` builds a Container from the gdxpds symbols
+gdxcc engine. Write: ``write_file`` builds a Container from the gdxpds symbols
 (the inverse translation) and writes it, including Sets, aliases, and element text.
 
 ``gams.transfer`` is imported at module load, but this module is itself imported
-lazily by :func:`gdxpds._backend.make_backend`, so ``import gdxpds`` stays free
-of the gams.transfer import cost unless the backend is actually selected.
+lazily by :func:`gdxpds._engine.make_engine`, so ``import gdxpds`` stays free
+of the gams.transfer import cost unless the engine is actually selected.
 """
 
 from __future__ import annotations
@@ -21,7 +21,7 @@ import gams.transfer as gt
 import numpy as np
 import pandas as pd
 
-from gdxpds._backend import GdxBackend
+from gdxpds._engine import GdxEngine
 from gdxpds.gdx import (
     DomainError,
     GamsDataType,
@@ -61,7 +61,7 @@ _EQU_TYPE = {
     "nonbinding": GamsEquationType.NothingEnforced,
     "external": GamsEquationType.External,
     # gt's 'boolean' (subtype 6) has no GamsEquationType; gdxcc can't model it
-    # either, so leaving it unmapped keeps the two backends consistent.
+    # either, so leaving it unmapped keeps the two engines consistent.
 }
 
 # Inverse maps for the write path (gdxpds enum -> gams.transfer .type string).
@@ -124,12 +124,12 @@ def _dims_of(gt_sym) -> list[str]:
 def _convert_transfer_specials(values: pd.DataFrame) -> pd.DataFrame:
     """Map gams.transfer special-value encodings to the gdxpds canonical form.
 
-    Mirrors the gdxcc backend's :func:`special.convert_gdx_to_np_svs` exactly:
+    Mirrors the gdxcc engine's :func:`special.convert_gdx_to_np_svs` exactly:
     EPS (gt's ``-0.0``) -> machine eps; NA (gt's NA sentinel) -> ``np.nan``;
     UNDEF (gt's plain NaN) -> ``None``; +/-inf already match. Genuine ``0.0`` is
     left alone (only negative zero is EPS).
 
-    UNDEF is kept distinct from NA, matching the gdxcc backend: gdxcc maps GDX
+    UNDEF is kept distinct from NA, matching the gdxcc engine: gdxcc maps GDX
     UNDEF -> ``None`` and GDX NA -> ``np.nan`` (see
     :data:`special.GDX_TO_NP_SVS`). A column carrying any UNDEF therefore comes
     back as object dtype (so ``None`` survives), matching gdxcc; a column with no
@@ -154,7 +154,7 @@ def _convert_transfer_specials(values: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
-class TransferBackend(GdxBackend):
+class TransferEngine(GdxEngine):
     """Reads and writes GDX via ``gams.transfer``, translating to/from the gdxpds shape.
 
     Holds no native handle (``handle`` stays ``None``); state is the cached
@@ -249,7 +249,7 @@ class TransferBackend(GdxBackend):
         # Parameter / Variable / Equation. gams.transfer's value-column names are
         # the gdxpds value_col_names lowercased (Value -> value, Level -> level,
         # ...); value_col_names derives from GamsValueType, the same source the
-        # gdxcc backend uses, so there is no second hard-coded list to keep in sync.
+        # gdxcc engine uses, so there is no second hard-coded list to keep in sync.
         value_cols = [name.lower() for name in symbol.value_col_names]
         records = symbol.dataframe.copy()
         records.columns = dim_names + value_cols

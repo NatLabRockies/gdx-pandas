@@ -42,11 +42,11 @@ https://github.com/NatLabRockies/gdx-pandas/releases.
 
 ### Configure
 
-gdxpds needs to know **where GAMS is**, and optionally **which I/O engine** to use. Set either once via an environment variable, or per call with the `gams_dir=` / `backend=` keywords (also `--gams_dir` / `--backend` on the CLIs):
+gdxpds needs to know **where GAMS is**, and optionally **which I/O engine** to use. Set either once via an environment variable, or per call with the `gams_dir=` / `engine=` keywords (also `--gams_dir` / `--engine` on the CLIs):
 
 ```bash
 export GAMS_DIR=/path/to/gams        # otherwise auto-discovered
-export GDXPDS_BACKEND=gdxcc          # default: gams_transfer when usable (much faster on large files), else gdxcc
+export GDXPDS_ENGINE=gdxcc          # default: gams_transfer when usable (much faster on large files), else gdxcc
 ```
 
 See *Configuration* in the [documentation](https://NatLabRockies.github.io/gdx-pandas) for the full keyword / environment-variable / CLI matrix and the speed trade-offs.

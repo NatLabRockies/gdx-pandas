@@ -31,10 +31,10 @@ ELEMENTS = ["a", "b", "c"]
 
 
 def main():
-    # Pin the gdxcc backend: this script drives raw gdxcc calls through the GDX
-    # handle, which the gams.transfer backend does not have.
-    with gdxpds.gdx.GdxFile(backend="gdxcc") as f:
-        H = f._backend_impl.handle
+    # Pin the gdxcc engine: this script drives raw gdxcc calls through the GDX
+    # handle, which the gams.transfer engine does not have.
+    with gdxpds.gdx.GdxFile(engine="gdxcc") as f:
+        H = f._engine_impl.handle
         if not gdxcc.gdxOpenWrite(H, OUT_PATH, "gdxpds"):
             raise gdxpds.gdx.GdxError(H, f"Could not open {OUT_PATH!r} for writing")
         f.universal_set.write()

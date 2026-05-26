@@ -20,18 +20,18 @@ from gdxpds.gdx import (
 from gdxpds.tools import Error
 
 if TYPE_CHECKING:
-    from gdxpds._backend import Backend
+    from gdxpds._engine import Engine
 
 logger = logging.getLogger(__name__)
 
 
 class Translator:
-    def __init__(self, dataframes, gams_dir=None, domains=None, backend=None, aliases=None):
+    def __init__(self, dataframes, gams_dir=None, domains=None, engine=None, aliases=None):
         self.dataframes = dataframes
         self.__domains = domains
         self.__aliases = aliases
         self.__gams_dir = gams_dir
-        self.__backend = backend
+        self.__engine = engine
         self.__gdx = None
 
     def __exit__(self, *args):
@@ -85,7 +85,7 @@ class Translator:
         if self.__gdx is None:
             domains = self.__domains
             aliases = self.__aliases
-            gdx_file = GdxFile(gams_dir=self.__gams_dir, backend=self.__backend)
+            gdx_file = GdxFile(gams_dir=self.__gams_dir, engine=self.__engine)
             dataframes = (
                 self.__topo_sort_dataframes(self.dataframes, domains)
                 if domains is not None
@@ -245,7 +245,7 @@ def to_gdx(
     path: str | os.PathLike[str] | None = None,
     gams_dir: str | os.PathLike[str] | None = None,
     domains: Mapping[str, Sequence[str | None]] | None = None,
-    backend: str | Backend | None = None,
+    engine: str | Engine | None = None,
     aliases: Mapping[str, str] | None = None,
 ) -> GdxFile:
     """
@@ -271,8 +271,8 @@ def to_gdx(
         input (unknown parent name, wrong type, wrong length, cyclic references) raises
         :class:`DomainError`.
 
-    backend : None or str or :py:class:`gdxpds.Backend`
-        Which I/O engine to use for the write (default resolves via ``GDXPDS_BACKEND``,
+    engine : None or str or :py:class:`gdxpds.Engine`
+        Which I/O engine to use for the write (default resolves via ``GDXPDS_ENGINE``,
         then the default engine: ``gams.transfer`` when usable, otherwise ``gdxcc``).
     aliases : None or dict of str to str
         Optional aliases, string-based. Each entry maps a new alias name to the name of an
@@ -284,7 +284,7 @@ def to_gdx(
     :py:class:`gdxpds.gdx.GdxFile`
     """
     translator = Translator(
-        dataframes, gams_dir=gams_dir, domains=domains, backend=backend, aliases=aliases
+        dataframes, gams_dir=gams_dir, domains=domains, engine=engine, aliases=aliases
     )
     gdx = translator.gdx
     if path is not None:

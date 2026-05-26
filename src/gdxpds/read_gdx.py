@@ -10,14 +10,14 @@ import pandas as pd
 from gdxpds.gdx import GamsDataType, GdxFile, SymbolNotFoundError
 
 if TYPE_CHECKING:
-    from gdxpds._backend import Backend
+    from gdxpds._engine import Engine
 
 logger = logging.getLogger(__name__)
 
 
 class Translator:
-    def __init__(self, gdx_file, gams_dir=None, lazy_load=False, backend=None):
-        self.__gdx = GdxFile(gams_dir=gams_dir, lazy_load=lazy_load, backend=backend)
+    def __init__(self, gdx_file, gams_dir=None, lazy_load=False, engine=None):
+        self.__gdx = GdxFile(gams_dir=gams_dir, lazy_load=lazy_load, engine=engine)
         self.__gdx.read(gdx_file)
         self.__dataframes = None
 
@@ -42,7 +42,7 @@ class Translator:
         self.__gdx = GdxFile(
             gams_dir=self.gdx.gams_dir,
             lazy_load=self.gdx.lazy_load,
-            backend=self.gdx._backend_kind,
+            engine=self.gdx._engine_kind,
         )
         self.__gdx.read(value)
         self.__dataframes = None
@@ -74,7 +74,7 @@ class Translator:
     def _get_dataframes(self, symbols=None):
         # One eager load, then collect a copy of each symbol's dataframe.
         # `symbols=None` loads/returns every symbol in file order; a list
-        # loads/returns only those, in the given order. Backends optimize the
+        # loads/returns only those, in the given order. Engines optimize the
         # load: gdxcc loops per symbol; gams.transfer does a single (bulk or
         # targeted) read.
         if self.__dataframes is None:
@@ -93,7 +93,7 @@ class Translator:
 def to_dataframes(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
-    backend: str | Backend | None = None,
+    engine: str | Engine | None = None,
     symbols: list[str] | None = None,
 ) -> dict[str, pd.DataFrame]:
     """
@@ -105,9 +105,9 @@ def to_dataframes(
         Path to the GDX file to read
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
-    backend : None or str or :py:class:`gdxpds.Backend`
+    engine : None or str or :py:class:`gdxpds.Engine`
         Which I/O engine to use. ``None`` (default) resolves via the
-        ``GDXPDS_BACKEND`` env var, then the default engine (``gams.transfer``
+        ``GDXPDS_ENGINE`` env var, then the default engine (``gams.transfer``
         when usable, otherwise ``gdxcc``).
     symbols : None or list of str
         If None (default), every symbol is read. Otherwise only the named
@@ -123,7 +123,7 @@ def to_dataframes(
         value column holds the GAMS element text (``""`` for a member with no
         text); membership is conveyed by row presence.
     """
-    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, backend=backend)._get_dataframes(
+    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, engine=engine)._get_dataframes(
         symbols=symbols
     )
 
@@ -131,7 +131,7 @@ def to_dataframes(
 def list_symbols(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
-    backend: str | Backend | None = None,
+    engine: str | Engine | None = None,
 ) -> list[str]:
     """
     Returns the list of symbols available in gdx_file.
@@ -142,21 +142,21 @@ def list_symbols(
         Path to the GDX file to read
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
-    backend : None or str or :py:class:`gdxpds.Backend`
-        Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).
+    engine : None or str or :py:class:`gdxpds.Engine`
+        Which I/O engine to use (default resolves via ``GDXPDS_ENGINE``).
 
     Returns
     -------
     list of str
         List of symbol names
     """
-    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, backend=backend).symbols
+    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, engine=engine).symbols
 
 
 def get_data_types(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
-    backend: str | Backend | None = None,
+    engine: str | Engine | None = None,
 ) -> dict[str, GamsDataType]:
     """
     Returns a dict of the symbols' :py:class:`GamsDataTypes <GamsDataType>`.
@@ -167,21 +167,21 @@ def get_data_types(
         Path to the GDX file to read
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
-    backend : None or str or :py:class:`gdxpds.Backend`
-        Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).
+    engine : None or str or :py:class:`gdxpds.Engine`
+        Which I/O engine to use (default resolves via ``GDXPDS_ENGINE``).
 
     Returns
     -------
     dict of str to :py:class:GamsDataType`
         Map of symbol names to the corresponding :py:class:GamsDataType`
     """
-    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, backend=backend).data_types
+    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, engine=engine).data_types
 
 
 def get_subset_relationships(
     gdx_file: str | os.PathLike[str],
     gams_dir: str | os.PathLike[str] | None = None,
-    backend: str | Backend | None = None,
+    engine: str | Engine | None = None,
 ) -> dict[str, list[str | None]]:
     """
     Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name.
@@ -202,8 +202,8 @@ def get_subset_relationships(
         Path to the GDX file to read
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
-    backend : None or str or :py:class:`gdxpds.Backend`
-        Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).
+    engine : None or str or :py:class:`gdxpds.Engine`
+        Which I/O engine to use (default resolves via ``GDXPDS_ENGINE``).
 
     Returns
     -------
@@ -212,7 +212,7 @@ def get_subset_relationships(
         file shape.
     """
     result = OrderedDict()
-    gdx = GdxFile(gams_dir=gams_dir, lazy_load=True, backend=backend)
+    gdx = GdxFile(gams_dir=gams_dir, lazy_load=True, engine=engine)
     gdx.read(gdx_file)
     for symbol in gdx:
         if symbol.domain is not None:
@@ -222,11 +222,52 @@ def get_subset_relationships(
     return result
 
 
+def get_aliases(
+    gdx_file: str | os.PathLike[str],
+    gams_dir: str | os.PathLike[str] | None = None,
+    engine: str | Engine | None = None,
+) -> dict[str, str]:
+    """
+    Returns the alias relationships recorded in ``gdx_file``, keyed by alias name.
+
+    The output shape matches the ``aliases=`` argument of :func:`to_gdx`, so a value read
+    here can be fed straight back in. Each entry maps an alias's name to the name of its
+    parent symbol -- typically a Set, but a chained alias parent is possible (GDX permits
+    a chain, and the ``gdxcc`` engine preserves it on disk; ``gams.transfer`` flattens
+    to the root Set on write). The universe set (``'*'``) is reported verbatim for a
+    universe alias.
+
+    Symbols that are not aliases are not included in the output.
+
+    Parameters
+    ----------
+    gdx_file : pathlib.Path or str
+        Path to the GDX file to read
+    gams_dir : None or pathlib.Path or str
+        optional path to GAMS directory
+    engine : None or str or :py:class:`gdxpds.Engine`
+        Which I/O engine to use (default resolves via ``GDXPDS_ENGINE``).
+
+    Returns
+    -------
+    dict of str to str
+        Map of alias name to parent symbol name. Pair this with :func:`to_dataframes`
+        and :func:`get_subset_relationships` to recover the full file shape.
+    """
+    result = OrderedDict()
+    gdx = GdxFile(gams_dir=gams_dir, lazy_load=True, engine=engine)
+    gdx.read(gdx_file)
+    for symbol in gdx:
+        if symbol.data_type == GamsDataType.Alias and symbol.aliased_with_name is not None:
+            result[symbol.name] = symbol.aliased_with_name
+    return result
+
+
 def to_dataframe(
     gdx_file: str | os.PathLike[str],
     symbol_name: str,
     gams_dir: str | os.PathLike[str] | None = None,
-    backend: str | Backend | None = None,
+    engine: str | Engine | None = None,
 ) -> pd.DataFrame:
     """
     Interface for getting the data for a single symbol
@@ -240,8 +281,8 @@ def to_dataframe(
         :class:`~gdxpds.gdx.SymbolNotFoundError`.
     gams_dir : None or pathlib.Path or str
         optional path to GAMS directory
-    backend : None or str or :py:class:`gdxpds.Backend`
-        Which I/O engine to use (default resolves via ``GDXPDS_BACKEND``).
+    engine : None or str or :py:class:`gdxpds.Engine`
+        Which I/O engine to use (default resolves via ``GDXPDS_ENGINE``).
 
     Returns
     -------
@@ -250,6 +291,6 @@ def to_dataframe(
         value column holds the GAMS element text (``""`` for a member with no
         text); membership is conveyed by row presence.
     """
-    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, backend=backend).dataframe(
+    return Translator(gdx_file, gams_dir=gams_dir, lazy_load=True, engine=engine).dataframe(
         symbol_name
     )

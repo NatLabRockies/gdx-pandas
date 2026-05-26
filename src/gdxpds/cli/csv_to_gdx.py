@@ -6,7 +6,7 @@ import pandas as pd
 import gdxpds
 
 
-def convert_csv_to_gdx(input_files, output_file, gams_dir=None, backend=None):
+def convert_csv_to_gdx(input_files, output_file, gams_dir=None, engine=None):
     # check input files
     for ifile in input_files:
         if os.path.splitext(ifile)[1] not in [".csv", ".txt"]:
@@ -41,7 +41,7 @@ def convert_csv_to_gdx(input_files, output_file, gams_dir=None, backend=None):
             ifile, index_col=None
         )
 
-    gdxpds.to_gdx(dataframes, output_file, gams_dir, backend=backend)
+    gdxpds.to_gdx(dataframes, output_file, gams_dir, engine=engine)
 
 
 def main(argv=None):
@@ -74,16 +74,16 @@ def main(argv=None):
     )
     parser.add_argument(
         "-b",
-        "--backend",
-        choices=[b.value for b in gdxpds.Backend],
+        "--engine",
+        choices=[b.value for b in gdxpds.Engine],
         default=None,
-        help="""I/O engine to use. Defaults to the GDXPDS_BACKEND environment
+        help="""I/O engine to use. Defaults to the GDXPDS_ENGINE environment
         variable, then 'gams_transfer' when usable, otherwise 'gdxcc'.""",
     )
 
     args = parser.parse_args(argv)
 
-    convert_csv_to_gdx(args.input, args.output, args.gams_dir, args.backend)
+    convert_csv_to_gdx(args.input, args.output, args.gams_dir, args.engine)
 
 
 if __name__ == "__main__":

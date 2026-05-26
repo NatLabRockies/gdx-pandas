@@ -51,8 +51,8 @@ def main():
     eps = np.finfo(float).eps
 
     # Pin the gdxcc oracle so the committed fixture is written deterministically
-    # regardless of any ambient GDXPDS_BACKEND.
-    with gdxpds.gdx.GdxFile(backend="gdxcc") as gdx:
+    # regardless of any ambient GDXPDS_ENGINE.
+    with gdxpds.gdx.GdxFile(engine="gdxcc") as gdx:
         # Root Set with a wildcard domain (domain_type == NONE on read).
         gdx.append(gdxpds.gdx.GdxSymbol("t", gdxpds.gdx.GamsDataType.Set, dims=["*"]))
         gdx[-1].dataframe = pd.DataFrame(

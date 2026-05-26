@@ -55,24 +55,24 @@ def test_csv_roundtrip(data_dir, run_dir):
     assert cnt == n
 
 
-@pytest.mark.parametrize("backend", ["gdxcc", "gams_transfer"])
-def test_cli_backend_flag(data_dir, run_dir, backend):
-    # The --backend flag is accepted by both CLIs and routed to to_gdx /
+@pytest.mark.parametrize("engine", ["gdxcc", "gams_transfer"])
+def test_cli_engine_flag(data_dir, run_dir, engine):
+    # The --engine flag is accepted by both CLIs and routed to to_gdx /
     # to_dataframes (an unplumbed flag would make check=True fail).
-    if backend == "gams_transfer" and not gdxpds.HAVE_GAMS_TRANSFER:
+    if engine == "gams_transfer" and not gdxpds.HAVE_GAMS_TRANSFER:
         pytest.skip("gams.transfer not available")
     csvs = [
         os.path.join(data_dir, "installed_capacity.csv"),
         os.path.join(data_dir, "annual_generation.csv"),
     ]
-    out_dir = os.path.join(run_dir, f"cli_backend_{backend}")
+    out_dir = os.path.join(run_dir, f"cli_engine_{engine}")
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
     gdx_file = os.path.join(out_dir, "intermediate.gdx")
     subprocess.run(
-        ["csv_to_gdx", "-i", csvs[0], csvs[1], "-o", gdx_file, "--backend", backend], check=True
+        ["csv_to_gdx", "-i", csvs[0], csvs[1], "-o", gdx_file, "--engine", engine], check=True
     )
-    subprocess.run(["gdx_to_csv", "-i", gdx_file, "-o", out_dir, "--backend", backend], check=True)
+    subprocess.run(["gdx_to_csv", "-i", gdx_file, "-o", out_dir, "--engine", engine], check=True)
     for csv in csvs:
         name = os.path.splitext(os.path.basename(csv))[0]
         assert os.path.isfile(os.path.join(out_dir, name + ".csv"))

@@ -512,12 +512,12 @@ def info(gams_dir: str | os.PathLike[str] | None = None) -> str:
     lines.append(f"  gams.transfer usable: {'yes' if _probe_gams_transfer(gams_dir) else 'no'}")
 
     try:
-        from gdxpds._backend import resolve_backend
+        from gdxpds._engine import resolve_engine
 
-        default_backend = resolve_backend(None).value
+        default_engine = resolve_engine(None).value
     except Exception as e:
-        default_backend = f"(unresolved: {type(e).__name__}: {e})"
-    lines.append(f"Default backend: {default_backend}")
+        default_engine = f"(unresolved: {type(e).__name__}: {e})"
+    lines.append(f"Default engine: {default_engine}")
 
     try:
         finder = GamsDirFinder(gams_dir=gams_dir)

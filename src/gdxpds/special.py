@@ -210,6 +210,13 @@ def load_specials(gams_dir_finder):
     Needs to be called after gdxcc is loaded. Populates the module attributes
     SPECIAL_VALUES, GDX_TO_NP_SVS, and NP_TO_GDX_SVS.
 
+    The GDX magic floats for NA/EPS/+Inf/-Inf/UNDEF are properties of the loaded
+    GAMS shared library and exposed only by the SWIG-bound ``gdxcc`` API
+    (``gdxGetSpecialValues``); ``gams.transfer`` does not surface them. The
+    constants populated here are then used by both engines on read/write, so
+    this function always uses the gdxcc bindings regardless of which engine the
+    caller selected for I/O.
+
     Parameters
     ----------
     gams_dir_finder : :class:`gdxpds.tools.GamsDirFinder`

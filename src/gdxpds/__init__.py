@@ -1,8 +1,9 @@
 __version__ = "3.0.0"
 
-from gdxpds._backend import Backend, BackendError
+from gdxpds._engine import Engine, EngineError
 from gdxpds.gdx import DomainError, GdxError, SymbolNotFoundError, TransferError
 from gdxpds.read_gdx import (
+    get_aliases,
     get_data_types,
     get_subset_relationships,
     list_symbols,
@@ -28,8 +29,8 @@ __all__ = [
     "TransferError",
     "DomainError",
     "GamsDirFinder",
-    "Backend",
-    "BackendError",
+    "Engine",
+    "EngineError",
     "SymbolNotFoundError",
     "HAVE_GAMS_TRANSFER",
     "to_dataframes",
@@ -37,6 +38,7 @@ __all__ = [
     "list_symbols",
     "get_data_types",
     "get_subset_relationships",
+    "get_aliases",
     "to_gdx",
 ]
 

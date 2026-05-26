@@ -1,16 +1,16 @@
-"""Backend selection and the ``GdxBackend`` interface.
+"""Engine selection and the ``GdxEngine`` interface.
 
 gdxpds moves data between GDX files and pandas DataFrames through a selectable
 I/O engine. This module owns the engine-agnostic pieces:
 
-- :class:`Backend`, the engine enum, with :data:`DEFAULT_BACKEND`;
-- :func:`resolve_backend` (explicit arg / ``GDXPDS_BACKEND`` env var / default)
-  and :func:`make_backend`, which builds the chosen engine; and
-- :class:`GdxBackend`, the ABC each engine implements; see its docstring for the
+- :class:`Engine`, the engine enum, with :data:`DEFAULT_ENGINE`;
+- :func:`resolve_engine` (explicit arg / ``GDXPDS_ENGINE`` env var / default)
+  and :func:`make_engine`, which builds the chosen engine; and
+- :class:`GdxEngine`, the ABC each engine implements; see its docstring for the
   read / write / handle / teardown contract.
 
-The concrete engines live in :mod:`gdxpds._gdxcc_backend` (the legacy and default
-engine) and :mod:`gdxpds._transfer_backend`.
+The concrete engines live in :mod:`gdxpds._gdxcc_engine` (the legacy and default
+engine) and :mod:`gdxpds._transfer_engine`.
 """
 
 from __future__ import annotations
@@ -27,32 +27,32 @@ if TYPE_CHECKING:
     from gdxpds.gdx import GdxFile, GdxSymbol
 
 
-class BackendError(Error):
-    """Raised for an invalid or unavailable backend selection.
+class EngineError(Error):
+    """Raised for an invalid or unavailable engine selection.
 
     Subclass of :class:`~gdxpds.tools.Error`, so ``except Error`` still catches
     it.
     """
 
 
-class Backend(StrEnum):
+class Engine(StrEnum):
     """Selectable engine for GDX <-> DataFrame I/O.
 
     A :class:`~enum.StrEnum` so callers may pass either the member
-    (``Backend.GDXCC``) or its string value (``"gdxcc"``), and so the
-    ``GDXPDS_BACKEND`` env var maps straight onto it.
+    (``Engine.GDXCC``) or its string value (``"gdxcc"``), and so the
+    ``GDXPDS_ENGINE`` env var maps straight onto it.
     """
 
     GDXCC = "gdxcc"
     GAMS_TRANSFER = "gams_transfer"
 
 
-#: The backend used when none is explicitly requested: gams.transfer when it is
-#: usable, otherwise gdxcc (the fallback resolved in :func:`resolve_backend`).
-DEFAULT_BACKEND = Backend.GAMS_TRANSFER
+#: The engine used when none is explicitly requested: gams.transfer when it is
+#: usable, otherwise gdxcc (the fallback resolved in :func:`resolve_engine`).
+DEFAULT_ENGINE = Engine.GAMS_TRANSFER
 
 
-class GdxBackend(abc.ABC):
+class GdxEngine(abc.ABC):
     """Interface implemented by each GDX I/O engine.
 
     Abstract methods: :meth:`open_read` (metadata), :meth:`load_symbols`
@@ -67,7 +67,7 @@ class GdxBackend(abc.ABC):
         """Open ``filename`` for reading and populate ``gdx_file``'s metadata.
 
         Sets ``gdx_file``'s ``_filename`` and, where the engine exposes them, its
-        ``_version``/``_producer`` (the gams.transfer backend leaves those
+        ``_version``/``_producer`` (the gams.transfer engine leaves those
         ``None``); builds its ``universal_set`` and the ``GdxSymbol`` collection
         (with extended per-symbol metadata and resolved domains), but does
         **not** load records.
@@ -98,8 +98,8 @@ class GdxBackend(abc.ABC):
     def handle(self) -> object | None:
         """Native engine handle, if any.
 
-        The gdxcc backend returns its GDX pointer; backends without one (e.g.
-        gams.transfer) return ``None``. Reached as ``gdx_file._backend_impl.handle``
+        The gdxcc engine returns its GDX pointer; engines without one (e.g.
+        gams.transfer) return ``None``. Reached as ``gdx_file._engine_impl.handle``
         for the rare case of driving raw ``gdxcc`` calls.
         """
         return None
@@ -130,62 +130,68 @@ class GdxBackend(abc.ABC):
         """Release any native resources (run-once, idempotent)."""
 
 
-def resolve_backend(explicit: str | Backend | None) -> Backend:
-    """Resolve which backend to use.
+def resolve_engine(explicit: str | Engine | None) -> Engine:
+    """Resolve which engine to use.
 
-    Order: ``explicit`` value → ``GDXPDS_BACKEND`` env var → :data:`DEFAULT_BACKEND`.
-    Strings are normalized to :class:`Backend` members. An unrecognized value
-    raises :class:`BackendError`.
+    Order: ``explicit`` value → ``GDXPDS_ENGINE`` env var → :data:`DEFAULT_ENGINE`.
+    Strings are normalized to :class:`Engine` members. An unrecognized value
+    raises :class:`EngineError`.
 
     The default (no explicit arg / env var) prefers ``GAMS_TRANSFER`` but falls
     back to ``GDXCC`` when gams.transfer is not usable, so gdxcc-only environments
     are unaffected. An *explicit* ``GAMS_TRANSFER`` request that can't be satisfied
     raises instead of falling back.
     """
-    raw = explicit if explicit is not None else os.environ.get("GDXPDS_BACKEND")
+    # _probe_gams_transfer is the single source of truth for "is gams.transfer
+    # usable here?". Resolve `engine` first (default / env / explicit), then call
+    # it at most once -- and only if the resolved engine is GAMS_TRANSFER.
+    raw = explicit if explicit is not None else os.environ.get("GDXPDS_ENGINE")
     if raw is None or raw == "":
-        if DEFAULT_BACKEND is Backend.GAMS_TRANSFER:
-            from gdxpds.tools import _probe_gams_transfer
+        engine = DEFAULT_ENGINE
+        explicit_request = False
+    else:
+        try:
+            engine = Engine(raw)
+        except ValueError:
+            valid = ", ".join(repr(b.value) for b in Engine)
+            raise EngineError(f"Unknown engine {raw!r}. Valid engines: {valid}.")
+        explicit_request = True
 
-            if not _probe_gams_transfer():
-                return Backend.GDXCC
-        return DEFAULT_BACKEND
-    try:
-        backend = Backend(raw)
-    except ValueError:
-        valid = ", ".join(repr(b.value) for b in Backend)
-        raise BackendError(f"Unknown backend {raw!r}. Valid backends: {valid}.")
-    if backend is Backend.GAMS_TRANSFER:
+    if engine is Engine.GAMS_TRANSFER:
         from gdxpds.tools import _probe_gams_transfer
 
         if not _probe_gams_transfer():
-            raise BackendError(
-                "Backend 'gams_transfer' requested but gams.transfer is not "
-                "usable here (not installed, or its gamsapi build cannot load "
-                "the active GAMS libraries). Install a gamsapi matching your "
-                "GAMS version."
-            )
-    return backend
+            if explicit_request:
+                raise EngineError(
+                    "Engine 'gams_transfer' requested but gams.transfer is not "
+                    "usable here (not installed, or its gamsapi build cannot load "
+                    "the active GAMS libraries). Install a gamsapi matching your "
+                    "GAMS version."
+                )
+            # Quiet fallback: default-selected gams.transfer isn't usable, so
+            # gdxcc-only environments stay unaffected by the new default.
+            return Engine.GDXCC
+    return engine
 
 
-def make_backend(
-    kind: Backend = DEFAULT_BACKEND,
+def make_engine(
+    kind: Engine = DEFAULT_ENGINE,
     gams_dir: str | None = None,
     gams_dir_source: str | None = None,
-) -> GdxBackend:
-    """Construct the concrete backend for ``kind``.
+) -> GdxEngine:
+    """Construct the concrete engine for ``kind``.
 
     The implementation module is imported lazily so importing :mod:`gdxpds.gdx`
-    does not pull in every backend.
+    does not pull in every engine.
     """
-    if kind == Backend.GDXCC:
-        from gdxpds._gdxcc_backend import GdxccBackend
+    if kind == Engine.GDXCC:
+        from gdxpds._gdxcc_engine import GdxccEngine
 
-        return GdxccBackend(gams_dir, gams_dir_source)
-    if kind == Backend.GAMS_TRANSFER:
-        from gdxpds._transfer_backend import TransferBackend
+        return GdxccEngine(gams_dir, gams_dir_source)
+    if kind == Engine.GAMS_TRANSFER:
+        from gdxpds._transfer_engine import TransferEngine
 
-        return TransferBackend(gams_dir, gams_dir_source)
-    # Exhaustive over Backend; guards against a future member added without a
-    # branch here. User-facing validation of bad values lives in resolve_backend.
+        return TransferEngine(gams_dir, gams_dir_source)
+    # Exhaustive over Engine; guards against a future member added without a
+    # branch here. User-facing validation of bad values lives in resolve_engine.
     assert_never(kind)

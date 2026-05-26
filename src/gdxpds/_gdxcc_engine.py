@@ -1,11 +1,11 @@
-"""gdxcc implementation of :class:`gdxpds._backend.GdxBackend`.
+"""gdxcc implementation of :class:`gdxpds._engine.GdxEngine`.
 
-Holds the gdxcc-specific I/O logic, implementing the backend of the
-:mod:`gdxpds.gdx` interface + data model as mediated by :mod:`gdxpds._backend`.
-Implements the full backend contract: metadata read
-(:meth:`GdxccBackend.open_read`), record read (:meth:`GdxccBackend.load_symbols`),
-write (:meth:`GdxccBackend.write_file` and the per-symbol
-:meth:`GdxccBackend.write_symbol`), plus ownership and teardown of the GDX handle.
+Holds the gdxcc-specific I/O logic, implementing the engine of the
+:mod:`gdxpds.gdx` interface + data model as mediated by :mod:`gdxpds._engine`.
+Implements the full engine contract: metadata read
+(:meth:`GdxccEngine.open_read`), record read (:meth:`GdxccEngine.load_symbols`),
+write (:meth:`GdxccEngine.write_file` and the per-symbol
+:meth:`GdxccEngine.write_symbol`), plus ownership and teardown of the GDX handle.
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from numbers import Number
 from typing import TYPE_CHECKING
 
 import gdxpds.special as special
-from gdxpds._backend import GdxBackend
+from gdxpds._engine import GdxEngine
 from gdxpds.gdx import (
     DomainError,
     GamsDataType,
@@ -42,12 +42,12 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class GdxccBackend(GdxBackend):
+class GdxccEngine(GdxEngine):
     """Reads/writes GDX via the SWIG-bound ``gdxcc`` calls.
 
     Owns the GDX handle: a :class:`~gdxpds.tools._GdxHandle` created in
     :meth:`__init__` and freed in :meth:`close`. The handle is exposed via
-    :attr:`handle` (reached as ``gdx_file._backend_impl.handle``), and
+    :attr:`handle` (reached as ``gdx_file._engine_impl.handle``), and
     :class:`~gdxpds.gdx.GdxFile` schedules :meth:`close` via ``weakref.finalize``.
     """
 
@@ -58,7 +58,7 @@ class GdxccBackend(GdxBackend):
         # subsequent calls validate gams_dir and warn on mismatch.
         load_gdxcc(gams_dir=gams_dir)
         # _GdxHandle validates the create (raising GamsLoadError on failure, and
-        # deleting the wrapper without an unsafe gdxFree). This backend owns the
+        # deleting the wrapper without an unsafe gdxFree). This engine owns the
         # handle; GdxFile's weakref.finalize calls close() to free+delete it.
         self._handle = _GdxHandle(gdxcc, gams_dir, gams_dir_source)
 
@@ -183,9 +183,13 @@ class GdxccBackend(GdxBackend):
 
         vc = symbol.value_cols  # local for speed in the comprehensions below
         if symbol.data_type in (GamsDataType.Set, GamsDataType.Alias):
-            # A Set/Alias value is its element text ("" when none); membership is
-            # row presence. An Alias reads like the Set it aliases. The stored
-            # value is the index into the element-text table.
+            # gdxpds surfaces a Set/Alias value as its element text (a string;
+            # `""` when none; membership conveyed by row presence; an Alias reads
+            # like the Set it aliases). On disk the gdxcc engine stores a
+            # float-encoded *index* into the element-text table per row, so this
+            # loop resolves each index back to its text via `gdxGetElemText`
+            # before handing the records to the DataFrame -- callers never see
+            # the index.
             data = [
                 elements
                 + [gdxcc.gdxGetElemText(H, int(values[col_ind]))[1] for _col_name, col_ind in vc]

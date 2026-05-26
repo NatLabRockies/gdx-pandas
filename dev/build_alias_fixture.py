@@ -1,6 +1,6 @@
 """Generate tests/data/alias_fixture.gdx.
 
-A 1D parent Set plus an Alias of it, used by the backend read-parity tests.
+A 1D parent Set plus an Alias of it, used by the engine read-parity tests.
 Built with the raw gdxcc bindings (gdxAddAlias) so the read tests stay independent
 of gdxpds's own alias-write path, the same low-level approach used in
 build_set_text_fixture.py. Committed to the repo; only re-run this if the schema changes.
@@ -31,11 +31,11 @@ ELEMENTS = ["a", "b", "c"]
 
 
 def main():
-    # Pin the gdxcc backend: this script drives raw gdxcc calls through the GDX
-    # handle, which the gams.transfer backend does not have (so GDXPDS_BACKEND
+    # Pin the gdxcc engine: this script drives raw gdxcc calls through the GDX
+    # handle, which the gams.transfer engine does not have (so GDXPDS_ENGINE
     # must not be allowed to redirect us).
-    with gdxpds.gdx.GdxFile(backend="gdxcc") as f:
-        H = f._backend_impl.handle
+    with gdxpds.gdx.GdxFile(engine="gdxcc") as f:
+        H = f._engine_impl.handle
         if not gdxcc.gdxOpenWrite(H, OUT_PATH, "gdxpds"):
             raise gdxpds.gdx.GdxError(H, f"Could not open {OUT_PATH!r} for writing")
         f.universal_set.write()

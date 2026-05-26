@@ -1,5 +1,5 @@
 """
-Backend functionality for reading and writing GDX files.
+Engine functionality for reading and writing GDX files.
 The GdxFile and GdxSymbol classes are full-featured interfaces
 for going between the GDX format and pandas DataFrames,
 including translation between GDX and numpy special values.
@@ -18,7 +18,7 @@ from enum import Enum
 import numpy as np
 import pandas as pd
 
-from gdxpds._backend import Backend, make_backend, resolve_backend
+from gdxpds._engine import Engine, make_engine, resolve_engine
 
 # Re-exported from gdxpds.special for backward compatibility.
 from gdxpds.special import (
@@ -172,7 +172,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         self,
         gams_dir: str | os.PathLike[str] | None = None,
         lazy_load: bool = True,
-        backend: str | Backend | None = None,
+        engine: str | Engine | None = None,
     ) -> None:
         """
         Initializes a GdxFile object by connecting to GAMS and creating a pointer.
@@ -189,10 +189,10 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             accessed later after the corresponding calls to :py:meth:`GdxSymbol.load`.
             If False, all data are automatically loaded and the full GDX file is
             available in memory after the call to :py:meth:`read`.
-        backend : None or str or :py:class:`gdxpds.Backend`
+        engine : None or str or :py:class:`gdxpds.Engine`
             Which I/O engine to use. ``None`` (default) resolves via the
-            ``GDXPDS_BACKEND`` env var, then the default engine: ``gams.transfer``
-            when usable, otherwise ``gdxcc``. Pass ``"gdxcc"`` / ``Backend.GDXCC``
+            ``GDXPDS_ENGINE`` env var, then the default engine: ``gams.transfer``
+            when usable, otherwise ``gdxcc``. Pass ``"gdxcc"`` / ``Engine.GDXCC``
             to pin the gdxcc engine.
         """
         self.lazy_load = lazy_load
@@ -202,22 +202,22 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         self._symbols = OrderedDict()
         # Set before anything that can raise, so cleanup() is safe if create fails.
         self._finalizer = None
-        self._backend_impl = None
-        self._backend_kind = None
+        self._engine_impl = None
+        self._engine_kind = None
 
         NeedsGamsDir.__init__(self, gams_dir=gams_dir)
-        # Build the I/O engine. For the gdxcc backend this binds the GDX library
-        # and creates the handle, which the backend owns and frees in close().
-        self._backend_kind = resolve_backend(backend)
-        self._backend_impl = make_backend(self._backend_kind, self.gams_dir, self.gams_dir_source)
+        # Build the I/O engine. For the gdxcc engine this binds the GDX library
+        # and creates the handle, which the engine owns and frees in close().
+        self._engine_kind = resolve_engine(engine)
+        self._engine_impl = make_engine(self._engine_kind, self.gams_dir, self.gams_dir_source)
 
         # Free the engine's native resources exactly once, at the first of:
         # cleanup(), garbage collection, or interpreter exit. The callback is the
-        # backend's own close() -- a bound method of the backend, not self -- so
+        # engine's own close() -- a bound method of the engine, not self -- so
         # it never keeps this GdxFile alive (which would defeat GC-time
         # finalization) and stays valid at interpreter shutdown (close() uses
         # callables bound when the handle was created, not module-global lookups).
-        self._finalizer = weakref.finalize(self, self._backend_impl.close)
+        self._finalizer = weakref.finalize(self, self._engine_impl.close)
 
         self.universal_set = GdxSymbol("*", GamsDataType.Set, dims=1, file=None, index=0)
         self.universal_set._file = self
@@ -225,7 +225,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
 
     def cleanup(self) -> None:
         if self._finalizer is not None:
-            self._finalizer()  # runs backend.close() at most once
+            self._finalizer()  # runs engine.close() at most once
 
     def __enter__(self):
         return self
@@ -244,7 +244,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         -------
         :py:class:`GdxFile`
         """
-        result = GdxFile(gams_dir=self.gams_dir, lazy_load=False, backend=self._backend_kind)
+        result = GdxFile(gams_dir=self.gams_dir, lazy_load=False, engine=self._engine_kind)
         for symbol in self:
             result.append(symbol.clone())
             result[-1]._file = result
@@ -313,9 +313,9 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         if not self.empty:
             raise Error("GdxFile.read can only be used if the GdxFile is .empty")
 
-        # The backend reads file + symbol metadata and builds the GdxSymbol
+        # The engine reads file + symbol metadata and builds the GdxSymbol
         # collection (records are not loaded here).
-        self._backend_impl.open_read(self, filename)
+        self._engine_impl.open_read(self, filename)
 
         # read all symbols if not lazy_load
         if not self.lazy_load:
@@ -328,13 +328,13 @@ class GdxFile(MutableSequence, NeedsGamsDir):
 
         Already-loaded symbols are skipped.
         """
-        self._backend_impl.load_file(self)
+        self._engine_impl.load_file(self)
 
     def load_symbols(self, names: Sequence[str]) -> None:
         """
         Eagerly load the records of the named symbols (a subset of the file).
 
-        Resolves each name to its :py:class:`GdxSymbol` and loads via the backend
+        Resolves each name to its :py:class:`GdxSymbol` and loads via the engine
         (gams.transfer issues a single targeted read; gdxcc loops per symbol).
         Raises :class:`SymbolNotFoundError` for an unknown name; already-loaded
         symbols are skipped.
@@ -344,7 +344,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
             if name not in self:
                 raise SymbolNotFoundError(f"No symbol named {name!r} in {self.filename!r}.")
             symbols.append(self[name])
-        self._backend_impl.load_symbols(self, symbols)
+        self._engine_impl.load_symbols(self, symbols)
 
     def reorder_for_strict_domains(self):
         """
@@ -394,7 +394,7 @@ class GdxFile(MutableSequence, NeedsGamsDir):
         ----------
         filename : pathlib.Path or str
         """
-        self._backend_impl.write_file(self, filename)
+        self._engine_impl.write_file(self, filename)
 
     def __repr__(self):
         return f"GdxFile(self,gams_dir={repr(self.gams_dir)},lazy_load={repr(self.lazy_load)})"
@@ -704,7 +704,7 @@ class GdxSymbol:
         self._aliased_with = None
         self._aliased_with_name = None
         # Record count per GAMS; meaningful only before load (afterwards
-        # num_records uses the dataframe). The backend's open_read overwrites
+        # num_records uses the dataframe). The engine's open_read overwrites
         # this for symbols read from a file.
         self._num_records = 0
         self.dims = dims
@@ -718,7 +718,7 @@ class GdxSymbol:
 
         # A symbol constructed without a file is being built for writing and is
         # ready to use immediately. A symbol constructed with a file is being
-        # read: the backend's open_read populates its extended metadata (record
+        # read: the engine's open_read populates its extended metadata (record
         # count, variable/equation subtype, description, domain) and it stays
         # unloaded until its records are pulled.
         if self.file is None:
@@ -1190,7 +1190,7 @@ class GdxSymbol:
         an alias whose parent could not be resolved against its file.
 
         The parent is typically a Set, but an Alias is also accepted (GDX itself
-        supports chained aliases; the ``gdxcc`` backend preserves the chain on
+        supports chained aliases; the ``gdxcc`` engine preserves the chain on
         write, while ``gams_transfer`` flattens it to point at the root Set).
 
         Unlike :py:attr:`domain`, an alias has no relaxed fallback: the parent must
@@ -1441,10 +1441,10 @@ class GdxSymbol:
             return
         if not self.file:
             raise Error(f"Cannot load {repr(self)} because there is no file pointer")
-        # The backend reads the records and populates this symbol's dataframe.
-        # The "no symbol index" guard now lives in the gdxcc backend, which is
+        # The engine reads the records and populates this symbol's dataframe.
+        # The "no symbol index" guard now lives in the gdxcc engine, which is
         # the path that needs it.
-        self.file._backend_impl.load_symbol(self)
+        self.file._engine_impl.load_symbol(self)
         return
 
     def unload(self) -> None:
@@ -1460,7 +1460,7 @@ class GdxSymbol:
         """
         if self.file is None:
             raise Error(f"Cannot write {self!r} because there is no file pointer")
-        self.file._backend_impl.write_symbol(
+        self.file._engine_impl.write_symbol(
             self.file, self, index=index, name_positions=name_positions
         )
 
@@ -1632,7 +1632,7 @@ def append_alias(
         the parent symbol the alias refers to, as a :class:`GdxSymbol` reference or
         the name of a symbol already in ``gdx_file``. The parent is typically a Set
         but an Alias is also accepted (GDX supports chained aliases; the gdxcc
-        backend preserves the chain on write, gams_transfer flattens it to the
+        engine preserves the chain on write, gams_transfer flattens it to the
         root Set). An unknown name, a non-:class:`GdxSymbol` parent, or a parent
         that is neither a Set nor an Alias raises :class:`DomainError` (an alias
         has no relaxed fallback).
