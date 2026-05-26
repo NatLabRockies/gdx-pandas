@@ -1,4 +1,4 @@
-v3.0.0, 05/25/26 -- BREAKING: the default I/O engine is now gams.transfer when it is
+v3.0.0, 05/26/26 -- BREAKING: the default I/O engine is now gams.transfer when it is
                     usable, falling back to gdxcc otherwise; pass engine="gdxcc" (or set
                     GDXPDS_ENGINE) to pin the gdxcc engine
                     BREAKING: a Set or Alias value column is now always the GAMS element
