@@ -1,3 +1,14 @@
+v3.1.0, 05/27/26 -- large read/write perf and memory wins on both engines; on a 5M-row
+                    synthetic Parameter the gdxcc write peak drops ~358 MB -> ~129 MB
+                    and gdxcc-read drops ~2.4 GB -> ~1.5 GB. Closes #113 and #65
+                    closes #75 (Set reorder under UEL collisions is a GDX file-format
+                    semantic, not a gdxpds bug); documented in overview.md with a
+                    workaround and pinned by tests/test_set_ordering.py
+                    overview.md "Subset (Domain) Relationships" renamed to "Domain
+                    Relationships"; the docs now spell out that any symbol type can
+                    carry a strict domain over a Set or Alias-of-Set
+                    drop the deprecated pd.option_context("future.no_silent_downcasting")
+                    wrapper in convert_gdx_to_np_svs; silences a Pandas4Warning
 v3.0.0, 05/26/26 -- BREAKING: the default I/O engine is now gams.transfer when it is
                     usable, falling back to gdxcc otherwise; pass engine="gdxcc" (or set
                     GDXPDS_ENGINE) to pin the gdxcc engine
