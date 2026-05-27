@@ -59,6 +59,11 @@ def _peak_python_memory(fn):
     own C-level allocations are not tracked, but the unoptimized
     per-symbol DataFrame copies are entirely Python-side, so this is the
     right measurement for what we are trying to reduce.
+
+    NOTE: ``tracemalloc`` slows the workload by a factor that depends on the
+    allocation pattern (a few percent to several x), so timings collected
+    under it are NOT reliable. Run the timed call outside this helper and use
+    this only when peak memory is what you want.
     """
     tracemalloc.start()
     try:
@@ -151,16 +156,18 @@ def test_engine_timing(data_dir, fixture, tmp_path, engine_timings):
 @pytest.mark.parametrize("engine", ["gdxcc", "gams_transfer"])
 def test_synthetic_write_memory(synthetic_param, tmp_path, engine, engine_memory):
     """Peak Python memory and elapsed time for writing the synthetic large-row
-    Parameter on each engine. The peak is captured by ``tracemalloc`` around
-    the ``to_gdx`` call, after a warm-up write to push first-time engine init
-    out of the measured window.
+    Parameter on each engine. Two passes: one under ``tracemalloc`` (peak
+    memory; timings are unreliable here) and one without it (clean wall-clock).
+    Warm-up runs once before either pass to push first-time engine init out
+    of both measured windows.
 
     The acceptance target for v3.1.0 (per the wrap-up plan) is peak Python
     memory <= 3x the resulting GDX's on-disk size. Pre-optimization, the
     unoptimized write paths run several times above that; the test is here to
     record the number so the ratio can be tracked across commits.
     """
-    out = str(tmp_path / f"synth_{engine}.gdx")
+    out_time = str(tmp_path / f"synth_{engine}_time.gdx")
+    out_mem = str(tmp_path / f"synth_{engine}_mem.gdx")
 
     # Warm-up: pay first-time engine init / gams.transfer import / GDX handle
     # bring-up costs outside the measured window.
@@ -170,11 +177,17 @@ def test_synthetic_write_memory(synthetic_param, tmp_path, engine, engine_memory
         engine=engine,
     )
 
+    # Time pass: no tracemalloc. The "seconds" column in the memory table comes
+    # from here so the x-raw ratio reflects real wall-clock cost.
     t = time.perf_counter()
-    _, peak = _peak_python_memory(lambda: to_gdx({"p": synthetic_param}, out, engine=engine))
+    to_gdx({"p": synthetic_param}, out_time, engine=engine)
     elapsed = time.perf_counter() - t
 
-    gdx_mb = os.path.getsize(out) / (1024 * 1024)
+    # Memory pass: separate write under tracemalloc. Wall-clock is ignored here
+    # because tracemalloc inflates it by an allocation-pattern-dependent factor.
+    _, peak = _peak_python_memory(lambda: to_gdx({"p": synthetic_param}, out_mem, engine=engine))
+
+    gdx_mb = os.path.getsize(out_time) / (1024 * 1024)
     peak_mb = peak / (1024 * 1024)
     ratio = peak_mb / gdx_mb if gdx_mb > 0 else float("inf")
 
@@ -256,11 +269,16 @@ def test_raw_gdxcc_write_baseline(synthetic_param, tmp_path, engine_memory):
     # Warm-up: load gdxcc + bring up a handle once before the measured window.
     _raw_gdxcc_write(df.head(1), num_dims, str(tmp_path / "warm_raw_gdxcc.gdx"), gams_dir)
 
+    # Time pass (no tracemalloc) and memory pass (with tracemalloc) are
+    # separated so the seconds column reflects real wall-clock cost.
+    out_time = out + ".time.gdx"
+    out_mem = out + ".mem.gdx"
     t = time.perf_counter()
-    _, peak = _peak_python_memory(lambda: _raw_gdxcc_write(df, num_dims, out, gams_dir))
+    _raw_gdxcc_write(df, num_dims, out_time, gams_dir)
     elapsed = time.perf_counter() - t
+    _, peak = _peak_python_memory(lambda: _raw_gdxcc_write(df, num_dims, out_mem, gams_dir))
 
-    gdx_mb = os.path.getsize(out) / (1024 * 1024)
+    gdx_mb = os.path.getsize(out_time) / (1024 * 1024)
     peak_mb = peak / (1024 * 1024)
     engine_memory.append(
         {
@@ -289,11 +307,14 @@ def test_raw_transfer_write_baseline(synthetic_param, tmp_path, engine_memory):
     # Warm-up: pay first-time gams.transfer container bring-up cost.
     _raw_transfer_write(df.head(1), num_dims, str(tmp_path / "warm_raw_transfer.gdx"), gams_dir)
 
+    out_time = out + ".time.gdx"
+    out_mem = out + ".mem.gdx"
     t = time.perf_counter()
-    _, peak = _peak_python_memory(lambda: _raw_transfer_write(df, num_dims, out, gams_dir))
+    _raw_transfer_write(df, num_dims, out_time, gams_dir)
     elapsed = time.perf_counter() - t
+    _, peak = _peak_python_memory(lambda: _raw_transfer_write(df, num_dims, out_mem, gams_dir))
 
-    gdx_mb = os.path.getsize(out) / (1024 * 1024)
+    gdx_mb = os.path.getsize(out_time) / (1024 * 1024)
     peak_mb = peak / (1024 * 1024)
     engine_memory.append(
         {
