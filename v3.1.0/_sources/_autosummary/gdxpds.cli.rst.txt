@@ -1,0 +1,20 @@
+gdxpds.cli
+==========
+
+.. automodule:: gdxpds.cli
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+
+.. rubric:: Submodules
+
+.. autosummary::
+   :toctree:
+   :recursive:
+
+   csv_to_gdx
+   gdx_to_csv
+   main
+
