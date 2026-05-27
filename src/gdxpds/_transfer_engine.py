@@ -73,18 +73,23 @@ def _substitute_value_col(col_data: pd.Series) -> np.ndarray:
     """Return a fresh ``float64`` ndarray with gdxpds-canonical special values
     pre-substituted to the gams.transfer encoding.
 
-    Inverse of :func:`_convert_transfer_specials`: machine eps -> EPS (gt's
-    ``-0.0``); NaN -> NA (gt's NA sentinel); +/-inf already match. Genuine 0.0
-    is left alone (only eps maps to EPS). GDX UNDEF is gdxpds' canonical
-    ``None`` (see :data:`special.NUMPY_SPECIAL_VALUES`), only possible in an
-    object column; it maps to ``gt.SpecialValues.UNDEF``, distinct from NA
-    (``np.nan``) which the float64 coercion would otherwise produce.
+    Inverse of :func:`_convert_transfer_value_col`: the EPS sentinel
+    (:data:`special.NUMPY_SPECIAL_VALUES[-1]`, ``np.finfo(float).tiny``) ->
+    ``gt.SpecialValues.EPS``, which is the negative-zero bit pattern (so
+    distinguishable from genuine ``+0.0`` only by the sign bit, not by
+    ``==``); NaN -> NA (gt's NA sentinel); +/-inf already match. Genuine 0.0
+    is left alone. GDX UNDEF is gdxpds' canonical ``None``, only possible
+    in an object column; it maps to ``gt.SpecialValues.UNDEF``, distinct
+    from NA (``np.nan``) which the float64 coercion would otherwise produce.
+
+    EPS detection is exact equality on the sentinel: a legitimate small float
+    (e.g. ``1e-200``) must not silently map to GAMS EPS on write (#39).
 
     Returns a NEW ndarray so the caller can attach it to a separate DataFrame
     without modifying the source (the source frame's columns stay views into
     the user's data, keeping the per-symbol allocation small).
     """
-    eps = NUMPY_SPECIAL_VALUES[-1]
+    eps_sv = NUMPY_SPECIAL_VALUES[-1]
     is_none: np.ndarray | None = None
     if col_data.dtype == object:
         # Cheap-out: only object columns can carry a Python ``None`` (the
@@ -94,7 +99,7 @@ def _substitute_value_col(col_data: pd.Series) -> np.ndarray:
         col_arr = col_data.to_numpy()
         is_none = np.fromiter((v is None for v in col_arr), dtype=bool, count=len(col_data))
     arr = col_data.to_numpy(dtype="float64", copy=True)
-    is_eps = np.abs(arr - eps) < eps
+    is_eps = arr == eps_sv
     nan_mask = np.isnan(arr)
     arr[nan_mask] = gt.SpecialValues.NA
     arr[is_eps] = gt.SpecialValues.EPS
@@ -130,9 +135,12 @@ def _convert_transfer_value_col(col_data: pd.Series) -> np.ndarray:
     """Map gams.transfer special-value encodings on a single value column to
     the gdxpds canonical form, returning a fresh ndarray.
 
-    EPS (gt's ``-0.0``) -> machine eps; NA (gt's NA sentinel) -> ``np.nan``;
-    UNDEF (gt's distinct NaN bit pattern) -> ``None``; +/-inf already match.
-    Genuine ``0.0`` is left alone (only negative zero is EPS).
+    EPS (gt's negative-zero bit pattern, ``gt.SpecialValues.EPS == -0.0``) ->
+    the EPS sentinel (``np.finfo(float).tiny``); NA (gt's NA sentinel) ->
+    ``np.nan``; UNDEF (gt's distinct NaN bit pattern) -> ``None``; +/-inf
+    already match. Genuine ``+0.0`` is left alone -- only negative zero is
+    EPS, and ``gt.SpecialValues.isEps`` distinguishes the two via the sign
+    bit (Python ``==`` would conflate them).
 
     UNDEF is kept distinct from NA, matching the gdxcc engine: gdxcc maps GDX
     UNDEF -> ``None`` and GDX NA -> ``np.nan``. A column carrying any UNDEF

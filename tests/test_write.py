@@ -426,7 +426,7 @@ def test_write_known_value_columns(run_dir):
     scratch with known, non-default values in every value column; write, read
     back, and assert the exact values and types survive. (Existing tests only
     wrote default value-column values.)"""
-    eps = np.finfo(float).eps
+    eps = np.finfo(float).tiny  # gdxpds' numpy encoding of GAMS EPS
     outdir = os.path.join(run_dir, "known_value_columns")
     if not os.path.exists(outdir):
         os.mkdir(outdir)

@@ -1,3 +1,12 @@
+v4.0.0, 05/27/26 -- BREAKING: GAMS EPS is now encoded as numpy.finfo(float).tiny
+                    (~2.22e-308), not numpy.finfo(float).eps (machine epsilon,
+                    ~2.22e-16). EPS detection is exact equality on the sentinel,
+                    so a legitimate small float (e.g. 1e-200) now round-trips as
+                    itself instead of silently mapping to GAMS EPS on write
+                    (closes #39). If you wrote numpy.finfo(float).eps to mean
+                    GAMS EPS, switch to numpy.finfo(float).tiny;
+                    gdxpds.special.NUMPY_SPECIAL_VALUES[-1] is always the
+                    canonical sentinel
 v3.1.0, 05/27/26 -- large read/write perf and memory wins on both engines; on a 5M-row
                     synthetic Parameter the gdxcc write peak drops ~358 MB -> ~129 MB
                     and gdxcc-read drops ~2.4 GB -> ~1.5 GB. Closes #113 and #65

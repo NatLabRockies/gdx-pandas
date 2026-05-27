@@ -9,7 +9,7 @@ There are two main ways to use gdxpds. The first use case is the one that was in
 The two primary points of reference for the direct conversion utilities are GDX files on disk and Python dicts of `{symbol_name: pandas.DataFrame}`, where each `pandas.DataFrame` contains data for a single set, parameter, equation, variable, or alias. The shape of the value columns depends on the symbol {py:data}`gdxpds.gdx.GamsDataType`:
 
 - **Sets and Aliases** have a single `Value` column whose entries are the GAMS *element text* string, with `""` denoting a member that has no text. Membership is conveyed by **row presence**: every row is a member. On write, the value column can be omitted, given as booleans (any value whether `True` or `False` means "member, no text"), or given as text strings.
-- **Parameters** have a single `Value` column of type `float`; the GAMS specials `NA`, `UNDEF`, `+Inf` / `-Inf`, and `EPS` map to `numpy.nan`, `None`, `numpy.inf` / `-numpy.inf`, and `numpy.finfo(float).eps` (see [Special values](#special-values)).
+- **Parameters** have a single `Value` column of type `float`; the GAMS specials `NA`, `UNDEF`, `+Inf` / `-Inf`, and `EPS` map to `numpy.nan`, `None`, `numpy.inf` / `-numpy.inf`, and `numpy.finfo(float).tiny` (see [Special values](#special-values)).
 - **Variables and Equations** have five value columns — level, marginal, lower, upper, scale — as enumerated in {py:class}`gdxpds.gdx.GamsValueType`; see {py:data}`gdxpds.gdx.GAMS_VALUE_COLS_MAP`.
 
 Aliases reuse their parent's records (on read they look like the Set they alias) and their parent relationship is carried separately; see [Aliases](#aliases) and the `aliases=` example below.
@@ -178,8 +178,8 @@ with GdxFile() as gdx:
     )
 
     # A Parameter with one Special value (UNDEF is None on read/write). See
-    # "Special values" -- np.nan, np.inf, -np.inf, and machine epsilon also
-    # round-trip via the same mapping.
+    # "Special values" -- np.nan, np.inf, -np.inf, and np.finfo(float).tiny
+    # also round-trip via the same mapping.
     append_parameter(
         gdx, 'p',
         pd.DataFrame({
@@ -409,23 +409,25 @@ In the value columns of Parameters, Variables, and Equations, GAMS's special val
 | `NA` | `numpy.nan` |
 | `UNDEF` | `None` |
 | `+Inf` / `-Inf` | `numpy.inf` / `-numpy.inf` |
-| `EPS` | machine epsilon (`numpy.finfo(float).eps`) |
+| `EPS` | `numpy.finfo(float).tiny` (smallest normal positive float, ~2.22e-308) |
 
 Both I/O engines preserve all of these on write, so they round-trip unchanged.
+
+EPS detection is exact equality on the sentinel: only `numpy.finfo(float).tiny` maps to GAMS `EPS` on write. Other small floats (`1e-200`, machine epsilon, etc.) survive as-is. In v3.x and earlier, the sentinel was `numpy.finfo(float).eps` (~2.22e-16) and any value below it silently became `EPS` (#39).
 
 :::{tip}
 If you would rather **not** keep `EPS` values, drop them yourself before writing — there is no write-time option, so the transformation stays explicit and engine-independent:
 
 ```python
 import numpy as np
-eps = np.finfo(float).eps
+eps = np.finfo(float).tiny
 df['Value'] = df['Value'].replace(eps, 0.0)   # treat EPS as plain zero
 ```
 :::
 
-## Migration from 1.x / 2.x
+## Migration from 1.x / 2.x / 3.x
 
-Releases 2.0.0 and 3.0.0 each made breaking changes. In v2.0.0, old interfaces were removed for `to_dataframe` and accessing the `csv_to_gdx` and `gdx_to_csv` scripts. Version 3.0.0 switches the default engine to `gams.transfer` (from `gdxcc`) and supports set text and aliases as first-class features. Additional details and other breaking changes:
+Releases 2.0.0, 3.0.0, and 4.0.0 each made breaking changes. In v2.0.0, old interfaces were removed for `to_dataframe` and accessing the `csv_to_gdx` and `gdx_to_csv` scripts. Version 3.0.0 switches the default engine to `gams.transfer` (from `gdxcc`) and supports set text and aliases as first-class features. Version 4.0.0 fixes the GAMS `EPS` encoding so legitimate small floats no longer round-trip as `EPS`. Additional details and other breaking changes:
 
 ### v2.0.0 breaking changes
 
@@ -440,6 +442,10 @@ Releases 2.0.0 and 3.0.0 each made breaking changes. In v2.0.0, old interfaces w
 - **`load_set_text` is removed.** Element text is always read and written, so drop the argument from any `to_dataframe` / `to_dataframes` / `GdxSymbol.load` / `GdxFile.load_all` / `load_symbols` calls.
 - **`GdxFile.H` is removed.** If you drove raw `gdxcc` calls through it, use `gdx_file._engine_impl.handle` instead.
 - **GDX UNDEF is preserved on write** (round-trips as `None`) instead of collapsing to `0.0`.
+
+### v4.0.0 breaking changes
+
+- **GAMS `EPS` is now encoded as `numpy.finfo(float).tiny`** (~2.22e-308), the smallest normal positive float, not `numpy.finfo(float).eps` (machine epsilon, ~2.22e-16). EPS detection is exact equality on this sentinel, so a legitimate small float (`1e-200`, machine epsilon, etc.) now round-trips as itself instead of silently mapping to GAMS `EPS` (#39). If your code wrote `numpy.finfo(float).eps` to mean GAMS `EPS`, switch to `numpy.finfo(float).tiny`; `gdxpds.special.NUMPY_SPECIAL_VALUES[-1]` is always the canonical sentinel.
 
 ## Configuration
 
