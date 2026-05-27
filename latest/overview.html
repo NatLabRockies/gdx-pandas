@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Overview &mdash; gdx-pandas 3.1.0 documentation</title>
+  <title>Overview &mdash; gdx-pandas 4.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="_static/sphinx-design.min.css?v=95c83b7e" />
@@ -14,7 +14,7 @@
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="_static/documentation_options.js?v=dd1205ac"></script>
+      <script src="_static/documentation_options.js?v=3304f9e4"></script>
       <script src="_static/doctools.js?v=fd6eb6e6"></script>
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/design-tabs.js?v=f930bc37"></script>
@@ -67,9 +67,10 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#migration-from-1-x-2-x">Migration from 1.x / 2.x</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#migration-from-1-x-2-x-3-x">Migration from 1.x / 2.x / 3.x</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#v2-0-0-breaking-changes">v2.0.0 breaking changes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#v3-0-0-breaking-changes">v3.0.0 breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#v4-0-0-breaking-changes">v4.0.0 breaking changes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#configuration">Configuration</a><ul>
@@ -211,7 +212,7 @@
 <p>The two primary points of reference for the direct conversion utilities are GDX files on disk and Python dicts of <code class="docutils literal notranslate"><span class="pre">{symbol_name:</span> <span class="pre">pandas.DataFrame}</span></code>, where each <code class="docutils literal notranslate"><span class="pre">pandas.DataFrame</span></code> contains data for a single set, parameter, equation, variable, or alias. The shape of the value columns depends on the symbol <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsDataType" title="gdxpds.gdx.GamsDataType"><code class="xref py py-data docutils literal notranslate"><span class="pre">gdxpds.gdx.GamsDataType</span></code></a>:</p>
 <ul class="simple">
 <li><p><strong>Sets and Aliases</strong> have a single <code class="docutils literal notranslate"><span class="pre">Value</span></code> column whose entries are the GAMS <em>element text</em> string, with <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> denoting a member that has no text. Membership is conveyed by <strong>row presence</strong>: every row is a member. On write, the value column can be omitted, given as booleans (any value whether <code class="docutils literal notranslate"><span class="pre">True</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> means “member, no text”), or given as text strings.</p></li>
-<li><p><strong>Parameters</strong> have a single <code class="docutils literal notranslate"><span class="pre">Value</span></code> column of type <code class="docutils literal notranslate"><span class="pre">float</span></code>; the GAMS specials <code class="docutils literal notranslate"><span class="pre">NA</span></code>, <code class="docutils literal notranslate"><span class="pre">UNDEF</span></code>, <code class="docutils literal notranslate"><span class="pre">+Inf</span></code> / <code class="docutils literal notranslate"><span class="pre">-Inf</span></code>, and <code class="docutils literal notranslate"><span class="pre">EPS</span></code> map to <code class="docutils literal notranslate"><span class="pre">numpy.nan</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.inf</span></code> / <code class="docutils literal notranslate"><span class="pre">-numpy.inf</span></code>, and <code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).eps</span></code> (see <a class="reference internal" href="#special-values">Special values</a>).</p></li>
+<li><p><strong>Parameters</strong> have a single <code class="docutils literal notranslate"><span class="pre">Value</span></code> column of type <code class="docutils literal notranslate"><span class="pre">float</span></code>; the GAMS specials <code class="docutils literal notranslate"><span class="pre">NA</span></code>, <code class="docutils literal notranslate"><span class="pre">UNDEF</span></code>, <code class="docutils literal notranslate"><span class="pre">+Inf</span></code> / <code class="docutils literal notranslate"><span class="pre">-Inf</span></code>, and <code class="docutils literal notranslate"><span class="pre">EPS</span></code> map to <code class="docutils literal notranslate"><span class="pre">numpy.nan</span></code>, <code class="docutils literal notranslate"><span class="pre">None</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy.inf</span></code> / <code class="docutils literal notranslate"><span class="pre">-numpy.inf</span></code>, and <code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).tiny</span></code> (see <a class="reference internal" href="#special-values">Special values</a>).</p></li>
 <li><p><strong>Variables and Equations</strong> have five value columns — level, marginal, lower, upper, scale — as enumerated in <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GamsValueType" title="gdxpds.gdx.GamsValueType"><code class="xref py py-class docutils literal notranslate"><span class="pre">gdxpds.gdx.GamsValueType</span></code></a>; see <a class="reference internal" href="_autosummary/gdxpds.gdx.html#gdxpds.gdx.GAMS_VALUE_COLS_MAP" title="gdxpds.gdx.GAMS_VALUE_COLS_MAP"><code class="xref py py-data docutils literal notranslate"><span class="pre">gdxpds.gdx.GAMS_VALUE_COLS_MAP</span></code></a>.</p></li>
 </ul>
 <p>Aliases reuse their parent’s records (on read they look like the Set they alias) and their parent relationship is carried separately; see <a class="reference internal" href="#aliases">Aliases</a> and the <code class="docutils literal notranslate"><span class="pre">aliases=</span></code> example below.</p>
@@ -362,8 +363,8 @@ csv_to_gdx<span class="w"> </span>--help
     <span class="p">)</span>
 
     <span class="c1"># A Parameter with one Special value (UNDEF is None on read/write). See</span>
-    <span class="c1"># &quot;Special values&quot; -- np.nan, np.inf, -np.inf, and machine epsilon also</span>
-    <span class="c1"># round-trip via the same mapping.</span>
+    <span class="c1"># &quot;Special values&quot; -- np.nan, np.inf, -np.inf, and np.finfo(float).tiny</span>
+    <span class="c1"># also round-trip via the same mapping.</span>
     <span class="n">append_parameter</span><span class="p">(</span>
         <span class="n">gdx</span><span class="p">,</span> <span class="s1">&#39;p&#39;</span><span class="p">,</span>
         <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
@@ -578,16 +579,17 @@ csv_to_gdx<span class="w"> </span>--help
 <td><p><code class="docutils literal notranslate"><span class="pre">numpy.inf</span></code> / <code class="docutils literal notranslate"><span class="pre">-numpy.inf</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">EPS</span></code></p></td>
-<td><p>machine epsilon (<code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).eps</span></code>)</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).tiny</span></code> (smallest normal positive float, ~2.22e-308)</p></td>
 </tr>
 </tbody>
 </table>
 <p>Both I/O engines preserve all of these on write, so they round-trip unchanged.</p>
+<p>EPS detection is exact equality on the sentinel: only <code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).tiny</span></code> maps to GAMS <code class="docutils literal notranslate"><span class="pre">EPS</span></code> on write. Other small floats (<code class="docutils literal notranslate"><span class="pre">1e-200</span></code>, machine epsilon, etc.) survive as-is. In v3.x and earlier, the sentinel was <code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).eps</span></code> (~2.22e-16) and any value below it silently became <code class="docutils literal notranslate"><span class="pre">EPS</span></code> (#39).</p>
 <div class="admonition tip">
 <p class="admonition-title">Tip</p>
 <p>If you would rather <strong>not</strong> keep <code class="docutils literal notranslate"><span class="pre">EPS</span></code> values, drop them yourself before writing — there is no write-time option, so the transformation stays explicit and engine-independent:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span>
+<span class="n">eps</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">tiny</span>
 <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Value&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">eps</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>   <span class="c1"># treat EPS as plain zero</span>
 </pre></div>
 </div>
@@ -595,9 +597,9 @@ csv_to_gdx<span class="w"> </span>--help
 </section>
 </section>
 </section>
-<section id="migration-from-1-x-2-x">
-<h2>Migration from 1.x / 2.x<a class="headerlink" href="#migration-from-1-x-2-x" title="Link to this heading"></a></h2>
-<p>Releases 2.0.0 and 3.0.0 each made breaking changes. In v2.0.0, old interfaces were removed for <code class="docutils literal notranslate"><span class="pre">to_dataframe</span></code> and accessing the <code class="docutils literal notranslate"><span class="pre">csv_to_gdx</span></code> and <code class="docutils literal notranslate"><span class="pre">gdx_to_csv</span></code> scripts. Version 3.0.0 switches the default engine to <code class="docutils literal notranslate"><span class="pre">gams.transfer</span></code> (from <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code>) and supports set text and aliases as first-class features. Additional details and other breaking changes:</p>
+<section id="migration-from-1-x-2-x-3-x">
+<h2>Migration from 1.x / 2.x / 3.x<a class="headerlink" href="#migration-from-1-x-2-x-3-x" title="Link to this heading"></a></h2>
+<p>Releases 2.0.0, 3.0.0, and 4.0.0 each made breaking changes. In v2.0.0, old interfaces were removed for <code class="docutils literal notranslate"><span class="pre">to_dataframe</span></code> and accessing the <code class="docutils literal notranslate"><span class="pre">csv_to_gdx</span></code> and <code class="docutils literal notranslate"><span class="pre">gdx_to_csv</span></code> scripts. Version 3.0.0 switches the default engine to <code class="docutils literal notranslate"><span class="pre">gams.transfer</span></code> (from <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code>) and supports set text and aliases as first-class features. Version 4.0.0 fixes the GAMS <code class="docutils literal notranslate"><span class="pre">EPS</span></code> encoding so legitimate small floats no longer round-trip as <code class="docutils literal notranslate"><span class="pre">EPS</span></code>. Additional details and other breaking changes:</p>
 <section id="v2-0-0-breaking-changes">
 <h3>v2.0.0 breaking changes<a class="headerlink" href="#v2-0-0-breaking-changes" title="Link to this heading"></a></h3>
 <ul class="simple">
@@ -614,6 +616,12 @@ csv_to_gdx<span class="w"> </span>--help
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">load_set_text</span></code> is removed.</strong> Element text is always read and written, so drop the argument from any <code class="docutils literal notranslate"><span class="pre">to_dataframe</span></code> / <code class="docutils literal notranslate"><span class="pre">to_dataframes</span></code> / <code class="docutils literal notranslate"><span class="pre">GdxSymbol.load</span></code> / <code class="docutils literal notranslate"><span class="pre">GdxFile.load_all</span></code> / <code class="docutils literal notranslate"><span class="pre">load_symbols</span></code> calls.</p></li>
 <li><p><strong><code class="docutils literal notranslate"><span class="pre">GdxFile.H</span></code> is removed.</strong> If you drove raw <code class="docutils literal notranslate"><span class="pre">gdxcc</span></code> calls through it, use <code class="docutils literal notranslate"><span class="pre">gdx_file._engine_impl.handle</span></code> instead.</p></li>
 <li><p><strong>GDX UNDEF is preserved on write</strong> (round-trips as <code class="docutils literal notranslate"><span class="pre">None</span></code>) instead of collapsing to <code class="docutils literal notranslate"><span class="pre">0.0</span></code>.</p></li>
+</ul>
+</section>
+<section id="v4-0-0-breaking-changes">
+<h3>v4.0.0 breaking changes<a class="headerlink" href="#v4-0-0-breaking-changes" title="Link to this heading"></a></h3>
+<ul class="simple">
+<li><p><strong>GAMS <code class="docutils literal notranslate"><span class="pre">EPS</span></code> is now encoded as <code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).tiny</span></code></strong> (~2.22e-308), the smallest normal positive float, not <code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).eps</span></code> (machine epsilon, ~2.22e-16). EPS detection is exact equality on this sentinel, so a legitimate small float (<code class="docutils literal notranslate"><span class="pre">1e-200</span></code>, machine epsilon, etc.) now round-trips as itself instead of silently mapping to GAMS <code class="docutils literal notranslate"><span class="pre">EPS</span></code> (#39). If your code wrote <code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).eps</span></code> to mean GAMS <code class="docutils literal notranslate"><span class="pre">EPS</span></code>, switch to <code class="docutils literal notranslate"><span class="pre">numpy.finfo(float).tiny</span></code>; <code class="docutils literal notranslate"><span class="pre">gdxpds.special.NUMPY_SPECIAL_VALUES[-1]</span></code> is always the canonical sentinel.</p></li>
 </ul>
 </section>
 </section>

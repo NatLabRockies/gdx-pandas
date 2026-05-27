@@ -6,7 +6,7 @@
   <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.special &mdash; gdx-pandas 3.1.0 documentation</title>
+  <title>gdxpds.special &mdash; gdx-pandas 4.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -14,7 +14,7 @@
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../_static/documentation_options.js?v=dd1205ac"></script>
+      <script src="../_static/documentation_options.js?v=3304f9e4"></script>
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/design-tabs.js?v=f930bc37"></script>
@@ -67,9 +67,10 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../overview.html#migration-from-1-x-2-x">Migration from 1.x / 2.x</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../overview.html#migration-from-1-x-2-x-3-x">Migration from 1.x / 2.x / 3.x</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../overview.html#v2-0-0-breaking-changes">v2.0.0 breaking changes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../overview.html#v3-0-0-breaking-changes">v3.0.0 breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../overview.html#v4-0-0-breaking-changes">v4.0.0 breaking changes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../overview.html#configuration">Configuration</a><ul>
@@ -208,9 +209,14 @@
 <span id="gdxpds-special"></span><h1>gdxpds.special<a class="headerlink" href="#module-gdxpds.special" title="Link to this heading"></a></h1>
 <dl class="py data">
 <dt class="sig sig-object py" id="gdxpds.special.NUMPY_SPECIAL_VALUES">
-<span class="sig-prename descclassname"><span class="pre">gdxpds.special.</span></span><span class="sig-name descname"><span class="pre">NUMPY_SPECIAL_VALUES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[None,</span> <span class="pre">nan,</span> <span class="pre">inf,</span> <span class="pre">-inf,</span> <span class="pre">np.float64(2.220446049250313e-16)]</span></span><a class="headerlink" href="#gdxpds.special.NUMPY_SPECIAL_VALUES" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">gdxpds.special.</span></span><span class="sig-name descname"><span class="pre">NUMPY_SPECIAL_VALUES</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[None,</span> <span class="pre">nan,</span> <span class="pre">inf,</span> <span class="pre">-inf,</span> <span class="pre">np.float64(2.2250738585072014e-308)]</span></span><a class="headerlink" href="#gdxpds.special.NUMPY_SPECIAL_VALUES" title="Link to this definition"></a></dt>
 <dd><p>List of numpy special values in gdxGetSpecialValues order, i.e.,
-[None, np.nan, np.inf, -np.inf, np.finfo(float).eps]</p>
+[None, np.nan, np.inf, -np.inf, np.finfo(float).tiny]</p>
+<p>GAMS EPS is the GAMS “infinitesimal” – a non-zero value distinct from 0 – so
+we encode it on the numpy side as <code class="docutils literal notranslate"><span class="pre">np.finfo(float).tiny</span></code> (smallest normal
+positive float, ~2.22e-308). v3.x and earlier used <code class="docutils literal notranslate"><span class="pre">np.finfo(float).eps</span></code>
+(machine epsilon, ~2.22e-16); that was conceptually wrong, and it silently
+mapped any legitimate small float <code class="docutils literal notranslate"><span class="pre">&lt;=</span> <span class="pre">eps</span></code> to GAMS EPS on write. See #39.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -246,7 +252,11 @@ their numpy equivalents</p>
 <dd class="field-odd"><p><strong>val</strong> (<em>numeric</em>) – value to test</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>True if val is equal to eps (np.finfo(float).eps), False otherwise</p>
+<dd class="field-even"><p>True if val is exactly the numpy encoding of GAMS EPS
+(<code class="xref py py-data docutils literal notranslate"><span class="pre">NUMPY_SPECIAL_VALUES[-1]</span></code>, i.e. <code class="docutils literal notranslate"><span class="pre">np.finfo(float).tiny</span></code>);
+False otherwise. Exact equality (no tolerance band): only the
+sentinel maps to GAMS EPS, so legitimate small floats like <code class="docutils literal notranslate"><span class="pre">1e-200</span></code>
+round-trip as themselves.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>bool</p>

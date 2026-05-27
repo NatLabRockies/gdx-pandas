@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.special &mdash; gdx-pandas 3.1.0 documentation</title>
+  <title>gdxpds.special &mdash; gdx-pandas 4.0.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=dd1205ac"></script>
+      <script src="../../_static/documentation_options.js?v=3304f9e4"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -64,9 +64,10 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../overview.html#migration-from-1-x-2-x">Migration from 1.x / 2.x</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../overview.html#migration-from-1-x-2-x-3-x">Migration from 1.x / 2.x / 3.x</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../overview.html#v2-0-0-breaking-changes">v2.0.0 breaking changes</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../overview.html#v3-0-0-breaking-changes">v3.0.0 breaking changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../overview.html#v4-0-0-breaking-changes">v4.0.0 breaking changes</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#configuration">Configuration</a><ul>
@@ -207,10 +208,16 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="c1">#                      1E300,  2E300,  3E300,   4E300,               5E300</span>
-<span class="n">NUMPY_SPECIAL_VALUES</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">eps</span><span class="p">]</span>
+<span class="c1">#                      1E300,  2E300,  3E300,   4E300,                5E300</span>
+<span class="n">NUMPY_SPECIAL_VALUES</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">finfo</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span><span class="o">.</span><span class="n">tiny</span><span class="p">]</span>
 <span class="sd">&quot;&quot;&quot;List of numpy special values in gdxGetSpecialValues order, i.e.,</span>
-<span class="sd">[None, np.nan, np.inf, -np.inf, np.finfo(float).eps]</span>
+<span class="sd">[None, np.nan, np.inf, -np.inf, np.finfo(float).tiny]</span>
+
+<span class="sd">GAMS EPS is the GAMS &quot;infinitesimal&quot; -- a non-zero value distinct from 0 -- so</span>
+<span class="sd">we encode it on the numpy side as ``np.finfo(float).tiny`` (smallest normal</span>
+<span class="sd">positive float, ~2.22e-308). v3.x and earlier used ``np.finfo(float).eps``</span>
+<span class="sd">(machine epsilon, ~2.22e-16); that was conceptually wrong, and it silently</span>
+<span class="sd">mapped any legitimate small float ``&lt;= eps`` to GAMS EPS on write. See #39.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 
@@ -262,9 +269,13 @@
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    bool</span>
-<span class="sd">        True if val is equal to eps (np.finfo(float).eps), False otherwise</span>
+<span class="sd">        True if val is exactly the numpy encoding of GAMS EPS</span>
+<span class="sd">        (:data:`NUMPY_SPECIAL_VALUES[-1]`, i.e. ``np.finfo(float).tiny``);</span>
+<span class="sd">        False otherwise. Exact equality (no tolerance band): only the</span>
+<span class="sd">        sentinel maps to GAMS EPS, so legitimate small floats like ``1e-200``</span>
+<span class="sd">        round-trip as themselves.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">val</span> <span class="o">-</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">val</span> <span class="o">==</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span></div>
 
 
 
@@ -313,10 +324,11 @@
     <span class="c1"># fillna and apply map to value columns, then merge with dimensional columns</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">values</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">num_dims</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">NP_TO_GDX_SVS</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-        <span class="c1"># DataFrame.replace is generally not sufficient to identify EPS values</span>
-        <span class="n">values</span><span class="p">[(</span><span class="n">values</span> <span class="o">-</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">abs</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">SPECIAL_VALUES</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
-        <span class="p">)</span>
+        <span class="c1"># ``DataFrame.replace`` on the float-keyed NP_TO_GDX_SVS doesn&#39;t always</span>
+        <span class="c1"># match the EPS sentinel under pandas&#39; float-equality rules, so detect</span>
+        <span class="c1"># the sentinel explicitly. Exact equality: a legitimate small float</span>
+        <span class="c1"># (e.g. 1e-200) must not silently map to GAMS EPS (#39).</span>
+        <span class="n">values</span><span class="p">[</span><span class="n">values</span> <span class="o">==</span> <span class="n">NUMPY_SPECIAL_VALUES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">SPECIAL_VALUES</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
         <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">num_dims</span><span class="p">])</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
