@@ -4,6 +4,9 @@ v3.1.0, 05/27/26 -- large read/write perf and memory wins on both engines; on a 
                     closes #75 (Set reorder under UEL collisions is a GDX file-format
                     semantic, not a gdxpds bug); documented in overview.md with a
                     workaround and pinned by tests/test_set_ordering.py
+                    closes #106: non-Set/Alias strict-domain parents now raise 
+                    DomainError up front instead of silently falling back
+                    to a relaxed write
                     overview.md "Subset (Domain) Relationships" renamed to "Domain
                     Relationships"; the docs now spell out that any symbol type can
                     carry a strict domain over a Set or Alias-of-Set

@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class Translator:
-    def __init__(self, dataframes, gams_dir=None, domains=None, engine=None, aliases=None):
+    def __init__(self, dataframes, gams_dir=None, domains=None, aliases=None, engine=None):
         self.dataframes = dataframes
         self.__domains = domains
         self.__aliases = aliases
@@ -162,8 +162,8 @@ class Translator:
     def __wire_domains(domains, gdx_file):
         """Resolve each ``domains`` entry against the materialized symbols and assign
         ``GdxSymbol.domain`` so subsequent writes take the strict
-        :c:func:`gdxSymbolSetDomain` path. Length-vs-``num_dims`` is checked here
-        because it needs the constructed symbol."""
+        :c:func:`gdxSymbolSetDomain` path. Length-vs-``num_dims`` and parent-type
+        are checked here because they need the constructed symbols."""
         for child_name, parents in domains.items():
             child = gdx_file[child_name]
             if len(parents) != child.num_dims:
@@ -171,6 +171,18 @@ class Translator:
                     f"to_gdx: domains[{child_name!r}] has length "
                     f"{len(parents)} but symbol has {child.num_dims} dims"
                 )
+            for p in parents:
+                if p is None:
+                    continue
+                parent = gdx_file[p]
+                # GDX's gdxSymbolSetDomain only accepts a Set or Alias-of-Set in
+                # each domain slot; previously a non-Set parent would silently
+                # fall back to a relaxed write, masking caller-side mistakes.
+                if parent.data_type not in (GamsDataType.Set, GamsDataType.Alias):
+                    raise DomainError(
+                        f"to_gdx: domains[{child_name!r}] parent {p!r} must be a "
+                        f"Set or Alias-of-Set; got {parent.data_type.name}."
+                    )
             child.domain = [None if p is None else gdx_file[p] for p in parents]
 
     @staticmethod
@@ -245,8 +257,8 @@ def to_gdx(
     path: str | os.PathLike[str] | None = None,
     gams_dir: str | os.PathLike[str] | None = None,
     domains: Mapping[str, Sequence[str | None]] | None = None,
-    engine: str | Engine | None = None,
     aliases: Mapping[str, str] | None = None,
+    engine: str | Engine | None = None,
 ) -> GdxFile:
     """
     Creates a :py:class:`gdxpds.gdx.GdxFile` from dataframes and optionally writes it to path
@@ -267,27 +279,26 @@ def to_gdx(
         a Set's domain is a *subset* relationship, a Parameter/Variable/Equation's is an
         *indexed-over* relationship -- and the parent named in each slot must itself be a
         Set or Alias-of-Set. Each entry maps a child symbol's name to a list or tuple of
-        its parent Set names, one per dimension, with ``None`` slots mapping to the GAMS
-        wildcard (``'*'``). When provided, the resulting :class:`Translator` (1) topologically
-        sorts ``dataframes`` so each parent precedes its children and (2) wires up strict
-        :c:func:`gdxSymbolSetDomain` writes for each listed child. Any invalid input
-        (unknown parent name, wrong type, wrong length, cyclic references) raises
-        :class:`DomainError`.
-
-    engine : None or str or :py:class:`gdxpds.Engine`
-        Which I/O engine to use for the write (default resolves via ``GDXPDS_ENGINE``,
-        then the default engine: ``gams.transfer`` when usable, otherwise ``gdxcc``).
+        parent symbol names, one per dimension, with ``None`` slots mapping to the GAMS
+        wildcard (``'*'``). When provided, the resulting :class:`Translator`
+        (1) topologically sorts ``dataframes`` so each parent precedes its children and
+        (2) wires up strict :c:func:`gdxSymbolSetDomain` writes for each listed child. Any
+        invalid input (unknown parent name, non-Set/Alias parent, wrong type, wrong length,
+        cyclic references) raises :class:`DomainError`.
     aliases : None or dict of str to str
         Optional aliases, string-based. Each entry maps a new alias name to the name of an
         existing parent Set in ``dataframes``. An unknown parent, a parent that is not a Set,
         or a name collision raises :class:`DomainError`.
+    engine : None or str or :py:class:`gdxpds.Engine`
+        Which I/O engine to use for the write (default resolves via ``GDXPDS_ENGINE``,
+        then the default engine: ``gams.transfer`` when usable, otherwise ``gdxcc``).
 
     Returns
     -------
     :py:class:`gdxpds.gdx.GdxFile`
     """
     translator = Translator(
-        dataframes, gams_dir=gams_dir, domains=domains, engine=engine, aliases=aliases
+        dataframes, gams_dir=gams_dir, domains=domains, aliases=aliases, engine=engine
     )
     gdx = translator.gdx
     if path is not None:

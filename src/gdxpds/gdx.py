@@ -1094,6 +1094,17 @@ class GdxSymbol:
                     "domain entries must be GdxSymbol references or None. "
                     f"Was passed {d} of type {type(d)} as element of {value}."
                 )
+            if d.data_type not in (GamsDataType.Set, GamsDataType.Alias):
+                # GDX's gdxSymbolSetDomain only accepts a Set or Alias-of-Set
+                # in each domain slot, so the strict-write path would fail and
+                # the engine would silently fall back to relaxed. Reject up front
+                # to match alias_of's setter behavior (see #106). Both engines
+                # accept Alias parents on write (verified by
+                # tests/test_domain.py::test_domain_accepts_alias_parent).
+                raise DomainError(
+                    f"domain parent must be a Set (or an Alias-of-Set); "
+                    f"{d.name!r} is a {d.data_type.name}."
+                )
         if (
             (self._dims is not None)
             and self.loaded
