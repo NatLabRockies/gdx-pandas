@@ -59,6 +59,10 @@ where = ["src"]
 testpaths = ["tests"]
 log_file = "tests/pytest.log"
 log_file_level = "INFO"
+addopts = "-m 'not slow'"
+markers = [
+  "slow: large-row scaling probes and other long-running perf tests; opt in with `pytest -m slow`.",
+]
 
 [tool.ruff]
 target-version = "py311"

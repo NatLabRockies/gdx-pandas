@@ -15,6 +15,9 @@ from collections.abc import Sequence
 from numbers import Number
 from typing import TYPE_CHECKING
 
+import numpy as np
+import pandas as pd
+
 import gdxpds.special as special
 from gdxpds._engine import GdxEngine
 from gdxpds.gdx import (
@@ -40,6 +43,109 @@ if TYPE_CHECKING:
     from gdxpds.gdx import GdxFile
 
 logger = logging.getLogger(__name__)
+
+# Rows-per-chunk for the dim-list materialization in write_symbol. Large enough
+# that ``np.column_stack(...).tolist()``'s per-chunk fixed costs amortize, small
+# enough that the sustained list-of-lists peak stays bounded at #65's scale
+# (29M-row 5/7-dim Parameters): one chunk is ~10 MB of inner-list objects,
+# independent of the symbol's total row count.
+_DIM_CHUNK = 100_000
+
+
+def _gdx_to_np_svs(arr: np.ndarray) -> np.ndarray:
+    """Substitute gdxcc magic floats with numpy SV equivalents, in place where
+    possible. Returns the input array (modified) when no UNDEF is present;
+    returns a fresh object-dtype array when UNDEFs require ``None`` slots.
+
+    Mapping mirrors :func:`gdxpds.special.convert_gdx_to_np_svs`. Note GDX
+    +Inf / -Inf are also magic floats (typically 3e+300 / 4e+300) -- not
+    float64 ``inf`` -- so they must be substituted explicitly:
+
+        UNDEF -> ``None`` (forces object dtype so ``None`` survives float64)
+        NA    -> ``np.nan``
+        +Inf  -> ``np.inf``
+        -Inf  -> ``-np.inf``
+        EPS   -> ``np.finfo(float).eps``
+    """
+    undef_mf, na_mf, pinf_mf, ninf_mf, eps_mf = (special.SPECIAL_VALUES[i] for i in range(5))
+    eps = special.NUMPY_SPECIAL_VALUES[-1]
+    undef_mask = arr == undef_mf
+    arr[arr == na_mf] = np.nan
+    arr[arr == pinf_mf] = np.inf
+    arr[arr == ninf_mf] = -np.inf
+    arr[arr == eps_mf] = eps
+    if undef_mask.any():
+        obj = arr.astype(object)
+        obj[undef_mask] = None
+        return obj
+    return arr
+
+
+def _coerce_value_col(col_data: pd.Series, n_rows: int) -> np.ndarray:
+    """Return a ``float64`` array of length ``n_rows`` with all gdxpds-canonical
+    special values pre-substituted to their GDX magic floats.
+
+    Numpy SVs (NaN, +/-inf, eps) are detected via vectorized masks and replaced
+    with the GDX NA / +/-Inf / EPS magic floats. The gdxpds-canonical UNDEF is
+    Python ``None`` inside an object column; its positions are recorded before
+    the float64 cast (since None coerces to NaN and would otherwise be
+    indistinguishable from genuine NA) and then overwritten with the GDX UNDEF
+    magic float at the end. The legacy per-row fallback that mapped non-Number,
+    non-None object values to 0.0 is preserved for object columns by routing
+    them through a single-pass Python loop only when nulls are actually present
+    or a fast cast fails -- the common case (float64 input, or object input
+    that's pure Number/None) stays vectorized.
+    """
+    eps = special.NUMPY_SPECIAL_VALUES[-1]
+    is_none: np.ndarray | None = None
+
+    if col_data.dtype == object:
+        null_mask = col_data.isna().to_numpy()
+        if null_mask.any():
+            # Object column with at least one null: walk it once to separate
+            # None (gdxpds UNDEF) from non-Number entries that the legacy code
+            # mapped to 0.0. Number entries cast straight to float; the rest
+            # stay 0.0 until the UNDEF substitution at the end.
+            col_arr = col_data.to_numpy()
+            is_none = np.fromiter((v is None for v in col_arr), dtype=bool, count=n_rows)
+            arr = np.zeros(n_rows, dtype=np.float64)
+            for i, v in enumerate(col_arr):
+                if v is None:
+                    continue  # arr[i] stays 0.0; is_none drives the override
+                elif isinstance(v, Number):
+                    arr[i] = float(v)
+                # else: leave arr[i] = 0.0 (legacy fallback for non-Number,
+                # non-None entries)
+        else:
+            try:
+                arr = col_data.to_numpy(dtype=np.float64, copy=True)
+            except (TypeError, ValueError):
+                # Mixed-type object column with no nulls: fall back to per-row
+                # classification, same as the legacy 0.0-for-non-Number branch.
+                col_arr = col_data.to_numpy()
+                arr = np.zeros(n_rows, dtype=np.float64)
+                for i, v in enumerate(col_arr):
+                    if isinstance(v, Number):
+                        arr[i] = float(v)
+    else:
+        arr = col_data.to_numpy(dtype=np.float64, copy=True)
+
+    # Vectorized numpy SV -> GDX magic float substitution.
+    nan_mask = np.isnan(arr)
+    pinf_mask = arr == np.inf
+    ninf_mask = arr == -np.inf
+    # NaN values fall out of the eps band naturally: arr - eps is NaN for NaN
+    # entries, and `np.abs(NaN) < eps` is False.
+    eps_mask = np.abs(arr - eps) < eps
+    arr[nan_mask] = special.SPECIAL_VALUES[1]  # GDX NA
+    arr[pinf_mask] = special.SPECIAL_VALUES[2]  # GDX +Inf
+    arr[ninf_mask] = special.SPECIAL_VALUES[3]  # GDX -Inf
+    arr[eps_mask] = special.SPECIAL_VALUES[4]  # GDX EPS
+    if is_none is not None:
+        # UNDEF override wins over the NaN -> NA substitution above for None
+        # positions, matching the legacy per-row ``if v is None: undef``.
+        arr[is_none] = special.SPECIAL_VALUES[0]  # GDX UNDEF
+    return arr
 
 
 class GdxccEngine(GdxEngine):
@@ -187,34 +293,67 @@ class GdxccEngine(GdxEngine):
     def _load_one(self, gdx_file: GdxFile, symbol: GdxSymbol) -> None:
         H = self.handle
         _ret, records = gdxcc.gdxDataReadStrStart(H, symbol.index)
+        n = int(records)
+        num_dims = symbol.num_dims
 
-        def reader():
-            for _i in range(records):
-                yield gdxcc.gdxDataReadStr(H)
+        if n == 0:
+            # Short-circuit: an empty Parameter/Variable/Equation gets a
+            # DataFrame with object-dtype columns (the pandas default for empty
+            # frames), matching the gams_transfer engine's empty-records branch.
+            # The value arrays I allocate below default to float64, which would
+            # otherwise mismatch transfer for the empty case.
+            gdxcc.gdxDataReadDone(H)
+            cols = list(symbol.dims) + list(symbol.value_col_names)
+            symbol.dataframe = pd.DataFrame([], columns=cols)
+            symbol._loaded = True
+            return
+        # Pre-allocate one ndarray per output column. Replaces the prior
+        # ``data = [elements + [...] for ...]`` row-list materialization that
+        # held N row-lists of ~6-10 string/float refs each (the dominant peak
+        # at large N) plus the convert_gdx_to_np_svs full-DataFrame copy on
+        # the non-Set path. Memory is now bounded by ``n_cols`` ndarrays
+        # rather than ``n_rows`` Python lists.
+        dim_arrays: list[np.ndarray] = [np.empty(n, dtype=object) for _ in range(num_dims)]
+        value_arrays: list[np.ndarray] = [
+            np.empty(n, dtype=object if symbol.data_type == GamsDataType.Set else np.float64)
+            for _ in symbol.value_cols
+        ]
+        # ``col_inds`` indexes into the SWIG-bound ``values`` doubleArray (size
+        # GMS_VAL_MAX); the same col_ind tells us which value-array to store into.
+        col_inds = [col_ind for _col_name, col_ind in symbol.value_cols]
 
-        vc = symbol.value_cols  # local for speed in the comprehensions below
         if symbol.data_type == GamsDataType.Set:
-            # gdxpds surfaces a Set value as its element text (a string;
-            # `""` when none; membership conveyed by row presence). On disk
-            # the gdxcc engine stores a float-encoded *index* into the
-            # element-text table per row, so this loop resolves each index back
-            # to its text via `gdxGetElemText` before handing the records to
-            # the DataFrame -- callers never see the index. (Aliases are
-            # handled in load_symbols: their dataframe is a view onto the
-            # parent's, so they don't reach this read path.)
-            data = [
-                elements
-                + [gdxcc.gdxGetElemText(H, int(values[col_ind]))[1] for _col_name, col_ind in vc]
-                for _ret, elements, values, _afdim in reader()
-            ]
-            symbol.dataframe = data
+            # On disk the value column is a float-encoded *index* into the
+            # element-text table; resolve to the text string via gdxGetElemText.
+            for i in range(n):
+                _, elements, values, _ = gdxcc.gdxDataReadStr(H)
+                for j in range(num_dims):
+                    dim_arrays[j][i] = elements[j]
+                for k, col_ind in enumerate(col_inds):
+                    value_arrays[k][i] = gdxcc.gdxGetElemText(H, int(values[col_ind]))[1]
         else:
-            data = [
-                elements + [values[col_ind] for _col_name, col_ind in vc]
-                for _ret, elements, values, _afdim in reader()
-            ]
-            symbol.dataframe = data
-            symbol.dataframe = special.convert_gdx_to_np_svs(symbol.dataframe, symbol.num_dims)
+            for i in range(n):
+                _, elements, values, _ = gdxcc.gdxDataReadStr(H)
+                for j in range(num_dims):
+                    dim_arrays[j][i] = elements[j]
+                for k, col_ind in enumerate(col_inds):
+                    value_arrays[k][i] = values[col_ind]
+            # Per-column gdxcc-magic-float -> numpy SV substitution; replaces
+            # the convert_gdx_to_np_svs full-DataFrame copy with one in-place
+            # pass per value column.
+            for k, arr in enumerate(value_arrays):
+                value_arrays[k] = _gdx_to_np_svs(arr)
+        gdxcc.gdxDataReadDone(H)
+
+        # Build the DataFrame from the pre-allocated columns. Construct via
+        # integer-keyed dict + rename so duplicate dim names (e.g. multiple
+        # unnamed '*' dims) survive (a dict keyed by ``symbol.dims`` would
+        # collapse them).
+        columns = list(symbol.dims) + list(symbol.value_col_names)
+        all_arrays = dim_arrays + value_arrays
+        df = pd.DataFrame({i: a for i, a in enumerate(all_arrays)}, copy=False)
+        df.columns = columns
+        symbol.dataframe = df
         symbol._loaded = True
 
     def write_file(self, gdx_file: GdxFile, filename: str | os.PathLike[str]) -> None:
@@ -329,46 +468,79 @@ class GdxccEngine(GdxEngine):
             else:
                 logger.info("Not writing domain information because symbol index is unknown.")
         values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
-        # make sure index is clean -- needed for merging in convert_np_to_gdx_svs
-        symbol.dataframe = symbol.dataframe.reset_index(drop=True)
+        df = symbol.dataframe.reset_index(drop=True)
+        num_dims = symbol.num_dims
+        n_rows = len(df)
+
+        # Per-column dim arrays. ``astype(str)`` is a near-zero-cost view for an
+        # already-string object column and amortizes the per-row ``str()`` call
+        # for numeric columns into one allocation per column.
+        dim_arrays = [df.iloc[:, j].astype(str).to_numpy() for j in range(num_dims)]
+
+        def build_chunk_dims(s: int, e: int) -> list[list[str]]:
+            # Pre-materialize ``e-s`` dim-lists via ``np.column_stack(...).tolist()``
+            # so the per-row write does a single list lookup instead of a Python
+            # list comp. Chunking bounds the sustained peak: one chunk is ~10 MB
+            # of inner-list objects regardless of total row count (issue #65).
+            if num_dims == 0:
+                return [[]] * (e - s)
+            return np.column_stack([a[s:e] for a in dim_arrays]).tolist()
 
         if symbol.data_type == GamsDataType.Set:
-            # Each row is a member; the value column is its element text ("" = no
-            # text). Non-empty text is registered with gdxAddSetText and the row
-            # stores the returned table index (0 means no text). (Aliases returned
+            # The (sole) value column carries the element text ("" = no text).
+            # Non-empty text registers via ``gdxAddSetText`` for a sequential
+            # table index; the row then stores that index. (Aliases returned
             # above; only Sets reach this data-write path.)
-            for row in symbol.dataframe.itertuples(index=False, name=None):
-                dims = [str(x) for x in row[: symbol.num_dims]]
-                vals = row[symbol.num_dims :]
-                for _col_name, col_ind in symbol.value_cols:
-                    text = vals[col_ind]
+            _col_name, col_ind = symbol.value_cols[0]
+            text_arr = df.iloc[:, num_dims + col_ind].to_numpy()
+            chunk_start = 0
+            while chunk_start < n_rows:
+                chunk_end = min(chunk_start + _DIM_CHUNK, n_rows)
+                chunk_dims = build_chunk_dims(chunk_start, chunk_end)
+                for i, r in enumerate(range(chunk_start, chunk_end)):
+                    text = text_arr[r]
                     node = 0
                     if isinstance(text, str) and text != "":
                         rc, node = gdxcc.gdxAddSetText(H, text)
                         if not rc:
                             raise GdxError(
-                                H, f"Could not add set text {text!r} for {symbol.name!r}"
+                                H,
+                                f"Could not add set text {text!r} for {symbol.name!r}",
                             )
                     values[col_ind] = float(node)
-                gdxcc.gdxDataWriteStr(H, dims, values)
+                    gdxcc.gdxDataWriteStr(H, chunk_dims[i], values)
+                chunk_start = chunk_end
         else:
-            to_write = special.convert_np_to_gdx_svs(symbol.dataframe, symbol.num_dims)
-            undef = special.SPECIAL_VALUES[0]  # GDX UNDEF magic float
-            for row in to_write.itertuples(index=False, name=None):
-                dims = [str(x) for x in row[: symbol.num_dims]]
-                vals = row[symbol.num_dims :]
-                for _col_name, col_ind in symbol.value_cols:
-                    v = vals[col_ind]
-                    try:
-                        if v is None:
-                            # gdxpds canonical UNDEF -> a genuine GDX UNDEF, which
-                            # reads back as None (convert_np_to_gdx_svs can't key None).
-                            values[col_ind] = undef
-                        elif isinstance(v, Number):
-                            values[col_ind] = float(v)
-                        else:
-                            values[col_ind] = 0.0
-                    except Exception:
-                        raise Error(f"Unable to set element {col_ind} from {vals}.")
-                gdxcc.gdxDataWriteStr(H, dims, values)
+            # Per value column, build ONE float64 array with all gdxpds-canonical
+            # special values already mapped to their GDX magic floats. Replaces
+            # both the ``convert_np_to_gdx_svs`` full-DataFrame copy and the
+            # per-row ``isinstance(v, Number)`` / ``v is None`` Python checks.
+            value_arrays = [
+                (col_ind, _coerce_value_col(df.iloc[:, num_dims + col_ind], n_rows))
+                for _col_name, col_ind in symbol.value_cols
+            ]
+            # Parameter has a single value column; special-case it so the hot
+            # loop doesn't iterate over a 1-element value_arrays list per row
+            # (~50ns saved per iteration, ~25ms at 500K rows).
+            if len(value_arrays) == 1:
+                only_col_ind, only_arr = value_arrays[0]
+                chunk_start = 0
+                while chunk_start < n_rows:
+                    chunk_end = min(chunk_start + _DIM_CHUNK, n_rows)
+                    chunk_dims = build_chunk_dims(chunk_start, chunk_end)
+                    for i, r in enumerate(range(chunk_start, chunk_end)):
+                        values[only_col_ind] = only_arr[r]
+                        gdxcc.gdxDataWriteStr(H, chunk_dims[i], values)
+                    chunk_start = chunk_end
+            else:
+                # Variable / Equation: multi-column value path.
+                chunk_start = 0
+                while chunk_start < n_rows:
+                    chunk_end = min(chunk_start + _DIM_CHUNK, n_rows)
+                    chunk_dims = build_chunk_dims(chunk_start, chunk_end)
+                    for i, r in enumerate(range(chunk_start, chunk_end)):
+                        for col_ind, arr in value_arrays:
+                            values[col_ind] = arr[r]
+                        gdxcc.gdxDataWriteStr(H, chunk_dims[i], values)
+                    chunk_start = chunk_end
         gdxcc.gdxDataWriteDone(H)

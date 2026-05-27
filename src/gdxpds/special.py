@@ -1,7 +1,6 @@
 import logging
 
 import numpy as np
-import pandas as pd
 
 logger = logging.getLogger(__name__)
 
@@ -35,17 +34,13 @@ def convert_gdx_to_np_svs(df, num_dims):
     # create clean copy of df
     tmp = df.copy()
 
-    # apply the map to the value columns and merge with the dimensional information.
-    # GDX_TO_NP_SVS maps GDX UNDEF (1e300) -> None; pandas 2.x's default `replace`
-    # silently downcasts None back to NaN when the source column is float, which
-    # would collapse the UNDEF/NA distinction. The option-context opts into the
-    # 3.x behavior locally: object dtype is preserved when None remains in the
-    # column, and untouched columns keep their float dtype.
-    if hasattr(pd.options, "future") and hasattr(pd.options.future, "no_silent_downcasting"):
-        with pd.option_context("future.no_silent_downcasting", True):
-            replaced = tmp.iloc[:, num_dims:].replace(GDX_TO_NP_SVS)
-    else:
-        replaced = tmp.iloc[:, num_dims:].replace(GDX_TO_NP_SVS)
+    # Apply the map to the value columns and merge with the dimensional
+    # information. GDX_TO_NP_SVS maps GDX UNDEF (1e300) -> None; on pandas 3+
+    # ``replace`` no longer silently downcasts None back to NaN on float
+    # columns, so object dtype is preserved when None remains (the
+    # UNDEF/NA distinction survives). pyproject pins pandas >= 2.2, where this
+    # is already the "future" behavior.
+    replaced = tmp.iloc[:, num_dims:].replace(GDX_TO_NP_SVS)
     tmp = (tmp.iloc[:, :num_dims]).merge(replaced, left_index=True, right_index=True)
     return tmp
 

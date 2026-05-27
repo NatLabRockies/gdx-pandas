@@ -467,3 +467,61 @@ def test_get_subset_relationships_round_trips_through_to_gdx(run_dir):
     # and the resulting file must report identical relationships.
     gdxpds.to_gdx(dataframes, out2, domains=rels)
     assert gdxpds.get_subset_relationships(out2) == rels
+
+
+# ---------------------------------------------------------------------------
+# 22. Strict-domain parent must be a Set or Alias-of-Set (#106)
+# ---------------------------------------------------------------------------
+def test_domain_setter_rejects_non_set_parent():
+    # The GdxSymbol.domain setter mirrors the alias_of setter: a non-Set,
+    # non-Alias parent fails up front instead of silently falling back to a
+    # relaxed write at write time.
+    with GdxFile() as gdx:
+        gdx.append(GdxSymbol("p", GamsDataType.Parameter, dims=["p"]))
+        gdx[-1].dataframe = pd.DataFrame([["p1", 1.0]], columns=["p", "Value"])
+        gdx.append(GdxSymbol("q", GamsDataType.Parameter, dims=["p"]))
+        with pytest.raises(DomainError, match="must be a Set"):
+            gdx["q"].domain = [gdx["p"]]
+        # Same for Variable / Equation parents:
+        gdx.append(
+            GdxSymbol(
+                "v",
+                GamsDataType.Variable,
+                dims=["v"],
+                variable_type=gdxpds.gdx.GamsVariableType.Free,
+            )
+        )
+        with pytest.raises(DomainError, match="must be a Set"):
+            gdx["q"].domain = [gdx["v"]]
+
+
+def test_to_gdx_domains_rejects_non_set_parent():
+    # The to_gdx domains= path raises with a clear message identifying which
+    # entry's parent is invalid, instead of silently falling back to relaxed.
+    dataframes = {
+        "p": pd.DataFrame([["p1", 1.0]], columns=["p", "Value"]),
+        "q": pd.DataFrame([["p1", 2.0]], columns=["p", "Value"]),
+    }
+    with pytest.raises(DomainError, match="must be a Set"):
+        gdxpds.to_gdx(dataframes, domains={"q": ["p"]})
+
+
+def test_domain_accepts_alias_parent(run_dir):
+    # Both engines accept an Alias-of-Set as a domain parent and round-trip it.
+    # The OO path passes domain=[alias_symbol] directly; the to_gdx
+    # ``domains=`` path passes the alias name.
+    engines = ["gdxcc"] + (["gams_transfer"] if gdxpds.HAVE_GAMS_TRANSFER else [])
+    for engine in engines:
+        out = os.path.join(run_dir, f"alias_parent_{engine}.gdx")
+        with GdxFile(engine=engine) as gdx:
+            t = gdxpds.gdx.append_set(gdx, "t", pd.DataFrame({"t": ["t1", "t2", "t3"]}))
+            at = gdxpds.gdx.append_alias(gdx, "at", t)
+            gdx.append(GdxSymbol("p", GamsDataType.Parameter, dims=["at"], domain=[at]))
+            gdx[-1].dataframe = pd.DataFrame({"at": ["t1", "t2", "t3"], "Value": [1.0, 2.0, 3.0]})
+            gdx.write(out)
+        with GdxFile(lazy_load=False, engine=engine) as gdx:
+            gdx.read(out)
+            assert gdx["p"].domain_type == GamsDomainType.REGULAR
+            assert gdx["p"].domain is not None
+            assert gdx["p"].domain[0].name == "at"
+            assert gdx["p"].domain[0].data_type == GamsDataType.Alias

@@ -26,10 +26,20 @@ def clean_up(request):
 # gams_transfer, ratio) where ratio = gdxcc / gams_transfer (>1 = transfer faster).
 _ENGINE_TIMINGS = []
 
+# Rows appended by tests/test_engine_timing.py's synthetic-IO measurements.
+# Each row: dict(engine, op, rows, gdx_mb, peak_mb, ratio, seconds) where ratio
+# is peak Python memory / GDX on-disk size, and op is "read" or "write".
+_ENGINE_MEMORY = []
+
 
 @pytest.fixture(scope="session")
 def engine_timings():
     return _ENGINE_TIMINGS
+
+
+@pytest.fixture(scope="session")
+def engine_memory():
+    return _ENGINE_MEMORY
 
 
 def _crossover_note(rows, op):
@@ -64,25 +74,65 @@ def _crossover_note(rows, op):
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
     rows = _ENGINE_TIMINGS
-    if not rows:
-        return
     tr = terminalreporter
-    tr.write_sep("=", "engine timing (gdxcc vs gams_transfer)")
-    tr.write_line(
-        "min seconds over repeated runs; ratio = gdxcc / gams_transfer (>1 = transfer faster)"
-    )
-    header = f"{'fixture':32s} {'size_KB':>9s} {'op':>5s} {'gdxcc':>9s} {'xfer':>9s} {'ratio':>7s}"
-    tr.write_line(header)
-    tr.write_line("-" * len(header))
-    for r in sorted(rows, key=lambda r: (r["size_kb"], r["op"])):
+    if rows:
+        tr.write_sep("=", "engine timing (gdxcc vs gams_transfer)")
         tr.write_line(
-            f"{r['fixture'][:32]:32s} {r['size_kb']:9.1f} {r['op']:>5s} "
-            f"{r['gdxcc']:9.4f} {r['gams_transfer']:9.4f} {r['ratio']:7.2f}"
+            "min seconds over repeated runs; ratio = gdxcc / gams_transfer (>1 = transfer faster)"
         )
-    for op in ("read", "write"):
-        note = _crossover_note(rows, op)
-        if note:
-            tr.write_line(note)
+        header = (
+            f"{'fixture':32s} {'size_KB':>9s} {'op':>5s} {'gdxcc':>9s} {'xfer':>9s} {'ratio':>7s}"
+        )
+        tr.write_line(header)
+        tr.write_line("-" * len(header))
+        for r in sorted(rows, key=lambda r: (r["size_kb"], r["op"])):
+            tr.write_line(
+                f"{r['fixture'][:32]:32s} {r['size_kb']:9.1f} {r['op']:>5s} "
+                f"{r['gdxcc']:9.4f} {r['gams_transfer']:9.4f} {r['ratio']:7.2f}"
+            )
+        for op in ("read", "write"):
+            note = _crossover_note(rows, op)
+            if note:
+                tr.write_line(note)
+
+    mem_rows = _ENGINE_MEMORY
+    if mem_rows:
+        # Group by (rows, op) so the default-scale (500K) and slow-scale (5M)
+        # appear in separate tables, each split by op. The x-raw column pairs
+        # each gdxpds engine with its same-(rows, op) raw counterpart so the
+        # 1.3x / 1.5x acceptance ratios can be read off directly.
+        rows_by_section: dict[tuple[int, str], list[dict]] = {}
+        for r in mem_rows:
+            rows_by_section.setdefault((r["rows"], r["op"]), []).append(r)
+        for (rows, op), section in sorted(rows_by_section.items()):
+            tr.write_sep(
+                "=",
+                f"synthetic-{op} {rows:,} rows (peak Python memory via tracemalloc)",
+            )
+            tr.write_line(
+                "ratio = peak_MB / gdx_MB; x raw = engine seconds / paired raw_* seconds "
+                "(targets: gdxcc-write <= 1.3x raw_gdxcc, gams_transfer-write <= 1.5x raw_transfer)."
+            )
+            header = (
+                f"{'engine':16s} {'gdx_MB':>9s} "
+                f"{'peak_MB':>10s} {'ratio':>7s} {'seconds':>9s} {'x raw':>7s}"
+            )
+            tr.write_line(header)
+            tr.write_line("-" * len(header))
+            raw_seconds = {
+                r["engine"]: r["seconds"] for r in section if r["engine"].startswith("raw_")
+            }
+            pair = {"gdxcc": "raw_gdxcc", "gams_transfer": "raw_transfer"}
+            for r in sorted(section, key=lambda r: r["engine"]):
+                raw = pair.get(r["engine"])
+                if raw is not None and raw_seconds.get(raw):
+                    x_raw = f"{r['seconds'] / raw_seconds[raw]:6.2f}x"
+                else:
+                    x_raw = "     -"
+                tr.write_line(
+                    f"{r['engine']:16s} {r['gdx_mb']:9.2f} "
+                    f"{r['peak_mb']:10.2f} {r['ratio']:7.2f} {r['seconds']:9.3f} {x_raw:>7s}"
+                )
 
 
 @pytest.fixture(scope="session")

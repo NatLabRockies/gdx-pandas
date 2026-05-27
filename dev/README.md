@@ -178,6 +178,29 @@ It runs, in each existing venv: `pytest tests` and `gdxpds test`. `.venv-no-gams
 
 Invoke it from an interactive bash shell so the `module` function is in scope.
 
+## Performance benchmarks
+
+[tests/test_engine_timing.py](../tests/test_engine_timing.py) records read/write timings + peak Python memory (via `tracemalloc`) across the gdxcc and `gams.transfer` engines, alongside raw-engine baselines (`_raw_gdxcc_write/read`, `_raw_transfer_write/read`) so the per-engine overhead is visible.
+
+The default `pytest tests` runs the benchmarks at **500K rows** (a 5-dim synthetic Parameter, ~6 MB GDX). Results print as tables in the pytest terminal summary, grouped by `(rows, op)`.
+
+To exercise the **5M-row scaling probe** (slow-marked, ~3 minutes against a hot GAMS install — confirms the default-scale ratios still hold an order of magnitude up, approaching the 29M-row case from [issue #65](https://github.com/NatLabRockies/gdx-pandas/issues/65)):
+
+```
+pytest tests -m slow
+```
+
+The `slow` marker is registered in [pyproject.toml](../pyproject.toml) under `[tool.pytest.ini_options]`; `addopts = "-m 'not slow'"` keeps the default suite fast.
+
+For deeper investigation when a benchmark regresses, two `cProfile`-driven probes localize per-row hotspots in the gdxcc write loop:
+
+```
+python dev/profile_gdxcc_write.py    # gdxpds-mediated write
+python dev/profile_raw_gdxcc.py      # bare gdxDataWriteStr baseline
+```
+
+Each prints a 25-entry cumulative profile of one 500K-row write, with no tracemalloc overhead distorting the per-call timing.
+
 ## Create a new release
 
 Two GitHub Actions workflows make a release fully automatic from the Releases UI: [release-pypi.yml](../.github/workflows/release-pypi.yml) publishes to PyPI via Trusted Publishing (OIDC, no API token stored anywhere), and [release-docs.yml](../.github/workflows/release-docs.yml) builds docs against the release tag and deploys them under `https://NatLabRockies.github.io/gdx-pandas/vX.Y.Z/`. Both gate on `release.prerelease == false`, so pre-release tags (e.g. `v2.0.0rc1`) are no-ops for automation — if you ever need a pre-release on PyPI, run `python -m build` and `twine upload` by hand.

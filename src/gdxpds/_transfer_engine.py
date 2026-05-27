@@ -69,35 +69,40 @@ _VAR_TYPE_STR = {member: s for s, member in _VAR_TYPE.items()}
 _EQU_TYPE_STR = {member: s for s, member in _EQU_TYPE.items()}
 
 
-def _np_to_transfer_specials(records: pd.DataFrame, value_cols: list[str]) -> None:
-    """In place, map gdxpds canonical special values to gams.transfer encodings.
+def _substitute_value_col(col_data: pd.Series) -> np.ndarray:
+    """Return a fresh ``float64`` ndarray with gdxpds-canonical special values
+    pre-substituted to the gams.transfer encoding.
 
-    Mostly the inverse of :func:`_convert_transfer_specials`: machine eps -> EPS
-    (gt's ``-0.0``); NaN -> NA (gt's NA sentinel); +/-inf already match. Genuine
-    0.0 is left alone (only eps maps to EPS).
+    Inverse of :func:`_convert_transfer_specials`: machine eps -> EPS (gt's
+    ``-0.0``); NaN -> NA (gt's NA sentinel); +/-inf already match. Genuine 0.0
+    is left alone (only eps maps to EPS). GDX UNDEF is gdxpds' canonical
+    ``None`` (see :data:`special.NUMPY_SPECIAL_VALUES`), only possible in an
+    object column; it maps to ``gt.SpecialValues.UNDEF``, distinct from NA
+    (``np.nan``) which the float64 coercion would otherwise produce.
 
-    GDX UNDEF is gdxpds' canonical ``None`` (see
-    :data:`special.NUMPY_SPECIAL_VALUES`), only possible in an object column. It
-    maps to a genuine ``gt.SpecialValues.UNDEF``, which reads back as ``None`` --
-    distinct from NA (``np.nan``), which the plain float64 coercion would otherwise
-    produce.
+    Returns a NEW ndarray so the caller can attach it to a separate DataFrame
+    without modifying the source (the source frame's columns stay views into
+    the user's data, keeping the per-symbol allocation small).
     """
     eps = NUMPY_SPECIAL_VALUES[-1]
-    for col in value_cols:
-        col_data = records[col]
-        # float64 columns can't hold a Python None, so only object columns need
-        # the (per-element) None check; skip it otherwise to keep the hot path fast.
-        if col_data.dtype == object:
-            is_none = col_data.map(lambda v: v is None).to_numpy(dtype=bool)
-        else:
-            is_none = np.zeros(len(col_data), dtype=bool)
-        arr = col_data.to_numpy(dtype="float64", copy=True)
-        is_eps = np.abs(arr - eps) < eps
-        is_nan = np.isnan(arr) & ~is_none  # genuine NaN (NA), not a coerced None
-        arr[is_nan] = gt.SpecialValues.NA
-        arr[is_eps] = gt.SpecialValues.EPS
-        arr[is_none] = gt.SpecialValues.UNDEF  # GDX UNDEF, reads back as None
-        records[col] = arr
+    is_none: np.ndarray | None = None
+    if col_data.dtype == object:
+        # Cheap-out: only object columns can carry a Python ``None`` (the
+        # gdxpds-canonical UNDEF). Record None positions BEFORE the float64
+        # cast (None coerces to NaN and would otherwise be indistinguishable
+        # from genuine NA).
+        col_arr = col_data.to_numpy()
+        is_none = np.fromiter((v is None for v in col_arr), dtype=bool, count=len(col_data))
+    arr = col_data.to_numpy(dtype="float64", copy=True)
+    is_eps = np.abs(arr - eps) < eps
+    nan_mask = np.isnan(arr)
+    arr[nan_mask] = gt.SpecialValues.NA
+    arr[is_eps] = gt.SpecialValues.EPS
+    if is_none is not None:
+        # UNDEF override wins over the NaN -> NA substitution above, matching
+        # the gdxcc engine's `None -> UNDEF` semantic at write time.
+        arr[is_none] = gt.SpecialValues.UNDEF
+    return arr
 
 
 def _data_type_of(gt_sym) -> GamsDataType:
@@ -121,37 +126,34 @@ def _dims_of(gt_sym) -> list[str]:
     return [d if isinstance(d, str) else d.name for d in gt_sym.domain]
 
 
-def _convert_transfer_specials(values: pd.DataFrame) -> pd.DataFrame:
-    """Map gams.transfer special-value encodings to the gdxpds canonical form.
+def _convert_transfer_value_col(col_data: pd.Series) -> np.ndarray:
+    """Map gams.transfer special-value encodings on a single value column to
+    the gdxpds canonical form, returning a fresh ndarray.
 
-    Mirrors the gdxcc engine's :func:`special.convert_gdx_to_np_svs` exactly:
     EPS (gt's ``-0.0``) -> machine eps; NA (gt's NA sentinel) -> ``np.nan``;
-    UNDEF (gt's plain NaN) -> ``None``; +/-inf already match. Genuine ``0.0`` is
-    left alone (only negative zero is EPS).
+    UNDEF (gt's distinct NaN bit pattern) -> ``None``; +/-inf already match.
+    Genuine ``0.0`` is left alone (only negative zero is EPS).
 
     UNDEF is kept distinct from NA, matching the gdxcc engine: gdxcc maps GDX
-    UNDEF -> ``None`` and GDX NA -> ``np.nan`` (see
-    :data:`special.GDX_TO_NP_SVS`). A column carrying any UNDEF therefore comes
-    back as object dtype (so ``None`` survives), matching gdxcc; a column with no
-    UNDEF stays ``float64``.
+    UNDEF -> ``None`` and GDX NA -> ``np.nan``. A column carrying any UNDEF
+    therefore comes back as object dtype (so ``None`` survives); a column with
+    no UNDEF stays ``float64``. Returning the ndarray instead of writing into a
+    DataFrame lets the caller assemble the result frame in one
+    ``pd.DataFrame(...)`` call, avoiding the prior full-DataFrame ``.copy()``
+    and per-column ``df[col] = arr`` writes.
     """
     eps = NUMPY_SPECIAL_VALUES[-1]
-    out = values.copy()
-    for col in out.columns:
-        arr = out[col].to_numpy(dtype="float64", copy=True)
-        is_eps = np.asarray(gt.SpecialValues.isEps(arr))
-        is_na = np.asarray(gt.SpecialValues.isNA(arr))
-        is_undef = np.asarray(gt.SpecialValues.isUndef(arr))
-        arr[is_na | is_undef] = np.nan
-        arr[is_eps] = eps
-        if is_undef.any():
-            # UNDEF -> None (gdxcc parity), forcing object dtype like gdxcc does.
-            obj = arr.astype(object)
-            obj[is_undef] = None
-            out[col] = obj
-        else:
-            out[col] = arr
-    return out
+    arr = col_data.to_numpy(dtype="float64", copy=True)
+    is_eps = np.asarray(gt.SpecialValues.isEps(arr))
+    is_na = np.asarray(gt.SpecialValues.isNA(arr))
+    is_undef = np.asarray(gt.SpecialValues.isUndef(arr))
+    arr[is_na | is_undef] = np.nan
+    arr[is_eps] = eps
+    if is_undef.any():
+        obj = arr.astype(object)
+        obj[is_undef] = None
+        return obj
+    return arr
 
 
 class TransferEngine(GdxEngine):
@@ -238,11 +240,20 @@ class TransferEngine(GdxEngine):
         # are matched by name.
         dim_names = [f"_d{i}" for i in range(num_dims)]
 
+        # Build ``records`` as a DataFrame whose dim columns share storage with
+        # the user's ``symbol.dataframe`` (no data copy) and whose value column(s)
+        # are fresh ndarrays with the special-value substitution baked in. The
+        # previous ``records = symbol.dataframe.copy()`` made a full-DataFrame
+        # copy per symbol (~50 MB on the 500K-row synthetic Parameter, scaling
+        # linearly with input size); per-column substitution allocates only the
+        # value columns (issue #65). For a Parameter this is one ~4-MB-per-500K
+        # float64 array; for Variable/Equation, five.
+        src = symbol.dataframe
+        dim_dict = {dim_names[j]: src.iloc[:, j] for j in range(num_dims)}
+
         if data_type == GamsDataType.Set:
-            records = symbol.dataframe.iloc[:, :num_dims].copy()
-            records.columns = dim_names
-            # The value column is the element text ("" = a member with no text).
-            records["element_text"] = symbol.dataframe.iloc[:, num_dims].astype(str).to_numpy()
+            dim_dict["element_text"] = src.iloc[:, num_dims].astype(str).to_numpy()
+            records = pd.DataFrame(dim_dict, copy=False)
             gt.Set(container, symbol.name, domain=domain, description=description, records=records)
             return
 
@@ -251,9 +262,9 @@ class TransferEngine(GdxEngine):
         # ...); value_col_names derives from GamsValueType, the same source the
         # gdxcc engine uses, so there is no second hard-coded list to keep in sync.
         value_cols = [name.lower() for name in symbol.value_col_names]
-        records = symbol.dataframe.copy()
-        records.columns = dim_names + value_cols
-        _np_to_transfer_specials(records, value_cols)
+        for i, col in enumerate(value_cols):
+            dim_dict[col] = _substitute_value_col(src.iloc[:, num_dims + i])
+        records = pd.DataFrame(dim_dict, copy=False)
         if data_type == GamsDataType.Parameter:
             gt.Parameter(
                 container, symbol.name, domain=domain, description=description, records=records
@@ -387,25 +398,40 @@ class TransferEngine(GdxEngine):
             return
 
         num_dims = symbol.num_dims
-        # Domain columns, decategorized to plain strings (gdxcc yields object/str,
-        # gams.transfer yields ordered categoricals).
-        dim_data = records.iloc[:, :num_dims].astype(str).reset_index(drop=True)
-
-        # A Set value is its element text ("" = no text); membership is row
-        # presence. (Aliases short-circuit above: their dataframe is a view onto
-        # the parent Set.)
-        if symbol.data_type == GamsDataType.Set:
-            if records.shape[1] > num_dims:
-                text = records.iloc[:, num_dims].astype(str)
+        # Build all columns as ndarrays into a positional dict, then one
+        # ``pd.DataFrame(...)`` -- replaces the prior pd.concat([dim_data,
+        # value_data]) flow that allocated intermediate DataFrames.
+        #
+        # Dim columns: gt stores them as ordered Categoricals with int8/int16
+        # codes pointing into a small ``cat.categories`` string array, so
+        # ``categories[codes]`` returns an object ndarray of shared string
+        # references (only ``len(categories)`` distinct Python str objects
+        # exist regardless of row count) without going through ``.astype(str)``
+        # and its intermediate DataFrame allocation.
+        arrays: list[np.ndarray] = []
+        for j in range(num_dims):
+            col = records.iloc[:, j]
+            if isinstance(col.dtype, pd.CategoricalDtype):
+                cats = col.cat.categories.to_numpy()
+                arrays.append(cats[col.cat.codes.to_numpy()])
             else:
-                text = pd.Series([""] * len(records))
-            value_data = text.reset_index(drop=True).to_frame()
-        else:
-            value_data = _convert_transfer_specials(
-                records.iloc[:, num_dims:].reset_index(drop=True)
-            )
+                arrays.append(col.astype(str).to_numpy())
 
-        df = pd.concat([dim_data, value_data], axis=1)
+        if symbol.data_type == GamsDataType.Set:
+            # A Set's value column is its element text ("" = no text);
+            # membership is row presence. (Aliases short-circuit above: their
+            # dataframe is a view onto the parent Set.)
+            if records.shape[1] > num_dims:
+                arrays.append(records.iloc[:, num_dims].astype(str).to_numpy())
+            else:
+                arrays.append(np.array([""] * len(records), dtype=object))
+        else:
+            # Parameter / Variable / Equation: per-column gt SV -> gdxpds
+            # canonical substitution, returning a fresh ndarray per col.
+            for k in range(num_dims, records.shape[1]):
+                arrays.append(_convert_transfer_value_col(records.iloc[:, k]))
+
+        df = pd.DataFrame({i: a for i, a in enumerate(arrays)}, copy=False)
         df.columns = out_cols
         symbol.dataframe = df
         symbol._loaded = True

@@ -1,4 +1,4 @@
-__version__ = "3.0.0"
+__version__ = "3.1.0"
 
 from gdxpds._engine import Engine, EngineError
 from gdxpds.gdx import DomainError, GdxError, SymbolNotFoundError, TransferError
