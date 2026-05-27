@@ -30,9 +30,7 @@ def build_param():
         {
             "i": np.array([f"i{i}" for i in range(n_i)], dtype=object)[idx % n_i],
             "j": np.array([f"j{i}" for i in range(n_j)], dtype=object)[(idx // n_i) % n_j],
-            "k": np.array([f"k{i}" for i in range(n_k)], dtype=object)[
-                (idx // (n_i * n_j)) % n_k
-            ],
+            "k": np.array([f"k{i}" for i in range(n_k)], dtype=object)[(idx // (n_i * n_j)) % n_k],
             "l": np.array([f"l{i}" for i in range(n_l)], dtype=object)[
                 (idx // (n_i * n_j * n_k)) % n_l
             ],

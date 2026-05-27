@@ -34,6 +34,16 @@ from gdxpds.tools import Error, NeedsGamsDir
 
 logger = logging.getLogger(__name__)
 
+# Pandas >= 3 has Copy-on-Write always enabled, so a shallow copy of the
+# caller's DataFrame in :meth:`GdxSymbol.dataframe.setter` is safe -- a later
+# user-side mutation of the source frame triggers a copy and does not leak into
+# the stored frame. On pandas < 3 (no CoW), the shallow copy shares column
+# storage with the caller and the assignment-captures-a-snapshot contract
+# requires a deep copy. Gating this saves an O(rows * num_dims) string-ref
+# allocation per write on pandas 3 (~22 MB on a 500K-row Parameter), which
+# dominates the gams_transfer engine's write-time peak vs raw_transfer.
+_PANDAS_HAS_COW: bool = int(pd.__version__.split(".", 1)[0]) >= 3
+
 
 def _stable_topological_sort(names, parents_of):
     """
@@ -1324,14 +1334,12 @@ class GdxSymbol:
         try:
             # get data in common format and start dealing with dimensions
             if isinstance(data, pd.DataFrame):
-                # Shallow copy: column rename / append-default-values below
-                # operate on the local ``df`` only; underlying arrays stay
-                # shared with the caller's frame. The previous deep copy
-                # allocated O(rows * num_dims) string-ref bytes per write
-                # (~22 MB on the 500K-row synthetic Parameter, scaling
-                # linearly), which dominated the gams_transfer engine's
-                # write-time peak vs raw_transfer.
-                df = data.copy(deep=False)
+                # Shallow copy on pandas 3 (CoW always on): the stored frame
+                # stays independent of caller-side mutations because any write
+                # to ``data`` triggers CoW. On pandas < 3 a shallow copy would
+                # share column storage with the caller, breaking the
+                # assignment-captures-a-snapshot contract -- fall back to deep.
+                df = data.copy(deep=not _PANDAS_HAS_COW)
                 has_col_names = True
             else:
                 df = pd.DataFrame(data)
