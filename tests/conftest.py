@@ -26,10 +26,20 @@ def clean_up(request):
 # gams_transfer, ratio) where ratio = gdxcc / gams_transfer (>1 = transfer faster).
 _ENGINE_TIMINGS = []
 
+# Rows appended by tests/test_engine_timing.py::test_synthetic_write_memory.
+# Each row: dict(engine, rows, gdx_mb, peak_mb, ratio, seconds) where ratio is
+# peak Python memory / GDX on-disk size (v3.1.0 target per wrap-up plan: <= 3x).
+_ENGINE_MEMORY = []
+
 
 @pytest.fixture(scope="session")
 def engine_timings():
     return _ENGINE_TIMINGS
+
+
+@pytest.fixture(scope="session")
+def engine_memory():
+    return _ENGINE_MEMORY
 
 
 def _crossover_note(rows, op):
@@ -83,6 +93,25 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         note = _crossover_note(rows, op)
         if note:
             tr.write_line(note)
+
+    mem_rows = _ENGINE_MEMORY
+    if mem_rows:
+        tr.write_sep("=", "synthetic-write memory (peak Python memory via tracemalloc)")
+        tr.write_line(
+            "peak Python memory during to_gdx; ratio = peak_MB / gdx_MB "
+            "(v3.1.0 target: <= 3x; pre-opt baseline is several x above)"
+        )
+        header = (
+            f"{'engine':16s} {'rows':>10s} {'gdx_MB':>9s} "
+            f"{'peak_MB':>10s} {'ratio':>7s} {'seconds':>9s}"
+        )
+        tr.write_line(header)
+        tr.write_line("-" * len(header))
+        for r in sorted(mem_rows, key=lambda r: r["engine"]):
+            tr.write_line(
+                f"{r['engine']:16s} {r['rows']:10,d} {r['gdx_mb']:9.2f} "
+                f"{r['peak_mb']:10.2f} {r['ratio']:7.2f} {r['seconds']:9.3f}"
+            )
 
 
 @pytest.fixture(scope="session")
