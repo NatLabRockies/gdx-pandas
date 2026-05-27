@@ -1324,7 +1324,14 @@ class GdxSymbol:
         try:
             # get data in common format and start dealing with dimensions
             if isinstance(data, pd.DataFrame):
-                df = data.copy()
+                # Shallow copy: column rename / append-default-values below
+                # operate on the local ``df`` only; underlying arrays stay
+                # shared with the caller's frame. The previous deep copy
+                # allocated O(rows * num_dims) string-ref bytes per write
+                # (~22 MB on the 500K-row synthetic Parameter, scaling
+                # linearly), which dominated the gams_transfer engine's
+                # write-time peak vs raw_transfer.
+                df = data.copy(deep=False)
                 has_col_names = True
             else:
                 df = pd.DataFrame(data)
