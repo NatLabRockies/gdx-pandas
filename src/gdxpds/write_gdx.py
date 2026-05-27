@@ -263,12 +263,15 @@ def to_gdx(
         If provided, the gdx file will be written to this path
     gams_dir : None or pathlib.Path or str
     domains : None or dict of str to (list or tuple) of (str or None)
-        Optional subset/domain relationships, string-based. Each entry maps a child symbol's name
-        to a list or tuple of its parent Set names, one per dimension, with ``None`` slots
-        mapping to the GAMS wildcard (``'*'``). When provided, the resulting :class:`Translator`
-        (1) topologically sorts ``dataframes`` so each parent precedes its children and (2)
-        wires up strict :c:func:`gdxSymbolSetDomain` writes for each listed child. Any invalid
-        input (unknown parent name, wrong type, wrong length, cyclic references) raises
+        Optional domain relationships, string-based. Any symbol type can carry a domain --
+        a Set's domain is a *subset* relationship, a Parameter/Variable/Equation's is an
+        *indexed-over* relationship -- and the parent named in each slot must itself be a
+        Set or Alias-of-Set. Each entry maps a child symbol's name to a list or tuple of
+        its parent Set names, one per dimension, with ``None`` slots mapping to the GAMS
+        wildcard (``'*'``). When provided, the resulting :class:`Translator` (1) topologically
+        sorts ``dataframes`` so each parent precedes its children and (2) wires up strict
+        :c:func:`gdxSymbolSetDomain` writes for each listed child. Any invalid input
+        (unknown parent name, wrong type, wrong length, cyclic references) raises
         :class:`DomainError`.
 
     engine : None or str or :py:class:`gdxpds.Engine`

@@ -184,7 +184,11 @@ def get_subset_relationships(
     engine: str | Engine | None = None,
 ) -> dict[str, list[str | None]]:
     """
-    Returns the subset (domain) relationships recorded in ``gdx_file``, keyed by symbol name.
+    Returns the domain relationships recorded in ``gdx_file``, keyed by symbol name.
+
+    Any symbol type (Set, Parameter, Variable, Equation) can carry a domain -- a Set's
+    domain is a *subset* relationship, a Parameter/Variable/Equation's is an *indexed-over*
+    relationship -- and the parent named in each slot is a Set or Alias-of-Set.
 
     Outputs a dict that maps each symbol name to a list with one entry per dimension, giving the
     parent Set name recorded for that dimension. A dimension whose domain is the wildcard

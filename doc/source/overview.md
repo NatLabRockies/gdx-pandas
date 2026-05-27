@@ -44,10 +44,10 @@ Additional functions include:
 - {py:func}`gdxpds.list_symbols`
 - {py:func}`gdxpds.get_data_types`
 - {py:func}`gdxpds.to_dataframe` — returns the named symbol's data as a plain DataFrame.
-- {py:func}`gdxpds.get_subset_relationships` — read the subset (domain) relationships out of a GDX file, returned as `{symbol_name: [parent_name_or_None_for_wildcard, ...]}`.
+- {py:func}`gdxpds.get_subset_relationships` — read the domain relationships out of a GDX file, returned as `{symbol_name: [parent_name_or_None_for_wildcard, ...]}`. Any symbol type (Set, Parameter, Variable, Equation) can carry a domain; the parent in each slot is a Set or Alias-of-Set.
 - {py:func}`gdxpds.get_aliases` — read the alias relationships out of a GDX file, returned as `{alias_name: parent_name}`. Symbols that are not aliases are not included.
 
-To create a GDX with strict subset relationships from the direct-conversion API, pass a `domains=` mapping to {py:func}`gdxpds.to_gdx`:
+To create a GDX with strict domain relationships from the direct-conversion API, pass a `domains=` mapping to {py:func}`gdxpds.to_gdx`. Any symbol type can carry a domain (a Set's domain is a *subset* relationship; a Parameter/Variable/Equation's is an *indexed-over* relationship); the parent named in each slot must be a Set or Alias-of-Set:
 
 ```python
 import gdxpds
@@ -67,7 +67,7 @@ print(gdxpds.get_subset_relationships('data.gdx'))
 # {'a': ['a'], 'sub_a': ['a']}
 ```
 
-The `domains=` keys are child symbol names; each value is the list of parent Set names (or `None` for the wildcard `'*'`), one entry per dimension. `to_gdx` topologically sorts the input so each parent is written before its children. The Direct Conversion API is **string-based** — parents are named by string. For an object-reference-based API (live links to parent `GdxSymbol`'s, useful when mutating or composing files in Python), see [Subset (Domain) Relationships](#subset-domain-relationships) under [Object-Oriented API](#object-oriented-api).
+The `domains=` keys are child symbol names; each value is the list of parent Set names (or `None` for the wildcard `'*'`), one entry per dimension. `to_gdx` topologically sorts the input so each parent is written before its children. The Direct Conversion API is **string-based** — parents are named by string. For an object-reference-based API (live links to parent `GdxSymbol`'s, useful when mutating or composing files in Python), see [Domain Relationships](#domain-relationships) under [Object-Oriented API](#object-oriented-api).
 
 Aliases work the same way: pass an `aliases=` mapping (alias name → parent Set name) to {py:func}`gdxpds.to_gdx`, and read the relationships back with {py:func}`gdxpds.get_aliases`:
 
@@ -153,9 +153,10 @@ with GdxFile() as gdx:
         }),
     )
 
-    # A Set with an explicit subset (strict domain) of u. See "Subset (Domain)
-    # Relationships". The convenience `domain=[u]` reference triggers a strict
-    # gdxSymbolSetDomain write.
+    # A Set with an explicit strict domain of u (a subset relationship). See
+    # "Domain Relationships". The convenience `domain=[u]` reference triggers
+    # a strict gdxSymbolSetDomain write; the same mechanism works for a
+    # Parameter/Variable/Equation child (indexed-over rather than subset).
     append_set(
         gdx, 'sub_u',
         pd.DataFrame({'u': [f'u{i}' for i in range(1, 6)]}),
@@ -245,9 +246,14 @@ The same reorder applies to **any** symbol whose dimensions reference reordered 
 
 **Workaround.** Write the order-sensitive symbol first, so its order fixes the UEL-pool indices for every later symbol that references the same elements. With `years` placed before `leading` in the dict above, `years` round-trips as `['2008', '2010', '2015', '2020']`. Regression coverage lives in [tests/test_set_ordering.py](https://github.com/NatLabRockies/gdx-pandas/blob/main/tests/test_set_ordering.py).
 
-#### Subset (Domain) Relationships
+#### Domain Relationships
 
-A Set in GAMS may be declared as a *subset* of another Set — `set sub_a(a)` declares `sub_a` over the domain `a`. GDX records this relationship per symbol via the {c:func}`gdxSymbolGetDomainX` / {c:func}`gdxSymbolSetDomain` API. `gdxpds` surfaces it through two complementary attributes on `GdxSymbol`:
+Any GDX symbol type — Set, Parameter, Variable, Equation — can declare a strict domain over one or more **parent Sets**. The relationship's semantics differ by child type, but the mechanics in GDX (and in `gdxpds`) are identical:
+
+- **Set on Set** is a *subset* relationship: `set sub_a(a)` declares `sub_a` ⊆ `a` (only members of `a` may appear in `sub_a`).
+- **Parameter / Variable / Equation on Set** is an *indexed-over* relationship: `parameter p(a)` declares that `p` is defined on `a`'s elements.
+
+GDX records the relationship per symbol via the {c:func}`gdxSymbolGetDomainX` / {c:func}`gdxSymbolSetDomain` API. The parent named in each domain slot must be a Set or Alias-of-Set — this is what `gdxSymbolSetDomain` enforces at write time. `gdxpds` surfaces it through three complementary attributes on `GdxSymbol`:
 
 - `GdxSymbol.dims` is the always-string list of dimension labels (today's API; unchanged).
 - `GdxSymbol.domain` is an optional list of parent-set *references* — each entry is either a `GdxSymbol` object (the parent) or `None` (the wildcard `'*'`). When set, this attribute flags the symbol for strict (`gdxSymbolSetDomain`) writes.
@@ -285,11 +291,35 @@ with gdxpds.gdx.GdxFile() as gdx:
     gdx.write('data.gdx')
 ```
 
-The convenience functions {py:func}`gdxpds.gdx.append_set` and {py:func}`gdxpds.gdx.append_parameter` both accept a `domain=` kwarg and return the appended `GdxSymbol`, so the same flow chains naturally:
+The same `domain=[parent]` mechanism works for a Parameter (or Variable, or Equation) child — only the semantics differ ("indexed over `a`" rather than "subset of `a`"):
+
+```python
+import gdxpds.gdx
+import pandas as pd
+
+with gdxpds.gdx.GdxFile() as gdx:
+    gdx.append(gdxpds.gdx.GdxSymbol('a', gdxpds.gdx.GamsDataType.Set, dims=['a']))
+    gdx[-1].dataframe = pd.DataFrame(
+        [['a1', True], ['a2', True], ['a3', True]],
+        columns=['a', 'Value'])
+
+    # Parameter strictly indexed over 'a'. Same `domain=[parent]` reference,
+    # same gdxSymbolSetDomain write path.
+    gdx.append(gdxpds.gdx.GdxSymbol(
+        'p', gdxpds.gdx.GamsDataType.Parameter, dims=['a'], domain=[gdx['a']]))
+    gdx[-1].dataframe = pd.DataFrame(
+        [['a1', 1.0], ['a2', 2.0], ['a3', 3.0]], columns=['a', 'Value'])
+
+    gdx.write('data.gdx')
+```
+
+The convenience functions {py:func}`gdxpds.gdx.append_set` and {py:func}`gdxpds.gdx.append_parameter` both accept a `domain=` kwarg and return the appended `GdxSymbol`, so the same flow chains naturally for either child type:
 
 ```python
 parent = gdxpds.gdx.append_set(gdx, 'a', pd.DataFrame({'a': ['a1', 'a2']}))
-child  = gdxpds.gdx.append_set(gdx, 'sub_a', pd.DataFrame({'a': ['a1']}), domain=[parent])
+sub    = gdxpds.gdx.append_set(gdx, 'sub_a', pd.DataFrame({'a': ['a1']}), domain=[parent])
+p      = gdxpds.gdx.append_parameter(
+    gdx, 'p', pd.DataFrame({'a': ['a1', 'a2'], 'Value': [1.0, 2.0]}), domain=[parent])
 ```
 
 Passing a `GdxSymbol` reference in `domain` is the only trigger for strict writes. Plain strings via `dims=` always stay relaxed — there is no auto-promotion from name to ref.
@@ -500,7 +530,7 @@ gdxpds can move data between GDX files and DataFrames through either of two engi
 - **`"gams_transfer"`** (the default, when usable) uses GAMS's `gams.transfer` library (shipped inside `gamsapi`). It is **much faster on large files** — roughly 2× faster to read and 4× faster to write a ~2 MB GDX, widening to an order of magnitude or more on hundreds-of-MB files — but its fixed per-file overhead makes it *slower* than `gdxcc` on very small files.
 - **`"gdxcc"`** (the fallback) uses SWIG-bound `gdxcc` calls and works with either GAMS Python binding.
 
-`gams.transfer` is only usable when a compatible `gamsapi` is installed (see [Install → Preliminaries](index.md#preliminaries)); this is checked at runtime and stored in `gdxpds.HAVE_GAMS_TRANSFER`. The **default** prefers `gams.transfer` and quietly falls back to `gdxcc` when it isn't usable, so gdxcc-only environments are unaffected. An *explicit* request for an unavailable engine raises {py:class}`gdxpds.EngineError` rather than falling back. Both engines produce identical DataFrames and GDX files under almost all circumstances — see the [Subset (Domain) Relationships](#subset-domain-relationships) and [Aliases](#aliases) notes above for the known edge cases.
+`gams.transfer` is only usable when a compatible `gamsapi` is installed (see [Install → Preliminaries](index.md#preliminaries)); this is checked at runtime and stored in `gdxpds.HAVE_GAMS_TRANSFER`. The **default** prefers `gams.transfer` and quietly falls back to `gdxcc` when it isn't usable, so gdxcc-only environments are unaffected. An *explicit* request for an unavailable engine raises {py:class}`gdxpds.EngineError` rather than falling back. Both engines produce identical DataFrames and GDX files under almost all circumstances — see the [Domain Relationships](#domain-relationships) and [Aliases](#aliases) notes above for the known edge cases.
 
 Two behavioral differences between the engines:
 
