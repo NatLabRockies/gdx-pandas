@@ -191,3 +191,118 @@ def test_synthetic_write_memory(synthetic_param, tmp_path, engine, engine_memory
 
     # Sanity only: the engine ran and produced a file (no memory threshold).
     assert gdx_mb > 0
+
+
+def _raw_gdxcc_write(df: pd.DataFrame, num_dims: int, out_path: str, gams_dir: str) -> None:
+    """Minimum Python required to write ``df`` as a Parameter via the raw SWIG
+    ``gdxDataWriteStr`` loop. No special-value handling, no per-value isinstance
+    checks -- just pre-built dim lists + pre-cast float64 values fed straight
+    into the C API. This is the hard floor the gdxpds gdxcc engine is measured
+    against (wrap-up plan target: <= 1.3x the time of this loop at 1M rows)."""
+    try:
+        from gams.core import gdx as gdxcc
+    except ImportError:
+        import gdxcc  # type: ignore[no-redef]
+
+    from gdxpds.tools import _GdxHandle
+
+    # Pre-build dim lists and value array (the gdxpds-equivalent work a user
+    # would have to do themselves to feed gdxDataWriteStr from a DataFrame).
+    dim_lists = df.iloc[:, :num_dims].astype(str).to_numpy().tolist()
+    value_arr = df.iloc[:, num_dims].to_numpy(dtype=np.float64, copy=True)
+    n = len(df)
+
+    with _GdxHandle(gdxcc, gams_dir, "raw-baseline") as h:
+        H = h.H
+        if not gdxcc.gdxOpenWrite(H, out_path, "raw-baseline"):
+            raise RuntimeError("gdxOpenWrite failed in raw baseline")
+        gdxcc.gdxDataWriteStrStart(H, "p", "", num_dims, 1, 0)  # 1 = GMS_DT_PAR
+        values = gdxcc.doubleArray(gdxcc.GMS_VAL_MAX)
+        for r in range(n):
+            values[0] = value_arr[r]
+            gdxcc.gdxDataWriteStr(H, dim_lists[r], values)
+        gdxcc.gdxDataWriteDone(H)
+        gdxcc.gdxClose(H)
+
+
+def _raw_transfer_write(df: pd.DataFrame, num_dims: int, out_path: str, gams_dir: str) -> None:
+    """Minimum Python required to write ``df`` as a Parameter via ``gams.transfer``:
+    rename the value column to lowercase (gt's convention), build a Container with
+    one Parameter, and call ``container.write``. The metadata-only ``rename`` does
+    not copy data. This is the hard floor the gdxpds transfer engine is measured
+    against (wrap-up plan target: <= 1.5x the time of this on the 145 MB workload)."""
+    import gams.transfer as gt
+
+    # gams.transfer wants the value column named "value" (lowercase); rename
+    # produces a shallow view under pandas 2.2+ copy-on-write, so no data copy.
+    new_cols = list(df.columns[:num_dims]) + ["value"]
+    records = df.set_axis(new_cols, axis=1)
+    container = gt.Container(system_directory=gams_dir)
+    gt.Parameter(container, "p", domain=["*"] * num_dims, records=records)
+    container.write(out_path, eps_to_zero=False)
+
+
+def test_raw_gdxcc_write_baseline(synthetic_param, tmp_path, engine_memory):
+    """Pre-cast, pre-stringified, no-overhead gdxDataWriteStr loop. The result
+    appears in the memory table as ``raw_gdxcc`` so the gdxpds gdxcc engine's
+    ratio (peak_MB and seconds) can be read off directly."""
+    from gdxpds.tools import GamsDirFinder
+
+    df = synthetic_param
+    num_dims = len(df.columns) - 1
+    out = str(tmp_path / "raw_gdxcc.gdx")
+    gams_dir = GamsDirFinder().gams_dir
+
+    # Warm-up: load gdxcc + bring up a handle once before the measured window.
+    _raw_gdxcc_write(df.head(1), num_dims, str(tmp_path / "warm_raw_gdxcc.gdx"), gams_dir)
+
+    t = time.perf_counter()
+    _, peak = _peak_python_memory(lambda: _raw_gdxcc_write(df, num_dims, out, gams_dir))
+    elapsed = time.perf_counter() - t
+
+    gdx_mb = os.path.getsize(out) / (1024 * 1024)
+    peak_mb = peak / (1024 * 1024)
+    engine_memory.append(
+        {
+            "engine": "raw_gdxcc",
+            "rows": len(df),
+            "gdx_mb": gdx_mb,
+            "peak_mb": peak_mb,
+            "ratio": peak_mb / gdx_mb if gdx_mb > 0 else float("inf"),
+            "seconds": elapsed,
+        }
+    )
+    assert gdx_mb > 0
+
+
+def test_raw_transfer_write_baseline(synthetic_param, tmp_path, engine_memory):
+    """Minimum-effort ``gams.transfer`` write. The result appears in the memory
+    table as ``raw_transfer`` so the gdxpds transfer engine's ratio (peak_MB and
+    seconds) can be read off directly."""
+    from gdxpds.tools import GamsDirFinder
+
+    df = synthetic_param
+    num_dims = len(df.columns) - 1
+    out = str(tmp_path / "raw_transfer.gdx")
+    gams_dir = GamsDirFinder().gams_dir
+
+    # Warm-up: pay first-time gams.transfer container bring-up cost.
+    _raw_transfer_write(df.head(1), num_dims, str(tmp_path / "warm_raw_transfer.gdx"), gams_dir)
+
+    t = time.perf_counter()
+    _, peak = _peak_python_memory(lambda: _raw_transfer_write(df, num_dims, out, gams_dir))
+    elapsed = time.perf_counter() - t
+
+    gdx_mb = os.path.getsize(out) / (1024 * 1024)
+    peak_mb = peak / (1024 * 1024)
+    engine_memory.append(
+        {
+            "engine": "raw_transfer",
+            "rows": len(df),
+            "gdx_mb": gdx_mb,
+            "peak_mb": peak_mb,
+            "ratio": peak_mb / gdx_mb if gdx_mb > 0 else float("inf"),
+            "seconds": elapsed,
+        }
+    )
+    assert gdx_mb > 0

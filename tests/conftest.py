@@ -99,18 +99,31 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
         tr.write_sep("=", "synthetic-write memory (peak Python memory via tracemalloc)")
         tr.write_line(
             "peak Python memory during to_gdx; ratio = peak_MB / gdx_MB "
-            "(v3.1.0 target: <= 3x; pre-opt baseline is several x above)"
+            "(v3.1.0 target: <= 3x; pre-opt baseline is several x above). "
+            "x raw = engine seconds / paired raw_* baseline seconds "
+            "(targets: gdxcc <= 1.3x raw_gdxcc, gams_transfer <= 1.5x raw_transfer)."
         )
         header = (
             f"{'engine':16s} {'rows':>10s} {'gdx_MB':>9s} "
-            f"{'peak_MB':>10s} {'ratio':>7s} {'seconds':>9s}"
+            f"{'peak_MB':>10s} {'ratio':>7s} {'seconds':>9s} {'x raw':>7s}"
         )
         tr.write_line(header)
         tr.write_line("-" * len(header))
+        # Pair each gdxpds engine with its raw counterpart by name; raw rows
+        # show "-" since they ARE the baseline.
+        raw_seconds = {
+            r["engine"]: r["seconds"] for r in mem_rows if r["engine"].startswith("raw_")
+        }
+        pair = {"gdxcc": "raw_gdxcc", "gams_transfer": "raw_transfer"}
         for r in sorted(mem_rows, key=lambda r: r["engine"]):
+            raw = pair.get(r["engine"])
+            if raw is not None and raw_seconds.get(raw):
+                x_raw = f"{r['seconds'] / raw_seconds[raw]:6.2f}x"
+            else:
+                x_raw = "     -"
             tr.write_line(
                 f"{r['engine']:16s} {r['rows']:10,d} {r['gdx_mb']:9.2f} "
-                f"{r['peak_mb']:10.2f} {r['ratio']:7.2f} {r['seconds']:9.3f}"
+                f"{r['peak_mb']:10.2f} {r['ratio']:7.2f} {r['seconds']:9.3f} {x_raw:>7s}"
             )
 
 
