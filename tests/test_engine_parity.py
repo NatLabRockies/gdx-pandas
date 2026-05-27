@@ -53,7 +53,7 @@ def test_read_parity(data_dir, fixture):
 def test_read_parity_special_values():
     # Write a Parameter carrying each producible special value via the gdxcc
     # write path, then assert both engines read it back identically.
-    eps = np.finfo(float).eps
+    eps = np.finfo(float).tiny  # gdxpds' numpy encoding of GAMS EPS
     df = pd.DataFrame(
         {"i": ["a", "b", "c", "d", "e", "f"], "Value": [np.nan, np.inf, -np.inf, eps, 0.0, 1.5]}
     )
@@ -139,7 +139,7 @@ def test_write_parity(data_dir, fixture, tmp_path):
 
 
 def test_write_parity_special_values(tmp_path):
-    eps = np.finfo(float).eps
+    eps = np.finfo(float).tiny  # gdxpds' numpy encoding of GAMS EPS
     dfs = {
         "p": pd.DataFrame(
             {"i": ["a", "b", "c", "d", "e"], "Value": [np.nan, np.inf, -np.inf, eps, 0.0]}
@@ -147,6 +147,30 @@ def test_write_parity_special_values(tmp_path):
         "scalar": pd.DataFrame({"Value": [42.0]}),
     }
     _assert_matrix_consistent(_write_read_matrix(dfs, tmp_path))
+
+
+def test_write_parity_small_floats_not_eps(tmp_path):
+    """Regression for #39: small floats below v3.x's machine-epsilon EPS band
+    survive the write/read round-trip as themselves through both engines.
+
+    Previously these would silently map to GAMS EPS and read back as
+    ``np.finfo(float).eps``; now only the exact ``np.finfo(float).tiny``
+    sentinel maps to EPS.
+    """
+    small_eps = np.finfo(float).eps
+    dfs = {
+        "p": pd.DataFrame(
+            {
+                "i": ["a", "b", "c", "d"],
+                "Value": [1e-200, small_eps, 1e-100, 1.5],
+            }
+        )
+    }
+    matrix = _write_read_matrix(dfs, tmp_path)
+    _assert_matrix_consistent(matrix)
+    for dfs_out in matrix.values():
+        vals = dfs_out["p"]["Value"].tolist()
+        assert vals == [1e-200, small_eps, 1e-100, 1.5]
 
 
 def test_write_parity_undef(tmp_path):

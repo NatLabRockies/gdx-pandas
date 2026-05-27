@@ -133,16 +133,37 @@ def test_special_integrity():
 
 
 def test_numpy_eps():
-    assert gdxpds.special.is_np_eps(np.finfo(float).eps)
+    # v4+: GAMS EPS encodes as np.finfo(float).tiny (smallest normal positive
+    # float). Exact equality only: legitimate small floats like machine
+    # epsilon, 1e-200, etc. must NOT match (#39).
+    assert gdxpds.special.is_np_eps(np.finfo(float).tiny)
     assert not gdxpds.special.is_np_eps(0.0)
-    assert not gdxpds.special.is_np_eps(2.0 * np.finfo(float).eps)
+    assert not gdxpds.special.is_np_eps(2.0 * np.finfo(float).tiny)
+    assert not gdxpds.special.is_np_eps(np.finfo(float).eps)
+    assert not gdxpds.special.is_np_eps(1e-200)
 
 
 def test_convert_np_to_gdx_svs_eps():
     test_df = pd.DataFrame(
-        [["a", np.finfo(float).eps], ["b", 0.0], ["c", 2.0 * np.finfo(float).eps]],
+        [["a", np.finfo(float).tiny], ["b", 0.0], ["c", 2.0 * np.finfo(float).tiny]],
         columns=["A", "Value"],
     )
     result_df = gdxpds.special.convert_np_to_gdx_svs(test_df, num_dims=1)
-    expected_df = pd.Series([gdxpds.special.SPECIAL_VALUES[4], 0.0, 2.0 * np.finfo(float).eps])
+    expected_df = pd.Series([gdxpds.special.SPECIAL_VALUES[4], 0.0, 2.0 * np.finfo(float).tiny])
     assert result_df["Value"].equals(expected_df)
+
+
+def test_small_float_is_not_eps():
+    """Regression for #39: legitimate small floats survive the write/read
+    round-trip as themselves, not as GAMS EPS."""
+    test_df = pd.DataFrame(
+        [["a", 1e-200], ["b", np.finfo(float).eps], ["c", 1e-100]],
+        columns=["A", "Value"],
+    )
+    result_df = gdxpds.special.convert_np_to_gdx_svs(test_df, num_dims=1)
+    # None of these should have been mapped to the GAMS EPS magic float
+    # (SPECIAL_VALUES[4]); they pass through as ordinary small floats.
+    assert (result_df["Value"].to_numpy() != gdxpds.special.SPECIAL_VALUES[4]).all()
+    assert result_df["Value"].iloc[0] == 1e-200
+    assert result_df["Value"].iloc[1] == np.finfo(float).eps
+    assert result_df["Value"].iloc[2] == 1e-100

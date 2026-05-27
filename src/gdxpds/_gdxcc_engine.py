@@ -65,7 +65,7 @@ def _gdx_to_np_svs(arr: np.ndarray) -> np.ndarray:
         NA    -> ``np.nan``
         +Inf  -> ``np.inf``
         -Inf  -> ``-np.inf``
-        EPS   -> ``np.finfo(float).eps``
+        EPS   -> ``np.finfo(float).tiny``
     """
     undef_mf, na_mf, pinf_mf, ninf_mf, eps_mf = (special.SPECIAL_VALUES[i] for i in range(5))
     eps = special.NUMPY_SPECIAL_VALUES[-1]
@@ -134,9 +134,10 @@ def _coerce_value_col(col_data: pd.Series, n_rows: int) -> np.ndarray:
     nan_mask = np.isnan(arr)
     pinf_mask = arr == np.inf
     ninf_mask = arr == -np.inf
-    # NaN values fall out of the eps band naturally: arr - eps is NaN for NaN
-    # entries, and `np.abs(NaN) < eps` is False.
-    eps_mask = np.abs(arr - eps) < eps
+    # Exact equality on the EPS sentinel: a legitimate small float (e.g.
+    # 1e-200) must not silently map to GAMS EPS on write (#39). NaN naturally
+    # falls out of the comparison (NaN == x is always False).
+    eps_mask = arr == eps
     arr[nan_mask] = special.SPECIAL_VALUES[1]  # GDX NA
     arr[pinf_mask] = special.SPECIAL_VALUES[2]  # GDX +Inf
     arr[ninf_mask] = special.SPECIAL_VALUES[3]  # GDX -Inf

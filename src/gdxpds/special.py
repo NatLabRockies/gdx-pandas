@@ -5,10 +5,16 @@ import numpy as np
 logger = logging.getLogger(__name__)
 
 
-#                      1E300,  2E300,  3E300,   4E300,               5E300
-NUMPY_SPECIAL_VALUES = [None, np.nan, np.inf, -np.inf, np.finfo(float).eps]
+#                      1E300,  2E300,  3E300,   4E300,                5E300
+NUMPY_SPECIAL_VALUES = [None, np.nan, np.inf, -np.inf, np.finfo(float).tiny]
 """List of numpy special values in gdxGetSpecialValues order, i.e.,
-[None, np.nan, np.inf, -np.inf, np.finfo(float).eps]
+[None, np.nan, np.inf, -np.inf, np.finfo(float).tiny]
+
+GAMS EPS is the GAMS "infinitesimal" -- a non-zero value distinct from 0 -- so
+we encode it on the numpy side as ``np.finfo(float).tiny`` (smallest normal
+positive float, ~2.22e-308). v3.x and earlier used ``np.finfo(float).eps``
+(machine epsilon, ~2.22e-16); that was conceptually wrong, and it silently
+mapped any legitimate small float ``<= eps`` to GAMS EPS on write. See #39.
 """
 
 
@@ -55,9 +61,13 @@ def is_np_eps(val):
     Returns
     -------
     bool
-        True if val is equal to eps (np.finfo(float).eps), False otherwise
+        True if val is exactly the numpy encoding of GAMS EPS
+        (:data:`NUMPY_SPECIAL_VALUES[-1]`, i.e. ``np.finfo(float).tiny``);
+        False otherwise. Exact equality (no tolerance band): only the
+        sentinel maps to GAMS EPS, so legitimate small floats like ``1e-200``
+        round-trip as themselves.
     """
-    return np.abs(val - NUMPY_SPECIAL_VALUES[-1]) < NUMPY_SPECIAL_VALUES[-1]
+    return val == NUMPY_SPECIAL_VALUES[-1]
 
 
 def is_np_sv(val):
@@ -100,10 +110,11 @@ def convert_np_to_gdx_svs(df, num_dims):
     # fillna and apply map to value columns, then merge with dimensional columns
     try:
         values = tmp.iloc[:, num_dims:].replace(NP_TO_GDX_SVS, value=None)
-        # DataFrame.replace is generally not sufficient to identify EPS values
-        values[(values - NUMPY_SPECIAL_VALUES[-1]).abs() < NUMPY_SPECIAL_VALUES[-1]] = (
-            SPECIAL_VALUES[4]
-        )
+        # ``DataFrame.replace`` on the float-keyed NP_TO_GDX_SVS doesn't always
+        # match the EPS sentinel under pandas' float-equality rules, so detect
+        # the sentinel explicitly. Exact equality: a legitimate small float
+        # (e.g. 1e-200) must not silently map to GAMS EPS (#39).
+        values[values == NUMPY_SPECIAL_VALUES[-1]] = SPECIAL_VALUES[4]
         tmp = (tmp.iloc[:, :num_dims]).merge(values, left_index=True, right_index=True)
     except Exception:
         logger.error(
