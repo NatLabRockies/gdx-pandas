@@ -221,6 +221,30 @@ df = gdxpds.to_dataframe('data.gdx', 's')
 print(df['Value'].tolist())   # ['alpha', '', 'gamma']
 ```
 
+#### Element ordering and the UEL pool
+
+GDX maintains a single file-wide string table — the **UEL pool** — and every symbol's records are stored sorted by that pool's index. The pool is populated in first-encounter order: whichever symbol introduces a UEL first fixes its index for the rest of the file. A later symbol that references the same UEL gets it back in the earlier symbol's position, regardless of where the UEL appeared in the later symbol's input DataFrame.
+
+This is GAMS file-format behavior (visible directly via `gdxdump`), not a `gdxpds` choice — it reproduces on both the `gdxcc` and `gams_transfer` engines.
+
+The user-visible symptom shows up most clearly on Sets, since a Set's records *are* its element list:
+
+```python
+import pandas as pd
+import gdxpds
+gdxpds.to_gdx({
+    'leading': pd.DataFrame({'i': ['2010', '2015', '2020'], 'Value': [True] * 3}),
+    'years':   pd.DataFrame({'i': ['2008', '2010', '2015', '2020'], 'Value': [True] * 4}),
+}, 'data.gdx')
+print(gdxpds.to_dataframes('data.gdx')['years']['i'].tolist())
+# ['2010', '2015', '2020', '2008']  -- 2008 moves to the end because it was
+#                                       registered last
+```
+
+The same reorder applies to **any** symbol whose dimensions reference reordered UELs — a `Parameter`, `Variable`, or `Equation` indexed by `years` would have its rows in the same `2010, 2015, 2020, 2008` order, not the input order.
+
+**Workaround.** Write the order-sensitive symbol first, so its order fixes the UEL-pool indices for every later symbol that references the same elements. With `years` placed before `leading` in the dict above, `years` round-trips as `['2008', '2010', '2015', '2020']`. Regression coverage lives in [tests/test_set_ordering.py](https://github.com/NatLabRockies/gdx-pandas/blob/main/tests/test_set_ordering.py).
+
 #### Subset (Domain) Relationships
 
 A Set in GAMS may be declared as a *subset* of another Set — `set sub_a(a)` declares `sub_a` over the domain `a`. GDX records this relationship per symbol via the {c:func}`gdxSymbolGetDomainX` / {c:func}`gdxSymbolSetDomain` API. `gdxpds` surfaces it through two complementary attributes on `GdxSymbol`:
