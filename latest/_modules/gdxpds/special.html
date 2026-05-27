@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.special &mdash; gdx-pandas 3.0.0 documentation</title>
+  <title>gdxpds.special &mdash; gdx-pandas 3.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+      <script src="../../_static/documentation_options.js?v=dd1205ac"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -52,7 +52,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#object-oriented-api">Object-Oriented API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../overview.html#set-details">Set details</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../overview.html#set-membership-and-element-text">Set membership and element text</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#element-ordering-and-the-uel-pool">Element ordering and the UEL pool</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#domain-relationships">Domain Relationships</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../overview.html#aliases">Aliases</a></li>
 </ul>
 </li>
@@ -202,7 +203,6 @@
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -238,17 +238,13 @@
     <span class="c1"># create clean copy of df</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-    <span class="c1"># apply the map to the value columns and merge with the dimensional information.</span>
-    <span class="c1"># GDX_TO_NP_SVS maps GDX UNDEF (1e300) -&gt; None; pandas 2.x&#39;s default `replace`</span>
-    <span class="c1"># silently downcasts None back to NaN when the source column is float, which</span>
-    <span class="c1"># would collapse the UNDEF/NA distinction. The option-context opts into the</span>
-    <span class="c1"># 3.x behavior locally: object dtype is preserved when None remains in the</span>
-    <span class="c1"># column, and untouched columns keep their float dtype.</span>
-    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="s2">&quot;future&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">future</span><span class="p">,</span> <span class="s2">&quot;no_silent_downcasting&quot;</span><span class="p">):</span>
-        <span class="k">with</span> <span class="n">pd</span><span class="o">.</span><span class="n">option_context</span><span class="p">(</span><span class="s2">&quot;future.no_silent_downcasting&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">):</span>
-            <span class="n">replaced</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">num_dims</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">GDX_TO_NP_SVS</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">replaced</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">num_dims</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">GDX_TO_NP_SVS</span><span class="p">)</span>
+    <span class="c1"># Apply the map to the value columns and merge with the dimensional</span>
+    <span class="c1"># information. GDX_TO_NP_SVS maps GDX UNDEF (1e300) -&gt; None; on pandas 3+</span>
+    <span class="c1"># ``replace`` no longer silently downcasts None back to NaN on float</span>
+    <span class="c1"># columns, so object dtype is preserved when None remains (the</span>
+    <span class="c1"># UNDEF/NA distinction survives). pyproject pins pandas &gt;= 2.2, where this</span>
+    <span class="c1"># is already the &quot;future&quot; behavior.</span>
+    <span class="n">replaced</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="n">num_dims</span><span class="p">:]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">GDX_TO_NP_SVS</span><span class="p">)</span>
     <span class="n">tmp</span> <span class="o">=</span> <span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">iloc</span><span class="p">[:,</span> <span class="p">:</span><span class="n">num_dims</span><span class="p">])</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">replaced</span><span class="p">,</span> <span class="n">left_index</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">tmp</span></div>
 

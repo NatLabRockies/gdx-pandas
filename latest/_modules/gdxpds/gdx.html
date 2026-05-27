@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>gdxpds.gdx &mdash; gdx-pandas 3.0.0 documentation</title>
+  <title>gdxpds.gdx &mdash; gdx-pandas 3.1.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
       <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../_static/sphinx-design.min.css?v=95c83b7e" />
@@ -13,7 +13,7 @@
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../_static/documentation_options.js?v=acc74ff5"></script>
+      <script src="../../_static/documentation_options.js?v=dd1205ac"></script>
       <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../../_static/design-tabs.js?v=f930bc37"></script>
@@ -52,7 +52,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../../overview.html#object-oriented-api">Object-Oriented API</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../overview.html#set-details">Set details</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../overview.html#set-membership-and-element-text">Set membership and element text</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../overview.html#subset-domain-relationships">Subset (Domain) Relationships</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#element-ordering-and-the-uel-pool">Element ordering and the UEL pool</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../overview.html#domain-relationships">Domain Relationships</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../overview.html#aliases">Aliases</a></li>
 </ul>
 </li>
@@ -234,6 +235,16 @@
 <span class="kn">from</span><span class="w"> </span><span class="nn">gdxpds.tools</span><span class="w"> </span><span class="kn">import</span> <span class="n">Error</span><span class="p">,</span> <span class="n">NeedsGamsDir</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># Pandas &gt;= 3 has Copy-on-Write always enabled, so a shallow copy of the</span>
+<span class="c1"># caller&#39;s DataFrame in :meth:`GdxSymbol.dataframe.setter` is safe -- a later</span>
+<span class="c1"># user-side mutation of the source frame triggers a copy and does not leak into</span>
+<span class="c1"># the stored frame. On pandas &lt; 3 (no CoW), the shallow copy shares column</span>
+<span class="c1"># storage with the caller and the assignment-captures-a-snapshot contract</span>
+<span class="c1"># requires a deep copy. Gating this saves an O(rows * num_dims) string-ref</span>
+<span class="c1"># allocation per write on pandas 3 (~22 MB on a 500K-row Parameter), which</span>
+<span class="c1"># dominates the gams_transfer engine&#39;s write-time peak vs raw_transfer.</span>
+<span class="n">_PANDAS_HAS_COW</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">3</span>
 
 
 <span class="k">def</span><span class="w"> </span><span class="nf">_stable_topological_sort</span><span class="p">(</span><span class="n">names</span><span class="p">,</span> <span class="n">parents_of</span><span class="p">):</span>
@@ -1359,6 +1370,17 @@
                     <span class="s2">&quot;domain entries must be GdxSymbol references or None. &quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;Was passed </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2"> of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="si">}</span><span class="s2"> as element of </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">.&quot;</span>
                 <span class="p">)</span>
+            <span class="k">if</span> <span class="n">d</span><span class="o">.</span><span class="n">data_type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">GamsDataType</span><span class="o">.</span><span class="n">Set</span><span class="p">,</span> <span class="n">GamsDataType</span><span class="o">.</span><span class="n">Alias</span><span class="p">):</span>
+                <span class="c1"># GDX&#39;s gdxSymbolSetDomain only accepts a Set or Alias-of-Set</span>
+                <span class="c1"># in each domain slot, so the strict-write path would fail and</span>
+                <span class="c1"># the engine would silently fall back to relaxed. Reject up front</span>
+                <span class="c1"># to match alias_of&#39;s setter behavior (see #106). Both engines</span>
+                <span class="c1"># accept Alias parents on write (verified by</span>
+                <span class="c1"># tests/test_domain.py::test_domain_accepts_alias_parent).</span>
+                <span class="k">raise</span> <span class="n">DomainError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;domain parent must be a Set (or an Alias-of-Set); &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="si">!r}</span><span class="s2"> is a </span><span class="si">{</span><span class="n">d</span><span class="o">.</span><span class="n">data_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
         <span class="k">if</span> <span class="p">(</span>
             <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dims</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">loaded</span>
@@ -1605,7 +1627,12 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># get data in common format and start dealing with dimensions</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
-                <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="c1"># Shallow copy on pandas 3 (CoW always on): the stored frame</span>
+                <span class="c1"># stays independent of caller-side mutations because any write</span>
+                <span class="c1"># to ``data`` triggers CoW. On pandas &lt; 3 a shallow copy would</span>
+                <span class="c1"># share column storage with the caller, breaking the</span>
+                <span class="c1"># assignment-captures-a-snapshot contract -- fall back to deep.</span>
+                <span class="n">df</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="ow">not</span> <span class="n">_PANDAS_HAS_COW</span><span class="p">)</span>
                 <span class="n">has_col_names</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
